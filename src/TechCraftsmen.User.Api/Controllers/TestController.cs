@@ -1,27 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
+using TechCraftsmen.User.Api.Controllers;
 using TechCraftsmen.User.Common.Dto;
 
 namespace TechCraftsmen.User.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TestController : ControllerBase
+    public class TestController : BaseController
     {
-        private readonly ILogger<TestController> _logger;
-
-        public TestController(ILogger<TestController> logger)
+        public TestController(ILogger<TestController> logger) : base(logger)
         {
-            _logger = logger;
         }
 
         [HttpGet]
         [Route("")]
-        [Route("HelloWorld")]
-        public ResultDto<string> HelloWorld()
+        public ActionResult<ResultDto<string>> HelloWorld()
         {
-            _logger.LogInformation("Hello world! User Api ON");
-
-            return new ResultDto<string>("Hello world!", "User Api ON", true);
+            return Success("Hello world!", "User Api ON");
         }
     }
 }

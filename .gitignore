@@ -43,4 +43,7 @@ msbuild.err
 msbuild.wrn
 
 # App settings
+appsettings.api.Local.json
 appsettings.api.Development.json
+appsettings.api.Staging.json
+appsettings.api.Production.json

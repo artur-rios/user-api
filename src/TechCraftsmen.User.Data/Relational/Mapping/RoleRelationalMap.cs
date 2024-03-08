@@ -19,10 +19,11 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
 
             role.ToTable(tableName, schema: "sc_user_api");
 
-            role.HasKey(u => u.Id);
+            role.HasKey(r => r.Id);
 
-            role.Property(u => u.Name).HasColumnName("name");
-            role.Property(u => u.Description).HasColumnName("description");
+            role.Property(r => r.Id).HasColumnName("id");
+            role.Property(r => r.Name).HasColumnName("name");
+            role.Property(r => r.Description).HasColumnName("description");
         }
     }
 }

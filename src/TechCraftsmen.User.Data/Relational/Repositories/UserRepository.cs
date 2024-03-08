@@ -28,11 +28,13 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
         public void Update(Core.Entities.User user)
         {
             _dbContext.Update(user);
+            _dbContext.SaveChanges();
         }
 
         public void Delete(Core.Entities.User user)
         {
             _dbContext.Remove(user);
+            _dbContext.SaveChanges();
         }
     }
 }

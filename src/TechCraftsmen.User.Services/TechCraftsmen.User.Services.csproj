@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TechCraftsmen.User.Common\TechCraftsmen.User.Common.csproj" />
     <ProjectReference Include="..\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
 </Project>

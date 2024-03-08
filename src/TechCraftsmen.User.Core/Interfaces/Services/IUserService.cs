@@ -1,10 +1,12 @@
-﻿namespace TechCraftsmen.User.Core.Interfaces.Services
+﻿using TechCraftsmen.User.Common.Dto;
+
+namespace TechCraftsmen.User.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        int CreateUser(Entities.User user);
-        Entities.User GetUserById(int id);
-        void UpdateUser(Entities.User user);
+        int CreateUser(UserDto userDto);
+        UserDto GetUserById(int id);
+        void UpdateUser(UserDto userDto);
         public void ActivateUser(int id);
         public void DeactivateUser(int id);
         void DeleteUser(int id);
