@@ -1,3 +1,8 @@
+using TechCraftsmen.User.Core.Interfaces.Repositories;
+using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.Services.Implementation;
+using TechCraftsmen.User.Data.Relational.Repositories;
+
 namespace TechCraftsmen.User.Api
 {
     public class Program
@@ -6,16 +11,16 @@ namespace TechCraftsmen.User.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<ICrudRepository<Core.Entities.User>, UserRepository>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -23,10 +28,7 @@ namespace TechCraftsmen.User.Api
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

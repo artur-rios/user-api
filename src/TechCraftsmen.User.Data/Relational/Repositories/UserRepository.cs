@@ -3,7 +3,7 @@ using TechCraftsmen.User.Core.Interfaces.Repositories;
 
 namespace TechCraftsmen.User.Data.Relational.Repositories
 {
-    internal class UserRepository : ICrudRepository<Core.Entities.User>
+    public class UserRepository : ICrudRepository<Core.Entities.User>
     {
         private readonly RelationalDBContext _dbContext;
 

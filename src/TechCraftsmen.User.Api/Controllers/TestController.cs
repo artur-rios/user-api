@@ -14,10 +14,12 @@ namespace TechCraftsmen.User.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "HelloWorld")]
+        [HttpGet]
+        [Route("")]
+        [Route("HelloWorld")]
         public ResultDto<string> HelloWorld()
         {
-            _logger.Log(LogLevel.Information, "Hello world! User Api ON");
+            _logger.LogInformation("Hello world! User Api ON");
 
             return new ResultDto<string>("Hello world!", "User Api ON", true);
         }
