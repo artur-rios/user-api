@@ -37,7 +37,7 @@ namespace TechCraftsmen.User.Common.Utils
             return hash.SequenceEqual(result.Hash);
         }
 
-        private static byte[] CreateSalt()
+        public static byte[] CreateSalt()
         {
             var buffer = new byte[16];
 
