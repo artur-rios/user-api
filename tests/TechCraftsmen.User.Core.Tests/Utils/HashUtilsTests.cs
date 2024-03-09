@@ -1,7 +1,7 @@
-﻿using TechCraftsmen.User.Common.Utils;
+﻿using TechCraftsmen.User.Core.Utils;
 using Xunit;
 
-namespace TechCraftsmen.User.Common.Tests.Utils
+namespace TechCraftsmen.User.Core.Tests.Utils
 {
     public class HashUtilsTests
     {

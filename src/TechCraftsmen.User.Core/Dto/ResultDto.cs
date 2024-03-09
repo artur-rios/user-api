@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Common.Dto
+﻿namespace TechCraftsmen.User.Core.Dto
 {
     public class ResultDto<T>(T? _data = default, string? _message = null, bool _success = false)
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using TechCraftsmen.User.Common.Utils;
+using TechCraftsmen.User.Core.Utils;
 
-namespace TechCraftsmen.User.Common.TypeConvertion
+namespace TechCraftsmen.User.Core.TypeConvertion
 {
     public class StringToHashBytesConverter : ITypeConverter<string, byte[]>
     {

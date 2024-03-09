@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using TechCraftsmen.User.Common.Dto;
-using TechCraftsmen.User.Common.Rules;
+using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Rules;
 
-namespace TechCraftsmen.User.Common.Validation
+namespace TechCraftsmen.User.Core.Validation
 {
     public class UserDtoValidator : AbstractValidator<UserDto>
     {

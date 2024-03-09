@@ -5,15 +5,13 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Api", "src\TechCraftsmen.User.Api\TechCraftsmen.User.Api.csproj", "{488BCFEB-0E6C-4726-BD2C-F83DD40D00FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Common", "src\TechCraftsmen.User.Common\TechCraftsmen.User.Common.csproj", "{D5C50A4A-6914-468A-B5C4-86AEDF15BCFF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Core", "src\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj", "{51F710FF-570F-424D-BA91-70CE105BC099}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Data", "src\TechCraftsmen.User.Data\TechCraftsmen.User.Data.csproj", "{EF951AED-14AC-4216-973B-6CA003983A22}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Services", "src\TechCraftsmen.User.Services\TechCraftsmen.User.Services.csproj", "{FDFC096A-15CD-441B-A112-9DF27774D525}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.Common.Tests", "tests\TechCraftsmen.User.Common.Tests\TechCraftsmen.User.Common.Tests.csproj", "{0ABA5EB8-AC48-45FD-B658-CEC59618A662}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.Core.Tests", "tests\TechCraftsmen.User.Core.Tests\TechCraftsmen.User.Core.Tests.csproj", "{0ABA5EB8-AC48-45FD-B658-CEC59618A662}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3A95A389-B2A3-4F1A-8E5D-E799B603EB1B}"
 EndProject

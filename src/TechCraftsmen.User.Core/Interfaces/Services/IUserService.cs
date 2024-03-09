@@ -1,4 +1,4 @@
-﻿using TechCraftsmen.User.Common.Dto;
+﻿using TechCraftsmen.User.Core.Dto;
 
 namespace TechCraftsmen.User.Core.Interfaces.Services
 {

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TechCraftsmen.User.Common\TechCraftsmen.User.Common.csproj" />
+    <ProjectReference Include="..\..\src\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj" />
   </ItemGroup>
 
 </Project>

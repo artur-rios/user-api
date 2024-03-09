@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TechCraftsmen.User.Common\TechCraftsmen.User.Common.csproj" />
+    <ProjectReference Include="..\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj" />
     <ProjectReference Include="..\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj" />
     <ProjectReference Include="..\TechCraftsmen.User.Data\TechCraftsmen.User.Data.csproj" />
     <ProjectReference Include="..\TechCraftsmen.User.Services\TechCraftsmen.User.Services.csproj" />

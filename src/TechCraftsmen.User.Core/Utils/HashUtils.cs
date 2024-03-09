@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace TechCraftsmen.User.Common.Utils
+namespace TechCraftsmen.User.Core.Utils
 {
     public static class HashUtils
     {

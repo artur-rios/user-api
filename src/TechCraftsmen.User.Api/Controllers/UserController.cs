@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Common.Dto;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
 

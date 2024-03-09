@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using TechCraftsmen.User.Common.Dto;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Interfaces.Rules;
 
-namespace TechCraftsmen.User.Common.Rules
+namespace TechCraftsmen.User.Core.Rules
 {
     public class PasswordRule : IRule
     {

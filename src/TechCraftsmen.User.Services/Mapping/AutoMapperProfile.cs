@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TechCraftsmen.User.Common.Dto;
-using TechCraftsmen.User.Common.TypeConvertion;
+using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.TypeConvertion;
 
 namespace TechCraftsmen.User.Services.Mapping
 {

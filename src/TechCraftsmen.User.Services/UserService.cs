@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TechCraftsmen.User.Common.Dto;
-using TechCraftsmen.User.Common.Utils;
+using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Repositories;

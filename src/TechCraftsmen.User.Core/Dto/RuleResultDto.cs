@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Common.Dto
+﻿namespace TechCraftsmen.User.Core.Dto
 {
     public class RuleResultDto
     {
