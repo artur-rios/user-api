@@ -1,20 +1,16 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Interfaces.Rules;
+using TechCraftsmen.User.Core.Rules.Parameters;
 
 namespace TechCraftsmen.User.Core.Rules
 {
-    public class UserUpdateRule : IRule<Entities.User>
+    public class UserUpdateRule : IRule<bool>
     {
-        public RuleResultDto Execute(Entities.User parameter)
+        public RuleResultDto Execute(RuleParameter<bool> parameter)
         {
             var result = new RuleResultDto();
 
-            if (!IsParameterValid(parameter, out string validationMessage))
-            {
-                result.Errors.Add(validationMessage);
-            }
-
-            if (!parameter.Active)
+            if (!parameter.Value)
             {
                 result.Errors.Add("Can't update inactive user!");
             }
@@ -22,20 +18,6 @@ namespace TechCraftsmen.User.Core.Rules
             result.Success = !result.Errors.Any();
 
             return result;
-        }
-
-        private bool IsParameterValid(Entities.User parameter, out string message)
-        {
-            if (parameter is null)
-            {
-                message = "User can't be null";
-
-                return false;
-            }
-
-            message = "Valid parameter";
-
-            return true;
         }
     }
 }

@@ -13,16 +13,16 @@ namespace TechCraftsmen.User.Core.Services.Implementation
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
-        private readonly IRule<Entities.User> _rule;
+        private readonly IRule<bool> _updateRule;
         private readonly ICrudRepository<Entities.User> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
 
-        public UserService(IMapper mapper, IRule<Entities.User> rule, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> validator)
+        public UserService(IMapper mapper, IRule<bool> rule, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator)
         {
             _mapper = mapper;
-            _rule = rule;
+            _updateRule = rule;
             _userRepository = userRepository;
-            _userValidator = validator;
+            _userValidator = userValidator;
         }
 
         public int CreateUser(UserDto userDto)
@@ -53,7 +53,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             var currentUser = _userRepository.GetById(userDto.Id);
 
-            var ruleResult = _rule.Execute(currentUser);
+            var ruleResult = _updateRule.Execute(currentUser!.Active);
 
             if (!ruleResult.Success)
             {

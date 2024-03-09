@@ -35,7 +35,7 @@ namespace TechCraftsmen.User.Api
 
             builder.Services.AddScoped<IValidator<UserDto>, UserDtoValidator>();
 
-            builder.Services.AddScoped<IRule<Core.Entities.User>, UserUpdateRule>();
+            builder.Services.AddScoped<IRule<bool>, UserUpdateRule>();
 
             builder.Services.AddScoped<ICrudRepository<Core.Entities.User>, UserRepository>();
 

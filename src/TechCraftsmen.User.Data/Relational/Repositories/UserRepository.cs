@@ -25,6 +25,12 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
             return _dbContext.Find<Core.Entities.User>(id);
         }
 
+        public IQueryable<Core.Entities.User> GetByFilter(HashSet<string> filters)
+        {
+            // TODO
+            throw new NotImplementedException();
+        }
+
         public void Update(Core.Entities.User user)
         {
             _dbContext.Update(user);
