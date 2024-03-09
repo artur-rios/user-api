@@ -4,7 +4,7 @@ using TechCraftsmen.User.Core.Interfaces.Rules;
 
 namespace TechCraftsmen.User.Core.Rules
 {
-    public class PasswordRule : IRule
+    public class PasswordRule : IRule<string>
     {
         private const int MINIMUM_LENGTH = 8;
 
@@ -13,31 +13,31 @@ namespace TechCraftsmen.User.Core.Rules
         private static readonly Regex _hasUpperChar = new(@"[A-Z]+");
         private static readonly Regex _hasMinimumLength = new(@".{" + MINIMUM_LENGTH + ",}");
 
-        public RuleResultDto Execute(params object[] ruleParameters)
+        public RuleResultDto Execute(string parameter)
         {
             var result = new RuleResultDto();
 
-            if (!ValidateParameters(out string validationResult, ruleParameters))
+            if (!IsParameterValid(parameter, out string validationMessage))
             {
-                result.Errors.Add(validationResult);
+                result.Errors.Add(validationMessage);
             }
 
-            if (_hasNumber.IsMatch(validationResult))
+            if (_hasNumber.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a number");
             }
 
-            if (_hasLowerChar.IsMatch(validationResult))
+            if (_hasLowerChar.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a lower char");
             }
 
-            if (_hasUpperChar.IsMatch(validationResult))
+            if (_hasUpperChar.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a upper char");
             }
 
-            if (_hasMinimumLength.IsMatch(validationResult))
+            if (_hasMinimumLength.IsMatch(parameter))
             {
                 result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
             }
@@ -47,41 +47,16 @@ namespace TechCraftsmen.User.Core.Rules
             return result;
         }
 
-        private bool ValidateParameters(out string result, params object[] ruleParameters)
+        private static bool IsParameterValid(string parameter, out string message)
         {
-            if (ruleParameters.Length == 0)
+            if (string.IsNullOrEmpty(parameter))
             {
-                result = "No parameters were passed to rule!";
+                message = $"Parameter null or empty.";
 
                 return false;
             }
 
-            if (ruleParameters.Length > 1)
-            {
-                result = $"{nameof(PasswordRule)} only accepts one parameter.";
-
-                return false;
-            }
-
-            var parameter = ruleParameters[0];
-
-            if (parameter is not string)
-            {
-                result = $"A string must be passed to the rule.";
-
-                return false;
-            }
-
-            var password = parameter as string;
-
-            if (string.IsNullOrEmpty(password))
-            {
-                result = $"Parameter null or empty.";
-
-                return false;
-            }
-
-            result = password;
+            message = "Parameter valid";
 
             return true;
         }

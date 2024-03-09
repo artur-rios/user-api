@@ -1,21 +1,25 @@
 ﻿using AutoMapper;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
+using TechCraftsmen.User.Core.Interfaces.Rules;
 using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Core.Services.Implementation
 {
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
+        private readonly IRule<Entities.User> _rule;
         private readonly ICrudRepository<Entities.User> _userRepository;
 
-        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository)
+
+        public UserService(IMapper mapper, IRule<Entities.User> rule, ICrudRepository<Entities.User> userRepository)
         {
             _mapper = mapper;
+            _rule = rule;
             _userRepository = userRepository;
         }
 
@@ -45,9 +49,13 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             var currentUser = _userRepository.GetById(userDto.Id);
 
-            if (!currentUser!.Active)
+            var ruleResult = _rule.Execute(currentUser);
+
+            if (!ruleResult.Success)
             {
-                throw new NotAllowedException("Can't update inactive user!");
+                var exceptionMessage = string.Join("|", ruleResult.Errors);
+
+                throw new NotAllowedException(exceptionMessage);
             }
 
             var user = _mapper.Map<Entities.User>(userDto);

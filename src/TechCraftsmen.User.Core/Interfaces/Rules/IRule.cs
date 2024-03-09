@@ -2,8 +2,8 @@
 
 namespace TechCraftsmen.User.Core.Interfaces.Rules
 {
-    public interface IRule
+    public interface IRule<T>
     {
-        RuleResultDto Execute(params object[] ruleParameters);
+        RuleResultDto Execute(T parameter);
     }
 }
