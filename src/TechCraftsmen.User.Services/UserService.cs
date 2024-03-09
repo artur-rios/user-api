@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
@@ -14,17 +15,20 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         private readonly IMapper _mapper;
         private readonly IRule<Entities.User> _rule;
         private readonly ICrudRepository<Entities.User> _userRepository;
+        private readonly IValidator<UserDto> _userValidator;
 
-
-        public UserService(IMapper mapper, IRule<Entities.User> rule, ICrudRepository<Entities.User> userRepository)
+        public UserService(IMapper mapper, IRule<Entities.User> rule, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> validator)
         {
             _mapper = mapper;
             _rule = rule;
             _userRepository = userRepository;
+            _userValidator = validator;
         }
 
         public int CreateUser(UserDto userDto)
         {
+            _userValidator.ValidateAndThrow(userDto);
+
             var user = _mapper.Map<Entities.User>(userDto);
 
             var hashResult = HashUtils.HashText(userDto.Password);

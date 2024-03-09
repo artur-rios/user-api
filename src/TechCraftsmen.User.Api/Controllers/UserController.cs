@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
@@ -27,6 +28,10 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return Created(userId, "User created with success");
             }
+            catch (ValidationException ve)
+            {
+                return BadRequest<int>(ve);
+            }
             catch (Exception ex)
             {
                 return Error<int>(ex);
@@ -45,7 +50,7 @@ namespace TechCraftsmen.User.Api.Controllers
             }
             catch (NotFoundException nfe)
             {
-                return NotFound(nfe.Message);
+                return NotFound<UserDto>(nfe);
             }
             catch (Exception ex)
             {

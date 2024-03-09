@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
 
@@ -11,6 +12,32 @@ namespace TechCraftsmen.User.Api.Controllers
         public BaseController(ILogger<BaseController> logger)
         {
             _logger = logger;
+        }
+
+        public ActionResult<ResultDto<T>> BadRequest<T>(Exception exception)
+        {
+            IList<string> errorList = [];
+
+            if (exception is ValidationException)
+            {
+                var validationException = exception as ValidationException;
+
+                if (validationException is not null)
+                {
+                    foreach (var error in validationException.Errors)
+                    {
+                        errorList.Add(error.ErrorMessage);
+                    }
+                }
+            }
+            else
+            {
+                errorList.Add(exception.Message);
+            }
+
+            var result = new ResultDto<T>(default, string.Join("|", errorList), false);
+
+            return BadRequest(result);
         }
 
         public ActionResult<ResultDto<T>> Created<T>(T data, string message)

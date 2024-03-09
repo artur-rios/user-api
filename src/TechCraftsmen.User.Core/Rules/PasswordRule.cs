@@ -22,22 +22,22 @@ namespace TechCraftsmen.User.Core.Rules
                 result.Errors.Add(validationMessage);
             }
 
-            if (_hasNumber.IsMatch(parameter))
+            if (!_hasNumber.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a number");
             }
 
-            if (_hasLowerChar.IsMatch(parameter))
+            if (!_hasLowerChar.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a lower char");
             }
 
-            if (_hasUpperChar.IsMatch(parameter))
+            if (!_hasUpperChar.IsMatch(parameter))
             {
                 result.Errors.Add("Password must contain a upper char");
             }
 
-            if (_hasMinimumLength.IsMatch(parameter))
+            if (!_hasMinimumLength.IsMatch(parameter))
             {
                 result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
             }
