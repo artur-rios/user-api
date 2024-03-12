@@ -1,13 +1,4 @@
-using FluentValidation;
-using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Interfaces.Rules;
-using TechCraftsmen.User.Core.Interfaces.Services;
-using TechCraftsmen.User.Core.Rules;
-using TechCraftsmen.User.Core.Services.Implementation;
-using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Data.Relational;
-using TechCraftsmen.User.Data.Relational.Repositories;
+using TechCraftsmen.User.Api.Configuration;
 using TechCraftsmen.User.Services.Mapping;
 
 namespace TechCraftsmen.User.Api
@@ -22,24 +13,17 @@ namespace TechCraftsmen.User.Api
 
             builder.Configuration.AddJsonFile(appSettings, optional: false, reloadOnChange: false);
 
-            var configuration = builder.Configuration;
-
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
-            builder.Services.AddRelationalDBContext(configuration.GetSection("ConnectionStrings"));
-
-            builder.Services.AddScoped<IValidator<UserDto>, UserDtoValidator>();
-
-            builder.Services.AddScoped<IRule<bool>, UserUpdateRule>();
-
-            builder.Services.AddScoped<ICrudRepository<Core.Entities.User>, UserRepository>();
-
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddRelationalContext(builder.Configuration.GetSection("ConnectionStrings"));
+            builder.Services.AddModelValidators();
+            builder.Services.AddRelationalRepositories();
+            builder.Services.AddDomainRules();
+            builder.Services.AddServices();
 
             var app = builder.Build();
 

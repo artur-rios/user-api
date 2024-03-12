@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
+using TechCraftsmen.User.Data.Relational.Configuration;
 
 namespace TechCraftsmen.User.Data.Relational.Repositories
 {
@@ -25,10 +27,28 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
             return _dbContext.Find<Core.Entities.User>(id);
         }
 
-        public IQueryable<Core.Entities.User> GetByFilter(HashSet<string> filters)
+        public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters)
         {
-            // TODO
-            throw new NotImplementedException();
+            var query = new StringBuilder("SELECT * FROM dbo.Users");
+
+            if (filters != null && filters.Count > 0)
+            {
+                query.Append(" WHERE ");
+
+                for (int index = 0; index < filters.Count; index++)
+                {
+                    var filter = filters.ElementAt(index);
+
+                    query.Append($"{filter.Key} = {filter.Value}");
+
+                    if (index < filters.Count - 1)
+                    {
+                        query.Append(" AND ");
+                    }
+                }
+            }
+
+            return _dbContext.Users.FromSqlRaw(query.ToString());
         }
 
         public void Update(Core.Entities.User user)

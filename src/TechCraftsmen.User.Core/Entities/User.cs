@@ -15,7 +15,5 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool Active { get; set; } = true;
-
-        public HashSet<string> Filters { get; private set; } = ["Name", "Email", "RoleId", "CreateAt", "Active"];
     }
 }

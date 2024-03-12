@@ -4,8 +4,8 @@ using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Interfaces.Rules;
 using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Core.Services.Implementation
@@ -13,21 +13,42 @@ namespace TechCraftsmen.User.Core.Services.Implementation
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
-        private readonly IRule<bool> _updateRule;
         private readonly ICrudRepository<Entities.User> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
 
-        public UserService(IMapper mapper, IRule<bool> rule, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator)
+        private readonly UserCreationRule _creationRule;
+        private readonly UserUpdateRule _updateRule;
+
+        private Dictionary<string, Func<object, bool>> _filters = new()
+        {
+            { "Name", value => value is string && !string.IsNullOrEmpty(value as string) },
+            { "Email", value => value is string && !string.IsNullOrEmpty(value as string) },
+            { "RoleId", value => value is int && (int) value > 0 },
+            { "CreateAt", value => value is DateTime && (DateTime) value < DateTime.UtcNow },
+            { "Active", value => value is bool }
+        };
+
+        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserCreationRule creationRule, UserUpdateRule updateRule)
         {
             _mapper = mapper;
-            _updateRule = rule;
             _userRepository = userRepository;
             _userValidator = userValidator;
+            _creationRule = creationRule;
+            _updateRule = updateRule;
         }
 
         public int CreateUser(UserDto userDto)
         {
             _userValidator.ValidateAndThrow(userDto);
+
+            var ruleResult = _creationRule.Execute(userDto.Email);
+
+            if (!ruleResult.Success)
+            {
+                var exceptionMessage = string.Join("|", ruleResult.Errors);
+
+                throw new NotAllowedException(exceptionMessage);
+            }
 
             var user = _mapper.Map<Entities.User>(userDto);
 
@@ -47,6 +68,33 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             return user is null
                 ? throw new NotFoundException("User not found!")
                 : _mapper.Map<UserDto>(user);
+        }
+        public IEnumerable<UserDto> GetUserByFilter(IDictionary<string, object> filters)
+        {
+            Dictionary<string, object> validFilters = [];
+
+            if (filters.Count > 0)
+            {
+                foreach (var filter in filters)
+                {
+                    var filterValidator = _filters.GetValueOrDefault(filter.Key);
+
+                    if (filterValidator is not null)
+                    {
+                        if (filterValidator(filter.Value))
+                        {
+                            validFilters.Add(filter.Key, filter.Value);
+                        }
+                    }
+                }
+            }
+
+            if (validFilters.Count == 0)
+            {
+                throw new NotAllowedException("No valid filters were passed!");
+            }
+
+            return _userRepository.GetByFilter(validFilters) as IEnumerable<UserDto> ?? throw new NotFoundException("No users found with the given filter");
         }
 
         public void UpdateUser(UserDto userDto)

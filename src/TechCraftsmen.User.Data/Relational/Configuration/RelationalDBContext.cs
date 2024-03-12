@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Data.Relational.Mapping;
 
-namespace TechCraftsmen.User.Data.Relational
+namespace TechCraftsmen.User.Data.Relational.Configuration
 {
     public class RelationalDBContext : DbContext
     {

@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Data.Relational
+﻿namespace TechCraftsmen.User.Data.Relational.Configuration
 {
     public class RelationalDBContextOptions
     {

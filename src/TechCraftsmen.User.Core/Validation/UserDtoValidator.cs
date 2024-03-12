@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Rules;
+using TechCraftsmen.User.Core.Rules.Password;
 
 namespace TechCraftsmen.User.Core.Validation
 {

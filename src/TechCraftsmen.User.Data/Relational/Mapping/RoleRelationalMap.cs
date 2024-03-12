@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
-using TechCraftsmen.User.Data.Relational.Constants;
+using TechCraftsmen.User.Data.Relational.Configuration;
 
 namespace TechCraftsmen.User.Data.Relational.Mapping
 {
@@ -10,7 +10,7 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
     {
         public static void Configure(this EntityTypeBuilder<Role> role)
         {
-            DatabaseConstants.Tables.TryGetValue(nameof(Role), out string? tableName);
+            RelationalDBConfiguration.Tables.TryGetValue(nameof(Role), out string? tableName);
 
             if (tableName is null)
             {

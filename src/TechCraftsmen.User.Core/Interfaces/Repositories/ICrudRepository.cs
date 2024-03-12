@@ -6,6 +6,7 @@ namespace TechCraftsmen.User.Core.Interfaces.Repositories
     {
         int Create(T entity);
         T? GetById(int id);
+        IQueryable<T> GetByFilter(IDictionary<string, object> filters);
         void Update(T entity);
         void Delete(T entity);
     }
