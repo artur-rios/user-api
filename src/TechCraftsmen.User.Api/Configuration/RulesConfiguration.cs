@@ -10,6 +10,8 @@ namespace TechCraftsmen.User.Api.Configuration
             services.AddScoped<PasswordRule>();
             services.AddScoped<UserCreationRule>();
             services.AddScoped<UserUpdateRule>();
+            services.AddScoped<UserStatusUpdateRule>();
+            services.AddScoped<UserDeletionRule>();
         }
     }
 }
