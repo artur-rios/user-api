@@ -1,4 +1,5 @@
-﻿using TechCraftsmen.User.Core.Dto;
+﻿using Microsoft.AspNetCore.Http;
+using TechCraftsmen.User.Core.Dto;
 
 namespace TechCraftsmen.User.Core.Interfaces.Services
 {
@@ -6,6 +7,7 @@ namespace TechCraftsmen.User.Core.Interfaces.Services
     {
         int CreateUser(UserDto userDto);
         UserDto GetUserById(int id);
+        IEnumerable<UserDto> GetUsersByFilter(IQueryCollection query);
         void UpdateUser(UserDto userDto);
         public void ActivateUser(int id);
         public void DeactivateUser(int id);

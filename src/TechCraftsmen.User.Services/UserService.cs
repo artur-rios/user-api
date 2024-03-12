@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
@@ -18,8 +19,19 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
         private readonly UserCreationRule _creationRule;
         private readonly UserUpdateRule _updateRule;
+        private readonly UserStatusUpdateRule _statusUpdateRule;
+        private readonly UserDeletionRule _deletionRule;
 
-        private Dictionary<string, Func<object, bool>> _filters = new()
+        private readonly Dictionary<string, Func<string, object>> _filterParsers = new()
+        {
+            { "Name", value => value },
+            { "Email", value => value },
+            { "RoleId", value => value.ToInt()  },
+            { "CreateAt", value => value.ToDateTime() },
+            { "Active", value => value }
+        };
+
+        private readonly Dictionary<string, Func<object, bool>> _filterValidators = new()
         {
             { "Name", value => value is string && !string.IsNullOrEmpty(value as string) },
             { "Email", value => value is string && !string.IsNullOrEmpty(value as string) },
@@ -28,13 +40,15 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             { "Active", value => value is bool }
         };
 
-        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserCreationRule creationRule, UserUpdateRule updateRule)
+        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _userValidator = userValidator;
             _creationRule = creationRule;
             _updateRule = updateRule;
+            _statusUpdateRule = statusUpdateRule;
+            _deletionRule = deletionRule;
         }
 
         public int CreateUser(UserDto userDto)
@@ -69,15 +83,17 @@ namespace TechCraftsmen.User.Core.Services.Implementation
                 ? throw new NotFoundException("User not found!")
                 : _mapper.Map<UserDto>(user);
         }
-        public IEnumerable<UserDto> GetUserByFilter(IDictionary<string, object> filters)
+
+        public IEnumerable<UserDto> GetUsersByFilter(IQueryCollection query)
         {
+            Dictionary<string, object> filters = ParseQueryParams(query);
             Dictionary<string, object> validFilters = [];
 
             if (filters.Count > 0)
             {
                 foreach (var filter in filters)
                 {
-                    var filterValidator = _filters.GetValueOrDefault(filter.Key);
+                    var filterValidator = _filterValidators.GetValueOrDefault(filter.Key);
 
                     if (filterValidator is not null)
                     {
@@ -99,7 +115,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
         public void UpdateUser(UserDto userDto)
         {
-            var currentUser = _userRepository.GetById(userDto.Id);
+            var currentUser = _userRepository.GetById(userDto.Id) ?? throw new NotFoundException("User not found!");
 
             var ruleResult = _updateRule.Execute(currentUser!.Active);
 
@@ -121,9 +137,13 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            if (user.Active)
+            var ruleResult = _statusUpdateRule.Execute(Tuple.Create(user.Active, true));
+
+            if (!ruleResult.Success)
             {
-                throw new EntityNotChangedException("User already active!");
+                var exceptionMessage = string.Join("|", ruleResult.Errors);
+
+                throw new EntityNotChangedException(exceptionMessage);
             }
 
             user.Active = true;
@@ -135,9 +155,13 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            if (!user.Active)
+            var ruleResult = _statusUpdateRule.Execute(Tuple.Create(user.Active, false));
+
+            if (!ruleResult.Success)
             {
-                throw new EntityNotChangedException("User already inactive!");
+                var exceptionMessage = string.Join("|", ruleResult.Errors);
+
+                throw new EntityNotChangedException(exceptionMessage);
             }
 
             user.Active = false;
@@ -149,9 +173,13 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            if (user.Active)
+            var ruleResult = _deletionRule.Execute(user.Active);
+
+            if (!ruleResult.Success)
             {
-                throw new NotAllowedException("Can't delete active user!");
+                var exceptionMessage = string.Join("|", ruleResult.Errors);
+
+                throw new NotAllowedException(exceptionMessage);
             }
 
             _userRepository.Delete(user);
@@ -166,6 +194,31 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             {
                 target.Active = source.Active;
             }
+        }
+
+        private Dictionary<string, object> ParseQueryParams(IQueryCollection query)
+        {
+            var parsedFilters = new Dictionary<string, object>();
+
+            if (query is not null || query?.Count > 0)
+            {
+                foreach (var item in query)
+                {
+                    var filterParser = _filterParsers.GetValueOrDefault(item.Key);
+
+                    if (filterParser is not null)
+                    {
+                        var parsedFilter = filterParser(item.Value);
+
+                        if (parsedFilter is not null)
+                        {
+                            parsedFilters.Add(item.Key, parsedFilter);
+                        }
+                    }
+                }
+            }
+
+            return parsedFilters;
         }
     }
 }

@@ -57,5 +57,125 @@ namespace TechCraftsmen.User.Api.Controllers
                 return Error<UserDto>(ex);
             }
         }
+
+        [HttpGet]
+        [Route("/Filter")]
+        public ActionResult<ResultDto<IEnumerable<UserDto>>> GetUsersByFilter()
+        {
+            try
+            {
+                var users = _userService.GetUsersByFilter(HttpContext.Request.Query);
+
+                return Success(users, "Search completed with success");
+            }
+            catch (NotAllowedException nfe)
+            {
+                return BadRequest<IEnumerable<UserDto>>(nfe);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound<IEnumerable<UserDto>>(nfe);
+            }
+            catch (Exception ex)
+            {
+                return Error<IEnumerable<UserDto>>(ex);
+            }
+        }
+
+        [HttpPut]
+        [Route("/Update")]
+        public ActionResult<ResultDto<UserDto>> UpdateUser(UserDto userDto)
+        {
+            try
+            {
+                _userService.UpdateUser(userDto);
+
+                return NoContent<UserDto>("User updated with success");
+            }
+            catch (NotAllowedException nfe)
+            {
+                return BadRequest<UserDto>(nfe);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound<UserDto>(nfe);
+            }
+            catch (Exception ex)
+            {
+                return Error<UserDto>(ex);
+            }
+        }
+
+        [HttpPatch]
+        [Route("/{id}/Activate")]
+        public ActionResult<ResultDto<UserDto>> ActivateUser(int id)
+        {
+            try
+            {
+                _userService.ActivateUser(id);
+
+                return NoContent<UserDto>("User activated with success");
+            }
+            catch (NotAllowedException nfe)
+            {
+                return BadRequest<UserDto>(nfe);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound<UserDto>(nfe);
+            }
+            catch (Exception ex)
+            {
+                return Error<UserDto>(ex);
+            }
+        }
+
+        [HttpPatch]
+        [Route("/{id}/Deactivate")]
+        public ActionResult<ResultDto<UserDto>> DeactivateUser(int id)
+        {
+            try
+            {
+                _userService.DeactivateUser(id);
+
+                return NoContent<UserDto>("User deactivated with success");
+            }
+            catch (NotAllowedException nfe)
+            {
+                return BadRequest<UserDto>(nfe);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound<UserDto>(nfe);
+            }
+            catch (Exception ex)
+            {
+                return Error<UserDto>(ex);
+            }
+        }
+
+        [HttpDelete]
+        [Route("/{id}/Delete")]
+        public ActionResult<ResultDto<UserDto>> DeleteUser(int id)
+        {
+            try
+            {
+                _userService.DeleteUser(id);
+
+                return NoContent<UserDto>("User deleted with success");
+            }
+            catch (NotAllowedException nfe)
+            {
+                return BadRequest<UserDto>(nfe);
+            }
+            catch (NotFoundException nfe)
+            {
+                return NotFound<UserDto>(nfe);
+            }
+            catch (Exception ex)
+            {
+                return Error<UserDto>(ex);
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 using TechCraftsmen.User.Api.Configuration;
-using TechCraftsmen.User.Services.Mapping;
+using TechCraftsmen.User.Core.Mapping;
 
 namespace TechCraftsmen.User.Api
 {

@@ -2,7 +2,7 @@
 
 namespace TechCraftsmen.User.Core.Rules.User
 {
-    public class UserUpdateRule : BaseRule<bool>
+    public class UserDeletionRule : BaseRule<bool>
     {
         public override RuleResultDto Execute(bool userActive)
         {
@@ -11,9 +11,9 @@ namespace TechCraftsmen.User.Core.Rules.User
                 _result.Errors.Add(validationMessage);
             }
 
-            if (!userActive)
+            if (userActive)
             {
-                _result.Errors.Add("Can't update inactive user!");
+                _result.Errors.Add("Can't delete active user!");
             }
 
             return Resolve();

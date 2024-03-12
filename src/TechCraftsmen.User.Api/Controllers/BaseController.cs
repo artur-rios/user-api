@@ -61,6 +61,13 @@ namespace TechCraftsmen.User.Api.Controllers
             return new ObjectResult(result) { StatusCode = StatusCodes.Status500InternalServerError };
         }
 
+        public ActionResult<ResultDto<T>> NoContent<T>(string message)
+        {
+            var result = new ResultDto<T>(default, message, false);
+
+            return new ObjectResult(result) { StatusCode = StatusCodes.Status204NoContent };
+        }
+
         public ActionResult<ResultDto<T>> NotFound<T>(NotFoundException exception)
         {
             var result = new ResultDto<T>(default, exception.Message, false);
