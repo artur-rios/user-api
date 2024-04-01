@@ -68,9 +68,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return Success(users, "Search completed with success");
             }
-            catch (NotAllowedException nfe)
+            catch (NotAllowedException nae)
             {
-                return BadRequest<IEnumerable<UserDto>>(nfe);
+                return BadRequest<IEnumerable<UserDto>>(nae);
             }
             catch (NotFoundException nfe)
             {
@@ -92,9 +92,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return NoContent<UserDto>("User updated with success");
             }
-            catch (NotAllowedException nfe)
+            catch (NotAllowedException nae)
             {
-                return BadRequest<UserDto>(nfe);
+                return BadRequest<UserDto>(nae);
             }
             catch (NotFoundException nfe)
             {
@@ -116,9 +116,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return NoContent<UserDto>("User activated with success");
             }
-            catch (NotAllowedException nfe)
+            catch (NotAllowedException nae)
             {
-                return BadRequest<UserDto>(nfe);
+                return BadRequest<UserDto>(nae);
             }
             catch (NotFoundException nfe)
             {
@@ -140,9 +140,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return NoContent<UserDto>("User deactivated with success");
             }
-            catch (NotAllowedException nfe)
+            catch (NotAllowedException nae)
             {
-                return BadRequest<UserDto>(nfe);
+                return BadRequest<UserDto>(nae);
             }
             catch (NotFoundException nfe)
             {
@@ -164,9 +164,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
                 return NoContent<UserDto>("User deleted with success");
             }
-            catch (NotAllowedException nfe)
+            catch (NotAllowedException nae)
             {
-                return BadRequest<UserDto>(nfe);
+                return BadRequest<UserDto>(nae);
             }
             catch (NotFoundException nfe)
             {
