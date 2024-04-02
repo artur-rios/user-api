@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using System.Text;
+using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Data.Relational.Configuration;
 
@@ -29,7 +31,14 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
 
         public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters)
         {
-            var query = new StringBuilder("SELECT * FROM dbo.Users");
+            RelationalDBConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
+
+            if (tableName is null)
+            {
+                throw new NotFoundException("Entity not mapped to relational table!");
+            }
+
+            var query = new StringBuilder($"SELECT * FROM sc_user_api.{tableName}");
 
             if (filters != null && filters.Count > 0)
             {
@@ -39,7 +48,14 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
                 {
                     var filter = filters.ElementAt(index);
 
-                    query.Append($"{filter.Key} = {filter.Value}");
+                    if (filter.Value is string || filter.Value is DateTime)
+                    {
+                        query.Append($"{filter.Key} = '{filter.Value}'");
+                    }
+                    else
+                    {
+                        query.Append($"{filter.Key} = {filter.Value}");
+                    }
 
                     if (index < filters.Count - 1)
                     {
@@ -48,7 +64,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
                 }
             }
 
-            return _dbContext.Users.FromSqlRaw(query.ToString());
+            return _dbContext.Users.FromSql(FormattableStringFactory.Create(query.ToString()));
         }
 
         public void Update(Core.Entities.User user)

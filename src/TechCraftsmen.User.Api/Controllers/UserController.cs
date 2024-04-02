@@ -1,12 +1,15 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using TechCraftsmen.User.Api.Authorization;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
 
 namespace TechCraftsmen.User.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class UserController : BaseController
     {
@@ -20,6 +23,8 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
+        [AllowAnonymous]
+        //[RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<int>> CreateUser(UserDto userDto)
         {
             try
@@ -39,7 +44,9 @@ namespace TechCraftsmen.User.Api.Controllers
         }
 
         [HttpGet]
-        [Route("/{id}")]
+        [Route("{id}")]
+        [AllowAnonymous]
+        //[RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> GetUserById(int id)
         {
             try
@@ -59,8 +66,9 @@ namespace TechCraftsmen.User.Api.Controllers
         }
 
         [HttpGet]
-        [Route("/Filter")]
-        public ActionResult<ResultDto<IEnumerable<UserDto>>> GetUsersByFilter()
+        [Route("Filter")]
+        [RoleRequirement(Roles.ADMIN)]
+        public ActionResult<ResultDto<IList<UserDto>>> GetUsersByFilter()
         {
             try
             {
@@ -70,20 +78,21 @@ namespace TechCraftsmen.User.Api.Controllers
             }
             catch (NotAllowedException nae)
             {
-                return BadRequest<IEnumerable<UserDto>>(nae);
+                return BadRequest<IList<UserDto>>(nae);
             }
             catch (NotFoundException nfe)
             {
-                return NotFound<IEnumerable<UserDto>>(nfe);
+                return NotFound<IList<UserDto>>(nfe);
             }
             catch (Exception ex)
             {
-                return Error<IEnumerable<UserDto>>(ex);
+                return Error<IList<UserDto>>(ex);
             }
         }
 
         [HttpPut]
-        [Route("/Update")]
+        [Route("Update")]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> UpdateUser(UserDto userDto)
         {
             try
@@ -107,7 +116,8 @@ namespace TechCraftsmen.User.Api.Controllers
         }
 
         [HttpPatch]
-        [Route("/{id}/Activate")]
+        [Route("{id}/Activate")]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> ActivateUser(int id)
         {
             try
@@ -131,7 +141,8 @@ namespace TechCraftsmen.User.Api.Controllers
         }
 
         [HttpPatch]
-        [Route("/{id}/Deactivate")]
+        [Route("{id}/Deactivate")]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> DeactivateUser(int id)
         {
             try
@@ -155,7 +166,8 @@ namespace TechCraftsmen.User.Api.Controllers
         }
 
         [HttpDelete]
-        [Route("/{id}/Delete")]
+        [Route("{id}/Delete")]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> DeleteUser(int id)
         {
             try

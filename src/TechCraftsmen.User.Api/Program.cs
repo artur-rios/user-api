@@ -1,4 +1,6 @@
+using TechCraftsmen.User.Api.Authorization;
 using TechCraftsmen.User.Api.Configuration;
+using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Mapping;
 
 namespace TechCraftsmen.User.Api
@@ -12,6 +14,8 @@ namespace TechCraftsmen.User.Api
             var appSettings = $"appsettings.api.{builder.Environment.EnvironmentName}.json";
 
             builder.Configuration.AddJsonFile(appSettings, optional: false, reloadOnChange: false);
+
+            builder.Services.Configure<AuthenticationTokenConfiguration>(builder.Configuration.GetSection("AuthenticationTokenSettings"));
 
             builder.Services.AddControllers();
 
@@ -33,6 +37,12 @@ namespace TechCraftsmen.User.Api
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseMiddleware<JwtMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();

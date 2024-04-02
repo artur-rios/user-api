@@ -10,7 +10,7 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
     {
         public static void Configure(this EntityTypeBuilder<Core.Entities.User> user)
         {
-            RelationalDBConfiguration.Tables.TryGetValue(nameof(Role), out string? tableName);
+            RelationalDBConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
 
             if (tableName is null)
             {
@@ -20,6 +20,11 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
             user.ToTable(tableName, schema: "sc_user_api");
 
             user.HasKey(u => u.Id);
+
+            user.HasOne<Role>()
+                .WithMany()
+                .HasForeignKey(u => u.RoleId)
+                .IsRequired();
 
             user.Property(u => u.Id).HasColumnName("id");
             user.Property(u => u.Name).HasColumnName("name");

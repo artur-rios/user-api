@@ -1,4 +1,5 @@
-﻿using TechCraftsmen.User.Core.Utils;
+﻿using System.Text;
+using TechCraftsmen.User.Core.Utils;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Utils
@@ -41,7 +42,11 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         public void Should_ReturnTrue_When_VerifyingWithCorrectHashAndSalt()
         {
             var hashResult = HashUtils.HashText(SAMPLE_TEXT);
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashResult.Salt, hashResult.Hash);
+
+            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
+            string saltString = Encoding.UTF8.GetString(hashResult.Salt, 0, hashResult.Salt.Length);
+
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, saltString);
 
             Assert.True(verifyResult);
         }
@@ -50,7 +55,11 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         public void Should_ReturnFalse_When_VerifyingWithIncorrectHash()
         {
             var hashResult = HashUtils.HashText($"{SAMPLE_TEXT}a");
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashResult.Salt, hashResult.Hash);
+
+            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
+            string saltString = Encoding.UTF8.GetString(hashResult.Salt, 0, hashResult.Salt.Length);
+
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, saltString);
 
             Assert.False(verifyResult);
         }
@@ -59,9 +68,11 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         public void Should_ReturnFalse_When_VerifyingWithIncorrectSalt()
         {
             var hashResult = HashUtils.HashText($"{SAMPLE_TEXT}");
-            var randomSalt = HashUtils.CreateSalt();
+            var randomSalt = Encoding.UTF8.GetString(HashUtils.CreateSalt());
 
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, randomSalt, hashResult.Hash);
+            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
+
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, randomSalt);
 
             Assert.False(verifyResult);
         }

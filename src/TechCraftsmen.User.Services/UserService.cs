@@ -66,9 +66,9 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
             var user = _mapper.Map<Entities.User>(userDto);
 
-            var hashResult = HashUtils.HashText(userDto.Password);
+            var hashResult = _mapper.Map<PasswordDto>(HashUtils.HashText(userDto.Password));
 
-            user.Password = hashResult.Hash;
+            user.Password = hashResult.Password;
             user.Salt = hashResult.Salt;
             user.RoleId = (int)Roles.ADMIN;
 
@@ -84,7 +84,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
                 : _mapper.Map<UserDto>(user);
         }
 
-        public IEnumerable<UserDto> GetUsersByFilter(IQueryCollection query)
+        public IList<UserDto> GetUsersByFilter(IQueryCollection query)
         {
             Dictionary<string, object> filters = ParseQueryParams(query);
             Dictionary<string, object> validFilters = [];
@@ -110,7 +110,30 @@ namespace TechCraftsmen.User.Core.Services.Implementation
                 throw new NotAllowedException("No valid filters were passed!");
             }
 
-            return _userRepository.GetByFilter(validFilters) as IEnumerable<UserDto> ?? throw new NotFoundException("No users found with the given filter");
+            var users = _userRepository.GetByFilter(validFilters).ToList();
+
+            if (users is null || users.Count == 0)
+            {
+                throw new NotFoundException("No users found with the given filter");
+            }
+
+            var userDtos = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                userDtos.Add(_mapper.Map<UserDto>(user));
+            }
+
+            return userDtos;
+        }
+
+        public PasswordDto GetPasswordByUserId(int id)
+        {
+            var user = _userRepository.GetById(id);
+
+            return user is null
+                ? throw new NotFoundException("User not found!")
+                : new PasswordDto() { Password = user.Password, Salt = user.Salt };
         }
 
         public void UpdateUser(UserDto userDto)
