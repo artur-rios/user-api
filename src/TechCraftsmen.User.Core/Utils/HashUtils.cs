@@ -31,14 +31,11 @@ namespace TechCraftsmen.User.Core.Utils
             return new() { Hash = argon2id.GetBytes(128), Salt = salt };
         }
 
-        public static bool VerifyHash(string text, string hash, string salt)
+        public static bool VerifyHash(string text, HashDto hashDto)
         {
-            byte[] hashBytes = Encoding.UTF8.GetBytes(hash);
-            byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
+            var result = HashText(text, hashDto.Salt);
 
-            var result = HashText(text, saltBytes);
-
-            return hashBytes.SequenceEqual(result.Hash);
+            return hashDto.Hash.SequenceEqual(result.Hash);
         }
 
         public static byte[] CreateSalt()

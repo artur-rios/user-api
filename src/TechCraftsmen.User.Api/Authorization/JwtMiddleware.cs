@@ -6,7 +6,7 @@ namespace TechCraftsmen.User.Api.Authorization
     {
         private readonly RequestDelegate _next = next;
 
-        public async Task Invoke(HttpContext context, IAuthenticationService authService, IUserService userService)
+        public async Task Invoke(HttpContext context, IAuthenticationService authService)
         {
             var token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
 

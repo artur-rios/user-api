@@ -11,8 +11,8 @@ Table tb_user {
   id integer [primary key, increment]
   name varchar [not null]
   email varchar [unique, not null]
-  password varchar [not null]
-  salt varchar [not null]
+  password bytea [not null]
+  salt bytea [not null]
   role_id integer [not null]
   active bool [not null]
   created_at timestamp [not null]
@@ -24,5 +24,5 @@ Table tb_role {
   description varchar [not null]
 }
 
-Ref: tb_user.role_id > tb_role.id  
+Ref: tb_user.role_id > tb_role.id
 ```

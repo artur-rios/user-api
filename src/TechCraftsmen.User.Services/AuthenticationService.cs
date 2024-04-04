@@ -5,7 +5,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
@@ -45,9 +44,9 @@ namespace TechCraftsmen.User.Services
 
             var user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
 
-            var passwordDto = _userService.GetPasswordByUserId(user.Id);
+            var password = _userService.GetPasswordByUserId(user.Id);
 
-            if (!HashUtils.VerifyHash(credentialsDto.Password, passwordDto.Salt, passwordDto.Password))
+            if (!HashUtils.VerifyHash(credentialsDto.Password, password))
             {
                 throw new NotAllowedException("Invalid credentials");
             }
@@ -59,12 +58,7 @@ namespace TechCraftsmen.User.Services
         {
             var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
-            ClaimsIdentity identity = new(
-                new GenericIdentity(userId.ToString(), "Login"),
-                [
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, userId.ToString())
-                ]);
+            ClaimsIdentity identity = new(new[] { new Claim("id", userId.ToString()) });
 
             DateTime creationDate = DateTime.Now;
             DateTime expirationDate = creationDate + TimeSpan.FromSeconds(_authTokenConfig.Seconds);
@@ -115,8 +109,8 @@ namespace TechCraftsmen.User.Services
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 

@@ -66,9 +66,9 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
             var user = _mapper.Map<Entities.User>(userDto);
 
-            var hashResult = _mapper.Map<PasswordDto>(HashUtils.HashText(userDto.Password));
+            var hashResult = HashUtils.HashText(userDto.Password);
 
-            user.Password = hashResult.Password;
+            user.Password = hashResult.Hash;
             user.Salt = hashResult.Salt;
             user.RoleId = (int)Roles.ADMIN;
 
@@ -127,13 +127,13 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             return userDtos;
         }
 
-        public PasswordDto GetPasswordByUserId(int id)
+        public HashDto GetPasswordByUserId(int id)
         {
             var user = _userRepository.GetById(id);
 
             return user is null
                 ? throw new NotFoundException("User not found!")
-                : new PasswordDto() { Password = user.Password, Salt = user.Salt };
+                : new HashDto() { Hash = user.Password, Salt = user.Salt };
         }
 
         public void UpdateUser(UserDto userDto)

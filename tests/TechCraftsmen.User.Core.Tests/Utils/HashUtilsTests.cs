@@ -1,5 +1,4 @@
-﻿using System.Text;
-using TechCraftsmen.User.Core.Utils;
+﻿using TechCraftsmen.User.Core.Utils;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Utils
@@ -43,10 +42,7 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         {
             var hashResult = HashUtils.HashText(SAMPLE_TEXT);
 
-            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
-            string saltString = Encoding.UTF8.GetString(hashResult.Salt, 0, hashResult.Salt.Length);
-
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, saltString);
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashResult);
 
             Assert.True(verifyResult);
         }
@@ -56,10 +52,7 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         {
             var hashResult = HashUtils.HashText($"{SAMPLE_TEXT}a");
 
-            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
-            string saltString = Encoding.UTF8.GetString(hashResult.Salt, 0, hashResult.Salt.Length);
-
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, saltString);
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashResult);
 
             Assert.False(verifyResult);
         }
@@ -68,11 +61,11 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         public void Should_ReturnFalse_When_VerifyingWithIncorrectSalt()
         {
             var hashResult = HashUtils.HashText($"{SAMPLE_TEXT}");
-            var randomSalt = Encoding.UTF8.GetString(HashUtils.CreateSalt());
+            var randomSalt = HashUtils.CreateSalt();
 
-            string hashString = Encoding.UTF8.GetString(hashResult.Hash, 0, hashResult.Hash.Length);
+            hashResult.Salt = randomSalt;
 
-            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashString, randomSalt);
+            var verifyResult = HashUtils.VerifyHash(SAMPLE_TEXT, hashResult);
 
             Assert.False(verifyResult);
         }

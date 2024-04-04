@@ -23,8 +23,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [AllowAnonymous]
-        //[RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<int>> CreateUser(UserDto userDto)
         {
             try
@@ -45,8 +44,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [AllowAnonymous]
-        //[RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> GetUserById(int id)
         {
             try
