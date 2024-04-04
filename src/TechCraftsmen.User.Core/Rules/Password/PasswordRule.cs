@@ -3,14 +3,23 @@ using TechCraftsmen.User.Core.Dto;
 
 namespace TechCraftsmen.User.Core.Rules.Password
 {
-    public class PasswordRule : BaseRule<string>
+    public partial class PasswordRule : BaseRule<string>
     {
         private const int MINIMUM_LENGTH = 8;
 
-        private static readonly Regex _hasNumber = new(@"[0-9]+");
-        private static readonly Regex _hasLowerChar = new(@"[a-z]+");
-        private static readonly Regex _hasUpperChar = new(@"[A-Z]+");
+        private static readonly Regex _hasNumber = HasNumber();
+        private static readonly Regex _hasLowerChar = HasLowerChar();
+        private static readonly Regex _hasUpperChar = HasUpperChar();
         private static readonly Regex _hasMinimumLength = new(@".{" + MINIMUM_LENGTH + ",}");
+
+        [GeneratedRegex(@"[0-9]+")]
+        private static partial Regex HasNumber();
+
+        [GeneratedRegex(@"[a-z]+")]
+        private static partial Regex HasLowerChar();
+
+        [GeneratedRegex(@"[A-Z]+")]
+        private static partial Regex HasUpperChar();
 
         public override RuleResultDto Execute(string password)
         {
