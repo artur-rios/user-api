@@ -15,6 +15,8 @@ namespace TechCraftsmen.User.Core.Rules.Email
             if (!IsParameterValid(email, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
+
+                return Resolve();
             }
 
             if (!_emailRegex.IsMatch(email))
@@ -29,7 +31,7 @@ namespace TechCraftsmen.User.Core.Rules.Email
         {
             if (string.IsNullOrEmpty(parameter))
             {
-                message = $"Parameter null or empty.";
+                message = $"Parameter null or empty";
 
                 return false;
             }

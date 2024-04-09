@@ -9,11 +9,13 @@ namespace TechCraftsmen.User.Core.Rules.User
             if (!IsParameterValid(userActive, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
+
+                return Resolve();
             }
 
             if (!userActive)
             {
-                _result.Errors.Add("Can't update inactive user!");
+                _result.Errors.Add("Can't update inactive user");
             }
 
             return Resolve();
@@ -21,7 +23,7 @@ namespace TechCraftsmen.User.Core.Rules.User
 
         internal override bool IsParameterValid(bool parameter, out string message)
         {
-            message = "Bool parameter, there's nothing to validate.";
+            message = "Bool parameter, there's nothing to validate";
 
             return true;
         }

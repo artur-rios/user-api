@@ -10,13 +10,15 @@ namespace TechCraftsmen.User.Core.Rules.User
             if (!IsParameterValid(parameter, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
+
+                return Resolve();
             }
 
             parameter.Deconstruct(out bool actualStatus, out bool newStatus);
 
             if (actualStatus == newStatus)
             {
-                _result.Errors.Add($"User already {actualStatus.ToCustomString("active", "inactive")}!");
+                _result.Errors.Add($"User already {actualStatus.ToCustomString("active", "inactive")}");
             }
 
             return Resolve();
@@ -24,7 +26,7 @@ namespace TechCraftsmen.User.Core.Rules.User
 
         internal override bool IsParameterValid(Tuple<bool, bool> parameter, out string message)
         {
-            message = "Bool parameter, there's nothing to validate.";
+            message = "Bool parameter, there's nothing to validate";
 
             return true;
         }

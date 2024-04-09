@@ -17,6 +17,8 @@ namespace TechCraftsmen.User.Core.Rules.User
             if (!IsParameterValid(email, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
+
+                return Resolve();
             }
 
             var filter = new Dictionary<string, object>()
@@ -28,7 +30,7 @@ namespace TechCraftsmen.User.Core.Rules.User
 
             if (user.Any())
             {
-                _result.Errors.Add("E-mail already registered!");
+                _result.Errors.Add("E-mail already registered");
             }
 
             return Resolve();
@@ -38,12 +40,12 @@ namespace TechCraftsmen.User.Core.Rules.User
         {
             if (string.IsNullOrEmpty(parameter))
             {
-                message = $"E-mail null or empty.";
+                message = $"Parameter null or empty";
 
                 return false;
             }
 
-            message = "E-mail valid";
+            message = "Parameter valid";
 
             return true;
         }

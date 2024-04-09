@@ -5,7 +5,7 @@ namespace TechCraftsmen.User.Core.Rules.Password
 {
     public partial class PasswordRule : BaseRule<string>
     {
-        private const int MINIMUM_LENGTH = 8;
+        public const int MINIMUM_LENGTH = 8;
 
         private static readonly Regex _hasNumber = HasNumber();
         private static readonly Regex _hasLowerChar = HasLowerChar();
@@ -26,6 +26,8 @@ namespace TechCraftsmen.User.Core.Rules.Password
             if (!IsParameterValid(password, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
+
+                return Resolve();
             }
 
             if (!_hasNumber.IsMatch(password))
@@ -55,7 +57,7 @@ namespace TechCraftsmen.User.Core.Rules.Password
         {
             if (string.IsNullOrEmpty(parameter))
             {
-                message = $"Parameter null or empty.";
+                message = $"Parameter null or empty";
 
                 return false;
             }
