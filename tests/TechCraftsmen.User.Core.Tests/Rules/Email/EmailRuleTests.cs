@@ -39,6 +39,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
         [Unit("EmailRule")]
         [InlineData("")]
         [InlineData(null)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_For_NullOrEmptyEmail(string email)
         {
             var result = _rule.Execute(email);

@@ -26,8 +26,10 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             { "Name", value => value },
             { "Email", value => value },
+#pragma warning disable CS8603 // Possible null reference return. Reason: null expected
             { "RoleId", value => value.ToInt()  },
             { "CreateAt", value => value.ToDateTime() },
+#pragma warning restore CS8603 // Possible null reference return.
             { "Active", value => value }
         };
 
@@ -35,8 +37,8 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         {
             { "Name", value => value is string && !string.IsNullOrEmpty(value as string) },
             { "Email", value => value is string && !string.IsNullOrEmpty(value as string) },
-            { "RoleId", value => value is int && (int) value > 0 },
-            { "CreateAt", value => value is DateTime && (DateTime) value < DateTime.UtcNow },
+            { "RoleId", value => value is int intValue && intValue > 0 },
+            { "CreateAt", value => value is DateTime datetime && datetime < DateTime.UtcNow },
             { "Active", value => value is bool }
         };
 
@@ -231,7 +233,9 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
                     if (filterParser is not null)
                     {
+#pragma warning disable CS8604 // Possible null reference argument. Reason: null expected.
                         var parsedFilter = filterParser(item.Value);
+#pragma warning restore CS8604 // Possible null reference argument.
 
                         if (parsedFilter is not null)
                         {

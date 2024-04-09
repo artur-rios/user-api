@@ -64,6 +64,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         [Unit("PasswordRule")]
         [InlineData("")]
         [InlineData(null)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForPassword_NullOrEmpty(string password)
         {
             var result = _rule.Execute(password);
