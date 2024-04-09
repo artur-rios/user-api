@@ -1,4 +1,6 @@
-﻿namespace TechCraftsmen.User.Core.Dto
+﻿using TechCraftsmen.User.Core.Enums;
+
+namespace TechCraftsmen.User.Core.Dto
 {
     public class UserDto
     {
@@ -10,7 +12,7 @@
 
         public string Password { get; set; } = string.Empty;
 
-        public int RoleId { get; set; }
+        public int RoleId { get; set; } = (int)Roles.REGULAR;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
