@@ -9,7 +9,7 @@ namespace TechCraftsmen.User.Core.Validation
         {
             RuleFor(config => config.Audience).NotEmpty();
             RuleFor(config => config.Issuer).NotEmpty();
-            RuleFor(config => config.Seconds).NotEmpty();
+            RuleFor(config => config.Seconds).NotEmpty().GreaterThan(0);
             RuleFor(config => config.Secret).NotEmpty();
         }
     }
