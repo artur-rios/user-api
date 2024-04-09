@@ -7,17 +7,8 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
 {
     public class UserStatusUpdateRuleTests
     {
-        public static IEnumerable<object[]> EqualUserStatusTestData()
-        {
-            yield return new object[] { new Tuple<bool, bool>(false, false) };
-            yield return new object[] { new Tuple<bool, bool>(true, true) };
-        }
-
-        public static IEnumerable<object[]> DifferentUserStatusTestData()
-        {
-            yield return new object[] { new Tuple<bool, bool>(false, true) };
-            yield return new object[] { new Tuple<bool, bool>(true, false) };
-        }
+        public static TheoryData<Tuple<bool, bool>> EqualUserStatusTestData => [new(false, false), new(true, true)];
+        public static TheoryData<Tuple<bool, bool>> DifferentUserStatusTestData => [new(false, true), new(true, false)];
 
         private readonly UserStatusUpdateRule _rule = new();
 
@@ -28,7 +19,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
         {
             var result = _rule.Execute(statuses);
 
-            statuses.Deconstruct(out bool actualStatus, out bool newStatus);
+            statuses.Deconstruct(out bool actualStatus, out _);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());

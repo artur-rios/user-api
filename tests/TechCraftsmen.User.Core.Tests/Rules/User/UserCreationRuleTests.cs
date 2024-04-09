@@ -43,6 +43,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
         [Unit("UserCreationRule")]
         [InlineData("")]
         [InlineData(null)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForPassword_NullOrEmpty(string email)
         {
             var result = _rule.Execute(email);

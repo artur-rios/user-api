@@ -8,24 +8,52 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
     {
         private readonly EmailRule _rule = new();
 
+        private static readonly string[] _invalidEmails = [
+            " ",
+            "-------",
+            "@majjf.com",
+            "A@b@c@example.com",
+            "Abc.example.com",
+            "js@proseware..com",
+            "ma@@jjf.com",
+            "ma@jjf.",
+            "ma@jjf..com",
+            "ma@jjf.c",
+            "ma_@jjf",
+            "ma_@jjf.",
+            "j@proseware.com9",
+            "js@proseware.com9",
+            "ma@hostname.comcom",
+            "MA@hostname.coMCom"
+        ];
+
+        private static readonly string[] _validEmails = [
+            "ma_@jjf.com",
+            "12@hostname.com",
+            "d.j@server1.proseware.com",
+            "david.jones@proseware.com",
+            "j.s@server1.proseware.com",
+            "jones@ms1.proseware.com",
+            "m.a@hostname.co",
+            "m_a1a@hostname.com",
+            "ma.h.saraf.onemore@hostname.com.edu",
+            "ma@hostname.com",
+            "ma12@hostname.com",
+            "ma-a.aa@hostname.com.edu",
+            "ma-a@hostname.com",
+            "ma-a@hostname.com.edu",
+            "ma-a@1hostname.com",
+            "ma.a@1hostname.com",
+            "ma@1hostname.com"
+        ];
+
+        public static TheoryData<string> InvalidEmails => new(_invalidEmails);
+
+        public static TheoryData<string> ValidEmails => new(_validEmails);
+
         [Theory]
         [Unit("EmailRule")]
-        [InlineData(" ")]
-        [InlineData("-------")]
-        [InlineData("@majjf.com")]
-        [InlineData("A@b@c@example.com")]
-        [InlineData("Abc.example.com")]
-        [InlineData("js@proseware..com")]
-        [InlineData("ma@@jjf.com")]
-        [InlineData("ma@jjf.")]
-        [InlineData("ma@jjf..com")]
-        [InlineData("ma@jjf.c")]
-        [InlineData("ma_@jjf")]
-        [InlineData("ma_@jjf.")]
-        [InlineData("j@proseware.com9")]
-        [InlineData("js@proseware.com9")]
-        [InlineData("ma@hostname.comcom")]
-        [InlineData("MA@hostname.coMCom")]
+        [MemberData(nameof(InvalidEmails))]
         public void Should_ReturnFalse_For_InvalidEmails(string email)
         {
             var result = _rule.Execute(email);
@@ -51,23 +79,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
 
         [Theory]
         [Unit("EmailRule")]
-        [InlineData("ma_@jjf.com")]
-        [InlineData("12@hostname.com")]
-        [InlineData("d.j@server1.proseware.com")]
-        [InlineData("david.jones@proseware.com")]
-        [InlineData("j.s@server1.proseware.com")]
-        [InlineData("jones@ms1.proseware.com")]
-        [InlineData("m.a@hostname.co")]
-        [InlineData("m_a1a@hostname.com")]
-        [InlineData("ma.h.saraf.onemore@hostname.com.edu")]
-        [InlineData("ma@hostname.com")]
-        [InlineData("ma12@hostname.com")]
-        [InlineData("ma-a.aa@hostname.com.edu")]
-        [InlineData("ma-a@hostname.com")]
-        [InlineData("ma-a@hostname.com.edu")]
-        [InlineData("ma-a@1hostname.com")]
-        [InlineData("ma.a@1hostname.com")]
-        [InlineData("ma@1hostname.com")]
+        [MemberData(nameof(ValidEmails))]
         public void Should_ReturnTrue_For_ValidEmail(string email)
         {
             var result = _rule.Execute(email);
