@@ -19,10 +19,10 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
         {
             _userRepository = new Mock<ICrudRepository<Entities.User>>();
 
-            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.GenerateFilter("Email", EXISTING_EMAIL)))
-                .Returns(() => new List<Entities.User>() { MockGenerators.GenerateUser() }.AsQueryable());
+            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.Filter("Email", EXISTING_EMAIL)))
+                .Returns(() => new List<Entities.User>() { MockGenerators.User() }.AsQueryable());
 
-            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.GenerateFilter("Email", INEXISTING_EMAIL)))
+            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.Filter("Email", INEXISTING_EMAIL)))
                 .Returns(() => new List<Entities.User>().AsQueryable());
 
             _rule = new UserCreationRule(_userRepository.Object);

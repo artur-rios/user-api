@@ -1,26 +1,11 @@
-﻿using System.Text.RegularExpressions;
-using TechCraftsmen.User.Core.Dto;
+﻿using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Core.Rules.Password
 {
-    public partial class PasswordRule : BaseRule<string>
+    public class PasswordRule : BaseRule<string>
     {
         public const int MINIMUM_LENGTH = 8;
-
-        private static readonly Regex _hasNumber = HasNumber();
-        private static readonly Regex _hasLowerChar = HasLowerChar();
-        private static readonly Regex _hasUpperChar = HasUpperChar();
-        private static readonly Regex _hasMinimumLength = new(@".{" + MINIMUM_LENGTH + ",}");
-
-        [GeneratedRegex(@"[0-9]+")]
-        private static partial Regex HasNumber();
-
-        [GeneratedRegex(@"[a-z]+")]
-        private static partial Regex HasLowerChar();
-
-        [GeneratedRegex(@"[A-Z]+")]
-        private static partial Regex HasUpperChar();
-
         public override RuleResultDto Execute(string password)
         {
             if (!IsParameterValid(password, out string validationMessage))
@@ -30,22 +15,22 @@ namespace TechCraftsmen.User.Core.Rules.Password
                 return Resolve();
             }
 
-            if (!_hasNumber.IsMatch(password))
+            if (!RegexCollection.HasNumber().IsMatch(password))
             {
                 _result.Errors.Add("Password must contain a number");
             }
 
-            if (!_hasLowerChar.IsMatch(password))
+            if (!RegexCollection.HasLowerChar().IsMatch(password))
             {
                 _result.Errors.Add("Password must contain a lower char");
             }
 
-            if (!_hasUpperChar.IsMatch(password))
+            if (!RegexCollection.HasUpperChar().IsMatch(password))
             {
                 _result.Errors.Add("Password must contain a upper char");
             }
 
-            if (!_hasMinimumLength.IsMatch(password))
+            if (password.Length < MINIMUM_LENGTH)
             {
                 _result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
             }

@@ -1,4 +1,5 @@
 ﻿using TechCraftsmen.User.Core.Rules.Password;
+using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
@@ -7,12 +8,13 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
     public class PasswordRuleTests
     {
         private readonly PasswordRule _rule = new();
+        private readonly RandomStringGenerator _randomStringGenerator = new();
 
         [Fact]
         [Unit("PasswordRule")]
         public void Should_ReturnFalse_ForPassword_WithNoNumber()
         {
-            var password = "Ab#cd#ef#";
+            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().Generate();
 
             var result = _rule.Execute(password);
 
@@ -25,7 +27,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         [Unit("PasswordRule")]
         public void Should_ReturnFalse_ForPassword_WithNoLowerChar()
         {
-            var password = "1A2B#CD#EF";
+            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithUpperChars().Generate();
 
             var result = _rule.Execute(password);
 
@@ -38,7 +40,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         [Unit("PasswordRule")]
         public void Should_ReturnFalse_ForPassword_WithNoUpperChar()
         {
-            var password = "1a2b#cd#ef";
+            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().Generate();
 
             var result = _rule.Execute(password);
 
@@ -51,7 +53,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         [Unit("PasswordRule")]
         public void Should_ReturnFalse_ForPassword_WithLessThanMinimumLength()
         {
-            var password = "1A2b#3c";
+            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH - 1).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
             var result = _rule.Execute(password);
 
@@ -78,7 +80,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         [Unit("PasswordRule")]
         public void Should_ReturnTrue_ForValidPassword()
         {
-            var password = "1A2b#cd#ef";
+            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
             var result = _rule.Execute(password);
 

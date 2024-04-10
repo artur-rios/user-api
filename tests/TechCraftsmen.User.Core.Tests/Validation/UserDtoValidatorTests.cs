@@ -1,5 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
@@ -17,9 +18,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForNameNullOrEmpty(string name)
         {
-            var credentialsDto = new Dto.UserDto() { Name = name, Email = "test@mail.com", Password = "1A2b#cd#ef", RoleId = 2 };
+            var user = MockGenerators.UserDto(new Tuple<bool, string?>(true, name));
 
-            var result = _validator.TestValidate(credentialsDto);
+            var result = _validator.TestValidate(user);
 
             result.ShouldHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);
@@ -36,9 +37,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidEmail(string email)
         {
-            var credentialsDto = new Dto.UserDto() { Name = "Jhon Doe", Email = email, Password = "1A2b#cd#ef", RoleId = 2 };
+            var user = MockGenerators.UserDto(null, new Tuple<bool, string?>(true, email));
 
-            var result = _validator.TestValidate(credentialsDto);
+            var result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldHaveValidationErrorFor(user => user.Email);
@@ -58,9 +59,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidPassword(string password)
         {
-            var credentialsDto = new Dto.UserDto() { Name = "Jhon Doe", Email = "test@mail.com", Password = password, RoleId = 2 };
+            var user = MockGenerators.UserDto(null, null, new Tuple<bool, string?>(true, password));
 
-            var result = _validator.TestValidate(credentialsDto);
+            var result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);
@@ -72,9 +73,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [Unit("UserDtoValidator")]
         public void Should_NotHaveError_ForValidUserDto()
         {
-            var credentialsDto = new Dto.UserDto() { Name = "Jhon Doe", Email = "test@mail.com", Password = "1A2b#cd#ef", RoleId = 2 };
+            var user = MockGenerators.UserDto();
 
-            var result = _validator.TestValidate(credentialsDto);
+            var result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);
