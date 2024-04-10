@@ -1,6 +1,7 @@
 ﻿using Moq;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Rules.User;
+using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
@@ -10,6 +11,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
     public class UserCreationRuleTests
     {
         private readonly UserCreationRule _rule;
+        private readonly UserGenerator _userGenerator;
         private readonly Mock<ICrudRepository<Entities.User>> _userRepository;
 
         private const string EXISTING_EMAIL = "exists@mail.com";
@@ -17,12 +19,13 @@ namespace TechCraftsmen.User.Core.Tests.Rules.User
 
         public UserCreationRuleTests()
         {
+            _userGenerator = new UserGenerator();
             _userRepository = new Mock<ICrudRepository<Entities.User>>();
 
-            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.Filter("Email", EXISTING_EMAIL)))
-                .Returns(() => new List<Entities.User>() { MockGenerators.User() }.AsQueryable());
+            _userRepository.Setup(repo => repo.GetByFilter(FilterUtils.Create("Email", EXISTING_EMAIL)))
+                .Returns(() => new List<Entities.User>() { _userGenerator.Generate() }.AsQueryable());
 
-            _userRepository.Setup(repo => repo.GetByFilter(MockGenerators.Filter("Email", INEXISTING_EMAIL)))
+            _userRepository.Setup(repo => repo.GetByFilter(FilterUtils.Create("Email", INEXISTING_EMAIL)))
                 .Returns(() => new List<Entities.User>().AsQueryable());
 
             _rule = new UserCreationRule(_userRepository.Object);

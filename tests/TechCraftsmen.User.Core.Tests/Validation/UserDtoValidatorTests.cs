@@ -8,6 +8,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
 {
     public class UserDtoValidatorTests
     {
+        private readonly UserDtoGenerator _userDtoGenerator = new();
         private readonly UserDtoValidator _validator = new();
 
         [Theory]
@@ -18,7 +19,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForNameNullOrEmpty(string name)
         {
-            var user = MockGenerators.UserDto(new Tuple<bool, string?>(true, name));
+            var user = _userDtoGenerator.WithDefaultEmail().WithRandomPassword().WithName(name).Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -37,7 +38,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidEmail(string email)
         {
-            var user = MockGenerators.UserDto(null, new Tuple<bool, string?>(true, email));
+            var user = _userDtoGenerator.WithDefaultName().WithRandomPassword().WithEmail(email).Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -59,7 +60,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidPassword(string password)
         {
-            var user = MockGenerators.UserDto(null, null, new Tuple<bool, string?>(true, password));
+            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithPassword(password).Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -73,7 +74,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [Unit("UserDtoValidator")]
         public void Should_NotHaveError_ForValidUserDto()
         {
-            var user = MockGenerators.UserDto();
+            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().Generate();
 
             var result = _validator.TestValidate(user);
 
