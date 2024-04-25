@@ -2,11 +2,12 @@
 using FluentValidation;
 using Moq;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
+using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Services.Implementation;
-using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Mock;
 using Xunit;
@@ -25,17 +26,17 @@ namespace TechCraftsmen.User.Services.Tests
         private readonly UserStatusUpdateRule _statusUpdateRule;
         private readonly UserDeletionRule _deletionRule;
 
+        private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly UserGenerator _userGenerator = new();
         private readonly UserDtoGenerator _userDtoGenerator = new();
 
+        private readonly string _passwordMock;
+        private readonly UserDto _userDtoMock;
         private readonly Core.Entities.User _userMock;
 
         private const int EXISTING_ID = 1;
         private const int INEXISTING_ID = 2;
         private const string EXISTING_EMAIL = "exists@mail.com";
-        private const string INEXISTING_EMAIL = "inexists@mail.com";
-        private const string CORRECT_PASSWORD = "C0rrectPassw0rd";
-        private const string INCORRECT_PASSWORD = "Inc0rrectPassw0rd";
 
         public UserServiceTests()
         {
@@ -46,20 +47,35 @@ namespace TechCraftsmen.User.Services.Tests
             _statusUpdateRule = new UserStatusUpdateRule();
             _deletionRule = new UserDeletionRule();
 
-            _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword().Generate();
+            _passwordMock = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            _userRepository.Setup(repo => repo.Create(_userMock)).Returns(() => _userMock.Id);
+            _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock).Generate();
+            _userDtoMock = _mapper.Map<UserDto>(_userMock);
+            _userDtoMock.Password = _passwordMock;
 
-            _userRepository.Setup(repo => repo.GetById(EXISTING_ID))
-                .Returns(() => _userGenerator.WithId(EXISTING_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().Generate());
+            _userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
 
-            _userRepository.Setup(repo => repo.GetById(EXISTING_ID)).Returns(() => null);
+            _userRepository.Setup(repo => repo.GetById(It.IsAny<int>()))
+                .Returns((int id) =>
+                {
+                    if (id == EXISTING_ID)
+                    {
+                        return _userGenerator.WithId(EXISTING_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().Generate();
+                    }
 
-            _userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", EXISTING_EMAIL)))
-                .Returns(() => new List<Core.Entities.User>() { _userGenerator.WithId(EXISTING_ID).WithEmail(EXISTING_EMAIL).WithPassword(CORRECT_PASSWORD).Generate() }.AsQueryable());
+                    return null;
+                });
 
-            _userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", INEXISTING_EMAIL)))
-                .Returns(() => new List<Core.Entities.User>().AsQueryable());
+            _userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>()))
+                .Returns((Dictionary<string, object> filter) =>
+                {
+                    if (filter.FirstOrDefault().Value as string == EXISTING_EMAIL)
+                    {
+                        return new List<Core.Entities.User>() { _userGenerator.WithId(EXISTING_ID).WithEmail(EXISTING_EMAIL).WithRandomPassword().Generate() }.AsQueryable();
+                    }
+
+                    return new List<Core.Entities.User>().AsQueryable();
+                });
 
             _userRepository.Setup(repo => repo.Update(_userMock));
 
@@ -76,6 +92,39 @@ namespace TechCraftsmen.User.Services.Tests
             var invalidDto = _userDtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword().Generate();
 
             Assert.Throws<ValidationException>(() => _userService.CreateUser(invalidDto));
+        }
+
+        [Fact]
+        public void Should_ThrowNotAllowedException_When_CreationRuleFails()
+        {
+            var userWithExisitingEmail = _userDtoGenerator.WithEmail(EXISTING_EMAIL).WithDefaultName().WithRandomPassword().Generate();
+
+            Assert.Throws<NotAllowedException>(() => _userService.CreateUser(userWithExisitingEmail));
+        }
+
+        [Fact]
+        public void Should_CreateUser_And_ReturnId_ForValidDto()
+        {
+            var newId = _userService.CreateUser(_userDtoMock);
+
+            Assert.Equal(_userMock.Id, newId);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_When_IdNotOnDatabase()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUserById(INEXISTING_ID));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ReturnUser_When_IdIsOnDatabase()
+        {
+            var user = _userService.GetUserById(EXISTING_ID);
+
+            Assert.NotNull(user);
+            Assert.Equal(EXISTING_ID, user.Id);
         }
     }
 }
