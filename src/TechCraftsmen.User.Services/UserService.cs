@@ -72,7 +72,6 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
             user.Password = hashResult.Hash;
             user.Salt = hashResult.Salt;
-            user.RoleId = (int)Roles.ADMIN;
 
             return _userRepository.Create(user);
         }
