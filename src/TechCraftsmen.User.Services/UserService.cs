@@ -2,8 +2,8 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Rules.User;
@@ -16,37 +16,18 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         private readonly IMapper _mapper;
         private readonly ICrudRepository<Entities.User> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
-
+        private readonly UserFilterValidator _userFilter;
         private readonly UserCreationRule _creationRule;
         private readonly UserUpdateRule _updateRule;
         private readonly UserStatusUpdateRule _statusUpdateRule;
         private readonly UserDeletionRule _deletionRule;
 
-        private readonly Dictionary<string, Func<string, object>> _filterParsers = new()
-        {
-            { "Name", value => value },
-            { "Email", value => value },
-#pragma warning disable CS8603 // Possible null reference return. Reason: null expected
-            { "RoleId", value => value.ToInt()  },
-            { "CreateAt", value => value.ToDateTime() },
-#pragma warning restore CS8603 // Possible null reference return.
-            { "Active", value => value }
-        };
-
-        private readonly Dictionary<string, Func<object, bool>> _filterValidators = new()
-        {
-            { "Name", value => value is string && !string.IsNullOrEmpty(value as string) },
-            { "Email", value => value is string && !string.IsNullOrEmpty(value as string) },
-            { "RoleId", value => value is int intValue && intValue > 0 },
-            { "CreateAt", value => value is DateTime datetime && datetime < DateTime.UtcNow },
-            { "Active", value => value is bool }
-        };
-
-        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
+        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserFilterValidator userFilter, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _userValidator = userValidator;
+            _userFilter = userFilter;
             _creationRule = creationRule;
             _updateRule = updateRule;
             _statusUpdateRule = statusUpdateRule;
@@ -87,24 +68,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
         public IList<UserDto> GetUsersByFilter(IQueryCollection query)
         {
-            Dictionary<string, object> filters = ParseQueryParams(query);
-            Dictionary<string, object> validFilters = [];
-
-            if (filters.Count > 0)
-            {
-                foreach (var filter in filters)
-                {
-                    var filterValidator = _filterValidators.GetValueOrDefault(filter.Key);
-
-                    if (filterValidator is not null)
-                    {
-                        if (filterValidator(filter.Value))
-                        {
-                            validFilters.Add(filter.Key, filter.Value);
-                        }
-                    }
-                }
-            }
+            Dictionary<string, object> validFilters = _userFilter.ParseAndValidateFilters(query);
 
             if (validFilters.Count == 0)
             {
@@ -218,33 +182,6 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             {
                 target.Active = source.Active;
             }
-        }
-
-        private Dictionary<string, object> ParseQueryParams(IQueryCollection query)
-        {
-            var parsedFilters = new Dictionary<string, object>();
-
-            if (query is not null || query?.Count > 0)
-            {
-                foreach (var item in query)
-                {
-                    var filterParser = _filterParsers.GetValueOrDefault(item.Key);
-
-                    if (filterParser is not null)
-                    {
-#pragma warning disable CS8604 // Possible null reference argument. Reason: null expected.
-                        var parsedFilter = filterParser(item.Value);
-#pragma warning restore CS8604 // Possible null reference argument.
-
-                        if (parsedFilter is not null)
-                        {
-                            parsedFilters.Add(item.Key, parsedFilter);
-                        }
-                    }
-                }
-            }
-
-            return parsedFilters;
         }
     }
 }

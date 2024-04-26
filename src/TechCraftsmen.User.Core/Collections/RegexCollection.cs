@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace TechCraftsmen.User.Core.Utils
+namespace TechCraftsmen.User.Core.Collections
 {
     public static partial class RegexCollection
     {

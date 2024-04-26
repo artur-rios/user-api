@@ -1,5 +1,5 @@
 ﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Utils;
+using TechCraftsmen.User.Core.Extensions;
 
 namespace TechCraftsmen.User.Core.Rules.User
 {

@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Utils;
+﻿using TechCraftsmen.User.Core.Collections;
+using TechCraftsmen.User.Core.Dto;
 
 namespace TechCraftsmen.User.Core.Rules.Password
 {

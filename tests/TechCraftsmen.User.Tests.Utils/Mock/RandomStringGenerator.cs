@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using TechCraftsmen.User.Core.Collections;
 using TechCraftsmen.User.Core.Exceptions;
-using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Tests.Utils.Mock
 {

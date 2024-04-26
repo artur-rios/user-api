@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Rules.User;
-using TechCraftsmen.User.Core.Utils;
+﻿using TechCraftsmen.User.Core.Extensions;
+using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

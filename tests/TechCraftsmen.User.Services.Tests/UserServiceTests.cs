@@ -3,6 +3,7 @@ using FluentValidation;
 using Moq;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Rules.Password;
@@ -20,7 +21,7 @@ namespace TechCraftsmen.User.Services.Tests
         private readonly IMapper _mapper;
         private readonly Mock<ICrudRepository<Core.Entities.User>> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
-
+        private readonly UserFilterValidator _userFilterValidator;
         private readonly UserCreationRule _creationRule;
         private readonly UserUpdateRule _updateRule;
         private readonly UserStatusUpdateRule _statusUpdateRule;
@@ -83,7 +84,9 @@ namespace TechCraftsmen.User.Services.Tests
 
             _creationRule = new UserCreationRule(_userRepository.Object);
 
-            _userService = new UserService(_mapper, _userRepository.Object, _userValidator, _creationRule, _updateRule, _statusUpdateRule, _deletionRule);
+            _userFilterValidator = new UserFilterValidator();
+
+            _userService = new UserService(_mapper, _userRepository.Object, _userValidator, _userFilterValidator, _creationRule, _updateRule, _statusUpdateRule, _deletionRule);
         }
 
         [Fact]

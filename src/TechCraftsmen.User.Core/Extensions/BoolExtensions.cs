@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Core.Utils
+﻿namespace TechCraftsmen.User.Core.Extensions
 {
     public static class BoolExtensions
     {
