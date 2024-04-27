@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         private readonly IMapper _mapper;
         private readonly ICrudRepository<Entities.User> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
-        private readonly UserFilterValidator _userFilter;
+        private readonly UserFilterValidator _filterValidator;
         private readonly UserCreationRule _creationRule;
         private readonly UserUpdateRule _updateRule;
         private readonly UserStatusUpdateRule _statusUpdateRule;
@@ -27,7 +27,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             _mapper = mapper;
             _userRepository = userRepository;
             _userValidator = userValidator;
-            _userFilter = userFilter;
+            _filterValidator = userFilter;
             _creationRule = creationRule;
             _updateRule = updateRule;
             _statusUpdateRule = statusUpdateRule;
@@ -68,7 +68,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
 
         public IList<UserDto> GetUsersByFilter(IQueryCollection query)
         {
-            Dictionary<string, object> validFilters = _userFilter.ParseAndValidateFilters(query);
+            Dictionary<string, object> validFilters = _filterValidator.ParseAndValidateFilters(query);
 
             if (validFilters.Count == 0)
             {
