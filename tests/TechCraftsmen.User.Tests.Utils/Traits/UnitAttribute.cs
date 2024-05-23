@@ -18,14 +18,12 @@ namespace TechCraftsmen.User.Tests.Utils.Traits
         {
             var name = traitAttribute.GetNamedArgument<string>("Name");
 
-
-            yield return new KeyValuePair<string, string>("Trait", "Unit");
-
             if (!string.IsNullOrWhiteSpace(name))
             {
                 yield return new KeyValuePair<string, string>("Unit", name);
             }
 
+            yield return new KeyValuePair<string, string>("Trait", "Unit");
         }
     }
 }

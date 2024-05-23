@@ -58,7 +58,7 @@ namespace TechCraftsmen.User.Services
         {
             var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
-            ClaimsIdentity identity = new(new[] { new Claim("id", userId.ToString()) });
+            ClaimsIdentity identity = new([new Claim("id", userId.ToString())]);
 
             DateTime creationDate = DateTime.Now;
             DateTime expirationDate = creationDate + TimeSpan.FromSeconds(_authTokenConfig.Seconds);
