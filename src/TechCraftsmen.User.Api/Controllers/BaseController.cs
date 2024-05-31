@@ -5,14 +5,9 @@ using TechCraftsmen.User.Core.Exceptions;
 
 namespace TechCraftsmen.User.Api.Controllers
 {
-    public abstract class BaseController : Controller
+    public abstract class BaseController(ILogger<BaseController> logger) : Controller
     {
-        private readonly ILogger<BaseController> _logger;
-
-        public BaseController(ILogger<BaseController> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<BaseController> _logger = logger;
 
         public ActionResult<ResultDto<T>> BadRequest<T>(Exception exception)
         {
@@ -53,7 +48,9 @@ namespace TechCraftsmen.User.Api.Controllers
 
             if (exception.InnerException is not null)
             {
+#pragma warning disable CA2254 // Template should be a static expression
                 _logger.LogError(exception.InnerException.Message);
+#pragma warning restore CA2254 // Template should be a static expression
             }
 
             var result = new ResultDto<T>(default, message, false);
