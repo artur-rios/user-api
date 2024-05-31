@@ -28,6 +28,7 @@ namespace TechCraftsmen.User.Api
             builder.Services.AddRelationalRepositories();
             builder.Services.AddDomainRules();
             builder.Services.AddServices();
+            builder.Services.AddFilterValidators();
 
             var app = builder.Build();
 
