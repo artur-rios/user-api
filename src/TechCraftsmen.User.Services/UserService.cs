@@ -9,12 +9,12 @@ using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 
-namespace TechCraftsmen.User.Core.Services.Implementation
+namespace TechCraftsmen.User.Services
 {
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
-        private readonly ICrudRepository<Entities.User> _userRepository;
+        private readonly ICrudRepository<Core.Entities.User> _userRepository;
         private readonly IValidator<UserDto> _userValidator;
         private readonly UserFilterValidator _filterValidator;
         private readonly UserCreationRule _creationRule;
@@ -22,7 +22,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
         private readonly UserStatusUpdateRule _statusUpdateRule;
         private readonly UserDeletionRule _deletionRule;
 
-        public UserService(IMapper mapper, ICrudRepository<Entities.User> userRepository, IValidator<UserDto> userValidator, UserFilterValidator userFilter, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
+        public UserService(IMapper mapper, ICrudRepository<Core.Entities.User> userRepository, IValidator<UserDto> userValidator, UserFilterValidator userFilter, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -47,7 +47,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            var user = _mapper.Map<Entities.User>(userDto);
+            var user = _mapper.Map<Core.Entities.User>(userDto);
 
             var hashResult = HashUtils.HashText(userDto.Password);
 
@@ -114,7 +114,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            var user = _mapper.Map<Entities.User>(userDto);
+            var user = _mapper.Map<Core.Entities.User>(userDto);
 
             MergeUser(user, currentUser);
 
@@ -173,7 +173,7 @@ namespace TechCraftsmen.User.Core.Services.Implementation
             _userRepository.Delete(user);
         }
 
-        private static void MergeUser(Entities.User source, Entities.User target, bool mergeStatus = true)
+        private static void MergeUser(Core.Entities.User source, Core.Entities.User target, bool mergeStatus = true)
         {
             target.Password = source.Password;
             target.CreatedAt = source.CreatedAt;

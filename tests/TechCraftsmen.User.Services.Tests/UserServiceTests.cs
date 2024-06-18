@@ -8,7 +8,7 @@ using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Rules.User;
-using TechCraftsmen.User.Core.Services.Implementation;
+using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Mock;
 using Xunit;
@@ -37,7 +37,9 @@ namespace TechCraftsmen.User.Services.Tests
 
         private const int EXISTING_ID = 1;
         private const int INEXISTING_ID = 2;
+        private const int INACTIVE_ID = 3;
         private const string EXISTING_EMAIL = "exists@mail.com";
+        private const string INEXISTING_EMAIL = "inexists@mail.com";
 
         public UserServiceTests()
         {
@@ -64,6 +66,11 @@ namespace TechCraftsmen.User.Services.Tests
                         return _userGenerator.WithId(EXISTING_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().Generate();
                     }
 
+                    if (id == INACTIVE_ID)
+                    {
+                        return _userGenerator.WithId(INACTIVE_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().WithStatus(false).Generate();
+                    }
+
                     return null;
                 });
 
@@ -78,9 +85,9 @@ namespace TechCraftsmen.User.Services.Tests
                     return new List<Core.Entities.User>().AsQueryable();
                 });
 
-            _userRepository.Setup(repo => repo.Update(_userMock));
+            _userRepository.Setup(repo => repo.Update(It.IsAny<Core.Entities.User>()));
 
-            _userRepository.Setup(repo => repo.Delete(_userMock));
+            _userRepository.Setup(repo => repo.Delete(It.IsAny<Core.Entities.User>()));
 
             _creationRule = new UserCreationRule(_userRepository.Object);
 
@@ -128,6 +135,155 @@ namespace TechCraftsmen.User.Services.Tests
 
             Assert.NotNull(user);
             Assert.Equal(EXISTING_ID, user.Id);
+        }
+
+        [Fact]
+        public void Should_ThrowNotAllowedException_When_FilterIsInvalid()
+        {
+            var exception = Assert.Throws<NotAllowedException>(() => _userService.GetUsersByFilter(FilterUtils.CreateQuery("InvalidFilter", "xxxxx")));
+
+            Assert.Equal("No valid filters were passed!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_When_FilterDoesNotReturnAnyResult()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", INEXISTING_EMAIL)));
+
+            Assert.Equal("No users found with the given filter", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ReturnUsers_For_ValidAndExistingFilter()
+        {
+            var users = _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", EXISTING_EMAIL));
+
+            Assert.NotNull(users);
+            Assert.NotEmpty(users);
+            Assert.True(users.FirstOrDefault(user => user.Email == EXISTING_EMAIL) is not null);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetPasswordByUserId(INEXISTING_ID));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ReturnPassword_When_IdIsOnDatabase()
+        {
+            var hashDto = _userService.GetPasswordByUserId(EXISTING_ID);
+
+            Assert.NotNull(hashDto);
+            Assert.NotEmpty(hashDto.Hash);
+            Assert.NotEmpty(hashDto.Salt);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotUpdateUser()
+        {
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(INEXISTING_ID).WithPassword(_passwordMock).Generate();
+            var userDto = _mapper.Map<UserDto>(userMock);
+
+            var exception = Assert.Throws<NotFoundException>(() => _userService.UpdateUser(userDto));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ThrowNotNotAllowedException_WhenUserIsInactive()
+        {
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(INACTIVE_ID).WithPassword(_passwordMock).Generate();
+            var userDto = _mapper.Map<UserDto>(userMock);
+
+            var exception = Assert.Throws<NotAllowedException>(() => _userService.UpdateUser(userDto));
+
+            Assert.Equal("Can't update inactive user", exception.Message);
+        }
+
+        [Fact]
+        public void Should_UpdateUser()
+        {
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(EXISTING_ID).WithPassword(_passwordMock).Generate();
+            var userDto = _mapper.Map<UserDto>(userMock);
+
+            var exception = Record.Exception(() => _userService.UpdateUser(userDto));
+
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotActivateUser()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.ActivateUser(INEXISTING_ID));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ThrowNotNotAllowedException_WhenUserIsActive()
+        {
+            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.ActivateUser(EXISTING_ID));
+
+            Assert.Equal("User already active", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ActivateUser()
+        {
+            var exception = Record.Exception(() => _userService.ActivateUser(INACTIVE_ID));
+
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeactivateUser()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.DeactivateUser(INEXISTING_ID));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ThrowNotNotAllowedException_WhenUserIsInactive_On_Deactivation()
+        {
+            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.DeactivateUser(INACTIVE_ID));
+
+            Assert.Equal("User already inactive", exception.Message);
+        }
+
+        [Fact]
+        public void Should_DeactivateUser()
+        {
+            var exception = Record.Exception(() => _userService.DeactivateUser(EXISTING_ID));
+
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeleteUser()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _userService.DeleteUser(INEXISTING_ID));
+
+            Assert.Equal("User not found!", exception.Message);
+        }
+
+        [Fact]
+        public void Should_ThrowNotAllowedException_WhenIdNotOnDatabaseAndCannotDeleteUser()
+        {
+            var exception = Assert.Throws<NotAllowedException>(() => _userService.DeleteUser(EXISTING_ID));
+
+            Assert.Equal("Can't delete active user", exception.Message);
+        }
+
+        [Fact]
+        public void Should_DeleteUser()
+        {
+            var exception = Record.Exception(() => _userService.DeleteUser(INACTIVE_ID));
+
+            Assert.Null(exception);
         }
     }
 }
