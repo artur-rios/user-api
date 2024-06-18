@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Api.Controllers;
 using TechCraftsmen.User.Core.Dto;
 
-namespace TechCraftsmen.User.Controllers
+namespace TechCraftsmen.User.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

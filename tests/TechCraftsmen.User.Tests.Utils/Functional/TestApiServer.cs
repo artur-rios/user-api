@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 
-namespace TechCraftsmen.User.Tests.Utils
+namespace TechCraftsmen.User.Tests.Utils.Functional
 {
 
     public class TestApiServer : TestServer

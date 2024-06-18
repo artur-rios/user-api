@@ -4,59 +4,60 @@ using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Interfaces.Services;
 
-namespace TechCraftsmen.User.Tests.Utils;
-
-public class TestApiClient
+namespace TechCraftsmen.User.Tests.Utils.Functional
 {
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<TestApiClient> _logger;
-    private readonly IAuthenticationService _authService;
-
-    public TestApiClient(TestServer server, IAuthenticationService authService, ILogger<TestApiClient> logger)
+    public class TestApiClient
     {
-        _authService = authService;
-        _httpClient = server.CreateClient();
-        _logger = logger;
-    }
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<TestApiClient> _logger;
+        private readonly IAuthenticationService _authService;
 
-    public void Authorize(AuthenticationCredentialsDto authCredentials)
-    {
-        try
+        public TestApiClient(TestServer server, IAuthenticationService authService, ILogger<TestApiClient> logger)
         {
-            var authToken = _authService.AuthenticateUser(authCredentials);
-
-            _httpClient.DefaultRequestHeaders.Add("Authorization", authToken.AccessToken);
+            _authService = authService;
+            _httpClient = server.CreateClient();
+            _logger = logger;
         }
-        catch (Exception e)
+
+        public void Authorize(AuthenticationCredentialsDto authCredentials)
         {
+            try
+            {
+                var authToken = _authService.AuthenticateUser(authCredentials);
+
+                _httpClient.DefaultRequestHeaders.Add("Authorization", authToken.AccessToken);
+            }
+            catch (Exception e)
+            {
 #pragma warning disable CA2254 // Template should be a static expression
-            _logger.LogError(e.Message);
+                _logger.LogError(e.Message);
 #pragma warning restore CA2254 // Template should be a static expression
+            }
         }
-    }
 
-    public async Task<HttpResponseMessage> Get(string url)
-    {
-        return await _httpClient.GetAsync(url);
-    }
+        public async Task<HttpResponseMessage> Get(string url)
+        {
+            return await _httpClient.GetAsync(url);
+        }
 
-    public async Task<HttpResponseMessage> Post(string url, object? content = null)
-    {
-        return await _httpClient.PostAsync(url, content?.ToJsonContent());
-    }
+        public async Task<HttpResponseMessage> Post(string url, object? content = null)
+        {
+            return await _httpClient.PostAsync(url, content?.ToJsonContent());
+        }
 
-    public async Task<HttpResponseMessage> Put(string url, object? content = null)
-    {
-        return await _httpClient.PutAsync(url, content?.ToJsonContent());
-    }
+        public async Task<HttpResponseMessage> Put(string url, object? content = null)
+        {
+            return await _httpClient.PutAsync(url, content?.ToJsonContent());
+        }
 
-    public async Task<HttpResponseMessage> Patch(string url, object? content = null)
-    {
-        return await _httpClient.PatchAsync(url, content?.ToJsonContent());
-    }
+        public async Task<HttpResponseMessage> Patch(string url, object? content = null)
+        {
+            return await _httpClient.PatchAsync(url, content?.ToJsonContent());
+        }
 
-    public async Task<HttpResponseMessage> Delete(string url)
-    {
-        return await _httpClient.DeleteAsync(url);
+        public async Task<HttpResponseMessage> Delete(string url)
+        {
+            return await _httpClient.DeleteAsync(url);
+        }
     }
 }

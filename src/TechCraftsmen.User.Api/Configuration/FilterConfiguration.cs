@@ -1,11 +1,12 @@
 ﻿using TechCraftsmen.User.Core.Filters;
 
-namespace TechCraftsmen.User.Api;
-
-public static class FilterConfiguration
+namespace TechCraftsmen.User.Api.Configuration
 {
-    public static void AddFilterValidators(this IServiceCollection services)
+    public static class FilterConfiguration
     {
-        services.AddScoped<UserFilterValidator>();
+        public static void AddFilterValidators(this IServiceCollection services)
+        {
+            services.AddScoped<UserFilterValidator>();
+        }
     }
 }

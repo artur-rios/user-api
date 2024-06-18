@@ -1,24 +1,25 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
-namespace TechCraftsmen.User.Tests.Utils;
-
-public class TestProgram
+namespace TechCraftsmen.User.Tests.Utils.Functional
 {
-    private readonly IConfiguration _configuration;
-
-    public TestProgram()
+    public class TestProgram
     {
-        _configuration = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .Build();
-    }
+        private readonly IConfiguration _configuration;
 
-    public IWebHostBuilder CreateWebHostBuilder() => new WebHostBuilder()
-        // TODO .UseStartup<Startup>()
-        .UseEnvironment("Testing")
-        .ConfigureAppConfiguration((builder, config) =>
+        public TestProgram()
         {
-            config.AddConfiguration(_configuration);
-        });
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .Build();
+        }
+
+        public IWebHostBuilder CreateWebHostBuilder() => new WebHostBuilder()
+            // TODO .UseStartup<Startup>()
+            .UseEnvironment("Testing")
+            .ConfigureAppConfiguration((builder, config) =>
+            {
+                config.AddConfiguration(_configuration);
+            });
+    }
 }
