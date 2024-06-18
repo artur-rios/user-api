@@ -14,6 +14,7 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
         private string? _email = null;
         private byte[]? _password = null;
         private byte[]? _salt = null;
+        private bool _status = true;
 
         public UserGenerator WithId(int id)
         {
@@ -78,6 +79,13 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
             return this;
         }
 
+        public UserGenerator WithStatus(bool status)
+        {
+            _status = status;
+
+            return this;
+        }
+
         public Core.Entities.User Generate()
         {
 #pragma warning disable CS8601 // Possible null reference assignment.
@@ -87,7 +95,8 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
                 Name = _name,
                 Email = _email,
                 Password = _password,
-                Salt = _salt
+                Salt = _salt,
+                Active = _status
             };
 #pragma warning restore CS8601 // Possible null reference assignment.
 

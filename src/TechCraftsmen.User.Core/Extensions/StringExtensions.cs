@@ -21,5 +21,20 @@
 
             return null;
         }
+
+        public static bool? ToBool(this string value)
+        {
+            if (value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            if (value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return false;
+            }
+
+            return null;
+        }
     }
 }

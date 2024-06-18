@@ -2,55 +2,64 @@
 using Microsoft.Extensions.Primitives;
 using TechCraftsmen.User.Core.Extensions;
 
-namespace TechCraftsmen.User.Core.Filters;
-
-public abstract class FilterValidator
+namespace TechCraftsmen.User.Core.Filters
 {
-    public List<EntityFilter> Filters = [];
 
-    public FilterValidator()
+    public abstract class FilterValidator
     {
-        SetFilters();
-    }
+        public List<EntityFilter> Filters = [];
 
-    public abstract void SetFilters();
-
-    public KeyValuePair<string, string>? ParseAndValidateFilter(KeyValuePair<string, StringValues> filter)
-    {
-        var searchedFilter = Filters.Find(f => f.Name == filter.Key);
-
-        if (searchedFilter is not null)
+        public FilterValidator()
         {
-            var value = searchedFilter.ParseAndValidateValue(filter.Value!);
-
-            if (value is not null)
-            {
-                return new KeyValuePair<string, string>(filter.Key, value);
-            }
+            SetFilters();
         }
 
-        return null;
-    }
+        public abstract void SetFilters();
 
-    public Dictionary<string, object> ParseAndValidateFilters(IQueryCollection query)
-    {
-        var parsedFilters = new Dictionary<string, object>();
-
-        if (query is not null || query?.Count > 0)
+        public KeyValuePair<string, object>? ParseAndValidateFilter(KeyValuePair<string, StringValues> filter)
         {
-            foreach (var item in query)
+            var searchedFilter = Filters.Find(f => f.Name == filter.Key);
+
+            if (searchedFilter is not null)
             {
-                var parsedFilter = ParseAndValidateFilter(item);
-
-                if (parsedFilter is not null)
+                try
                 {
-                    parsedFilter.Value.Deconstruct<string, string>(out var key, out var value);
+                    var value = searchedFilter.ParseAndValidateValue(filter.Value!);
 
-                    parsedFilters.Add(key, value);
+                    if (value is not null)
+                    {
+                        return new KeyValuePair<string, object>(filter.Key, value);
+                    }
+                }
+                catch
+                {
+                    return null;
                 }
             }
+
+            return null;
         }
 
-        return parsedFilters;
+        public Dictionary<string, object> ParseAndValidateFilters(IQueryCollection query)
+        {
+            var parsedFilters = new Dictionary<string, object>();
+
+            if (query is not null || query?.Count > 0)
+            {
+                foreach (var item in query)
+                {
+                    var parsedFilter = ParseAndValidateFilter(item);
+
+                    if (parsedFilter is not null)
+                    {
+                        parsedFilter.Value.Deconstruct<string, object>(out var key, out var value);
+
+                        parsedFilters.Add(key, value);
+                    }
+                }
+            }
+
+            return parsedFilters;
+        }
     }
 }
