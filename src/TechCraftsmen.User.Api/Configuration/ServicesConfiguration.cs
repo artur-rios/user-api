@@ -1,5 +1,4 @@
 ﻿using TechCraftsmen.User.Core.Interfaces.Services;
-using TechCraftsmen.User.Core.Services.Implementation;
 using TechCraftsmen.User.Services;
 
 namespace TechCraftsmen.User.Api.Configuration
