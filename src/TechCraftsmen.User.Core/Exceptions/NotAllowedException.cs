@@ -1,9 +1,6 @@
 ﻿namespace TechCraftsmen.User.Core.Exceptions
 {
-    public class NotAllowedException : Exception
+    public class NotAllowedException(string? message) : Exception(message)
     {
-        public NotAllowedException(string? message) : base(message)
-        {
-        }
     }
 }

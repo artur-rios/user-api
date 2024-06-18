@@ -1,9 +1,6 @@
 ﻿namespace TechCraftsmen.User.Core.Exceptions
 {
-    public class EntityNotChangedException : Exception
+    public class EntityNotChangedException(string? message) : Exception(message)
     {
-        public EntityNotChangedException(string? message) : base(message)
-        {
-        }
     }
 }
