@@ -95,6 +95,30 @@ namespace TechCraftsmen.User.Services.Tests
 
         [Fact]
         [Unit("AuthenticationService")]
+        public void Should_ReturnIdFromToken()
+        {
+            var token = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(EXISTING_EMAIL).WithPassword(CORRECT_PASSWORD).Generate());
+            var id = _authenticationService.GetUserIdFromJwtToken(token.AccessToken!);
+
+            Assert.Equal(TEST_ID, id);
+        }
+
+        [Theory]
+        [Unit("UserCreationRule")]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
+        public void Should_ReturnFalse_ForInvalidToken(string token)
+        {
+            var valid = _authenticationService.ValidateJwtToken(token, out var user);
+
+            Assert.False(valid);
+            Assert.Null(user);
+        }
+
+        [Fact]
+        [Unit("AuthenticationService")]
         public void Should_GenerateValidToken_ForValidCredentials()
         {
             var token = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(EXISTING_EMAIL).WithPassword(CORRECT_PASSWORD).Generate());

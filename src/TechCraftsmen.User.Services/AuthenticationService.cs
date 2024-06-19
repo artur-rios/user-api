@@ -95,7 +95,7 @@ namespace TechCraftsmen.User.Services
 
         public bool ValidateJwtToken(string token, out UserDto? authenticatedUser)
         {
-            if (token is null)
+            if (string.IsNullOrWhiteSpace(token))
             {
                 authenticatedUser = null;
 
