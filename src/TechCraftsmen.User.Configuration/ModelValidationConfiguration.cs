@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation;
 
-namespace TechCraftsmen.User.Api.Configuration
+namespace TechCraftsmen.User.Configuration
 {
     public static class ModelValidationConfiguration
     {

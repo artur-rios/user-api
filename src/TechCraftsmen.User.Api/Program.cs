@@ -1,5 +1,5 @@
 using TechCraftsmen.User.Api.Authorization;
-using TechCraftsmen.User.Api.Configuration;
+using TechCraftsmen.User.Configuration;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Mapping;
 

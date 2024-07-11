@@ -1,8 +1,10 @@
-﻿using TechCraftsmen.User.Core.Interfaces.Repositories;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Data.Relational.Configuration;
 using TechCraftsmen.User.Data.Relational.Repositories;
 
-namespace TechCraftsmen.User.Api.Configuration
+namespace TechCraftsmen.User.Configuration
 {
     public static class RelationalDatabaseConfiguration
     {
@@ -10,7 +12,7 @@ namespace TechCraftsmen.User.Api.Configuration
         {
             services.Configure<RelationalDBContextOptions>(configuration);
 
-            services.AddDbContext<RelationalDBContext>();
+            services.AddDbContext<RelationalDBContext>(optionsLifetime: ServiceLifetime.Singleton);
             services.AddDbContextFactory<RelationalDBContext>();
         }
 

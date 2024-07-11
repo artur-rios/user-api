@@ -1,7 +1,8 @@
-﻿using TechCraftsmen.User.Core.Rules.Password;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Rules.User;
 
-namespace TechCraftsmen.User.Api.Configuration
+namespace TechCraftsmen.User.Configuration
 {
     public static class RulesConfiguration
     {

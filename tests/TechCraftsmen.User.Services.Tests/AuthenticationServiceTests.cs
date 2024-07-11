@@ -69,7 +69,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("AuthenticationService")]
         public void Should_ThrowValidationException_ForInvalidCredentials()
         {
-            Assert.Throws<ValidationException>(() => _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail("").WithPassword("").Generate()));
+            Assert.Throws<ValidationException>(() => _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty).WithPassword(string.Empty).Generate()));
         }
 
         [Fact]

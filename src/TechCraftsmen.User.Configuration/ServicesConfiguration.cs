@@ -1,7 +1,8 @@
-﻿using TechCraftsmen.User.Core.Interfaces.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Services;
 
-namespace TechCraftsmen.User.Api.Configuration
+namespace TechCraftsmen.User.Configuration
 {
     public static class ServicesConfiguration
     {

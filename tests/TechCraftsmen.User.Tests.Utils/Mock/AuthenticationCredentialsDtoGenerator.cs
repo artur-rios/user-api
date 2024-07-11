@@ -8,8 +8,8 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
         private readonly EmailGenerator _emailGenerator = new();
         private readonly RandomStringGenerator _randomStringGenerator = new();
 
-        private string? _email = null;
-        private string? _password = null;
+        private string _email = string.Empty;
+        private string _password = string.Empty;
 
         public AuthenticationCredentialsDtoGenerator WithEmail(string email)
         {
@@ -41,13 +41,11 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
 
         public AuthenticationCredentialsDto Generate()
         {
-#pragma warning disable CS8601 // Possible null reference assignment. Reason: expected null
             return new AuthenticationCredentialsDto()
             {
                 Email = _email,
                 Password = _password
             };
-#pragma warning restore CS8601 // Possible null reference assignment.
         }
     }
 }

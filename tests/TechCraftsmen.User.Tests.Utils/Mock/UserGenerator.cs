@@ -10,10 +10,10 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
         private static readonly RandomStringGenerator _randomStringGenerator = new();
 
         private int _id = 0;
-        private string? _name = null;
-        private string? _email = null;
-        private byte[]? _password = null;
-        private byte[]? _salt = null;
+        private string _name = string.Empty;
+        private string _email = string.Empty;
+        private byte[] _password = [];
+        private byte[] _salt = [];
         private bool _status = true;
 
         public UserGenerator WithId(int id)
@@ -88,7 +88,6 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
 
         public Core.Entities.User Generate()
         {
-#pragma warning disable CS8601 // Possible null reference assignment.
             var user = new Core.Entities.User
             {
                 Id = _id,
@@ -98,7 +97,6 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
                 Salt = _salt,
                 Active = _status
             };
-#pragma warning restore CS8601 // Possible null reference assignment.
 
             return user;
         }

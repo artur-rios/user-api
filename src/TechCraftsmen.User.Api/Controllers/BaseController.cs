@@ -44,13 +44,11 @@ namespace TechCraftsmen.User.Api.Controllers
 
         public ActionResult<ResultDto<T>> Error<T>(Exception exception, string message = "Internal error, please try again later")
         {
-            _logger.LogError(exception.Message);
+            _logger.LogError("Exception on request: {message}", exception.Message);
 
             if (exception.InnerException is not null)
             {
-#pragma warning disable CA2254 // Template should be a static expression
-                _logger.LogError(exception.InnerException.Message);
-#pragma warning restore CA2254 // Template should be a static expression
+                _logger.LogError("Inner exception on request: {message}", exception.InnerException.Message);
             }
 
             var result = new ResultDto<T>(default, message, false);

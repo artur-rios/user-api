@@ -1,6 +1,7 @@
-﻿using TechCraftsmen.User.Core.Filters;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TechCraftsmen.User.Core.Filters;
 
-namespace TechCraftsmen.User.Api.Configuration
+namespace TechCraftsmen.User.Configuration
 {
     public static class FilterConfiguration
     {
