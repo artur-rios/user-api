@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

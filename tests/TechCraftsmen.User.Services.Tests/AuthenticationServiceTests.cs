@@ -6,7 +6,7 @@ using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

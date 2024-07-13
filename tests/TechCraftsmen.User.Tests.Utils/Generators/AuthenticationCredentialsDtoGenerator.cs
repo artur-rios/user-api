@@ -1,7 +1,7 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Rules.Password;
 
-namespace TechCraftsmen.User.Tests.Utils.Mock
+namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class AuthenticationCredentialsDtoGenerator
     {

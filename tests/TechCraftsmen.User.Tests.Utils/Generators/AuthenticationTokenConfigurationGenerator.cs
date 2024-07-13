@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Configuration;
 
-namespace TechCraftsmen.User.Tests.Utils.Mock
+namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class AuthenticationTokenConfigurationGenerator
     {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

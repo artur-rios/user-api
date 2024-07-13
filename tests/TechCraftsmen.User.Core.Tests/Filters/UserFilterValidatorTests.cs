@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

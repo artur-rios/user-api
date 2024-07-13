@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Text;
+﻿using System.Text;
 using TechCraftsmen.User.Core.Collections;
 using TechCraftsmen.User.Core.Exceptions;
 
-namespace TechCraftsmen.User.Tests.Utils.Mock
+namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class RandomStringGenerator
     {

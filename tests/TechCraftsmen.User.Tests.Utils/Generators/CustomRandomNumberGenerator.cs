@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace TechCraftsmen.User.Tests.Utils.Mock
+namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public static class CustomRandomNumberGenerator
     {

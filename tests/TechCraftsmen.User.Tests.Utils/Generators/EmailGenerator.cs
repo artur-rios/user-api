@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Tests.Utils.Mock
+﻿namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class EmailGenerator
     {

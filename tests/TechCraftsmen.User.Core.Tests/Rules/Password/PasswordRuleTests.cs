@@ -1,5 +1,5 @@
 ﻿using TechCraftsmen.User.Core.Rules.Password;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 

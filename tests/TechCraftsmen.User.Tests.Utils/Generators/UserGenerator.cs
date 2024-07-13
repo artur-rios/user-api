@@ -1,7 +1,7 @@
 ﻿using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Utils;
 
-namespace TechCraftsmen.User.Tests.Utils.Mock
+namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class UserGenerator
     {

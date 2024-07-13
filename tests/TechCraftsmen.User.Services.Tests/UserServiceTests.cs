@@ -10,7 +10,7 @@ using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
