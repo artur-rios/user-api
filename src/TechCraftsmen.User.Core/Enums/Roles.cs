@@ -3,6 +3,7 @@
     public enum Roles
     {
         ADMIN = 1,
-        REGULAR
+        REGULAR,
+        TEST
     }
 }

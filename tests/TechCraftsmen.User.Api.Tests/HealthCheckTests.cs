@@ -11,6 +11,7 @@ namespace TechCraftsmen.User.Api.Tests
         private readonly HttpClient _client;
 
         private const string TEST_ENVIRONMENT = "Local";
+        private const string HEALTH_CHECK_ROUTE = "/HealthCheck";
 
         public HealthCheckTests(WebApplicationFactory<Program> factory)
         {
@@ -21,20 +22,18 @@ namespace TechCraftsmen.User.Api.Tests
         }
 
         [Fact]
-        public async void ShouldReturnOK()
+        public async void Should_DoHealthCheck_And_ReturnSuccess()
         {
-            var route = "/HealthCheck";
-
-            var response = await _client.GetAsync(route);
+            var response = await _client.GetAsync(HEALTH_CHECK_ROUTE);
 
             var body = await response.Content.ReadAsStringAsync();
 
-            var dto = JsonConvert.DeserializeObject<ResultDto<string>>(body);
+            var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.NotNull(dto);
-            Assert.Equal("Hello world!", dto.Data);
-            Assert.Equal("User Api ON", dto.Message);
+            Assert.NotNull(result);
+            Assert.Equal("Hello world!", result.Data);
+            Assert.Equal("User Api ON", result.Message);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text;
 using TechCraftsmen.User.Core.Collections;
 using TechCraftsmen.User.Core.Exceptions;
 
@@ -10,35 +11,44 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
         private const string UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const string NUMBERS = "0123456789";
 
-        private int Length;
-        private bool LowerChars;
-        private bool UpperChars;
-        private bool Numbers;
+        private int _length;
+        private bool _lowerChars;
+        private bool _upperChars;
+        private bool _numbers;
+
+        private string[] _excludedStrings = [];
+
+        public RandomStringGenerator DifferentFrom(string[] excludedStrings)
+        {
+            _excludedStrings = excludedStrings;
+
+            return this;
+        }
 
         public RandomStringGenerator WithLength(int length)
         {
-            Length = length;
+            _length = length;
 
             return this;
         }
 
         public RandomStringGenerator WithLowerChars()
         {
-            LowerChars = true;
+            _lowerChars = true;
 
             return this;
         }
 
         public RandomStringGenerator WithUpperChars()
         {
-            UpperChars = true;
+            _upperChars = true;
 
             return this;
         }
 
         public RandomStringGenerator WithNumbers()
         {
-            Numbers = true;
+            _numbers = true;
 
             return this;
         }
@@ -47,19 +57,19 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
         {
             var chars = "";
 
-            StringBuilder result = new(Length);
+            StringBuilder result = new(_length);
 
-            if (LowerChars)
+            if (_lowerChars)
             {
                 chars += LOWER_CHARS;
             }
 
-            if (UpperChars)
+            if (_upperChars)
             {
                 chars += UPPER_CHARS;
             }
 
-            if (Numbers)
+            if (_numbers)
             {
                 chars += NUMBERS;
             }
@@ -71,9 +81,9 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
 
             char[] charPool = chars.ToCharArray();
 
-            for (int i = 0; i < Length; i++)
+            for (int i = 0; i < _length; i++)
             {
-                var index = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, Length - 1, i - 1);
+                var index = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, i - 1);
 
                 result.Append(charPool[index]);
             }
@@ -82,9 +92,9 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
             int? lastIndex = null;
             int randomIndex;
 
-            if (Numbers && !RegexCollection.HasNumber().IsMatch(generatedString))
+            if (_numbers && !RegexCollection.HasNumber().IsMatch(generatedString))
             {
-                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, Length - 1, lastIndex);
+                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
                 var numbersIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, NUMBERS.Length);
 
@@ -93,9 +103,9 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
                 lastIndex = randomIndex;
             }
 
-            if (LowerChars && !RegexCollection.HasLowerChar().IsMatch(generatedString))
+            if (_lowerChars && !RegexCollection.HasLowerChar().IsMatch(generatedString))
             {
-                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, Length - 1, lastIndex);
+                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
                 var lowerCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, LOWER_CHARS.Length);
 
@@ -104,16 +114,24 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
                 lastIndex = randomIndex;
             }
 
-            if (UpperChars && !RegexCollection.HasUpperChar().IsMatch(generatedString))
+            if (_upperChars && !RegexCollection.HasUpperChar().IsMatch(generatedString))
             {
-                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, Length - 1, lastIndex);
+                randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
                 var upperCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, UPPER_CHARS.Length);
 
                 result[randomIndex] = UPPER_CHARS.ToCharArray()[upperCharIndex];
             }
 
-            return result.ToString();
+            var finalString = result.ToString();
+            var matchesExcludedString = false;
+
+            if (_excludedStrings.Length > 0)
+            {
+                matchesExcludedString = _excludedStrings.Any(excludedString => excludedString.Equals(finalString));
+            }
+
+            return matchesExcludedString ? Generate() : finalString;
         }
     }
 }

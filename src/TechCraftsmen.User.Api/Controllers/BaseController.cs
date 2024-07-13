@@ -30,7 +30,7 @@ namespace TechCraftsmen.User.Api.Controllers
                 errorList.Add(exception.Message);
             }
 
-            var result = new ResultDto<T>(default, string.Join("|", errorList), false);
+            var result = new ResultDto<T>(default, string.Join(" | ", errorList), false);
 
             return BadRequest(result);
         }

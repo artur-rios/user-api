@@ -42,7 +42,16 @@ namespace TechCraftsmen.User.Services
                 { "Email",  credentialsDto.Email },
             };
 
-            var user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
+            UserDto? user;
+
+            try
+            {
+                user = _userService.GetUsersByFilter(new QueryCollection(filter)).First();
+            }
+            catch (NotFoundException)
+            {
+                throw new NotAllowedException("Invalid credentials");
+            }
 
             var password = _userService.GetPasswordByUserId(user.Id);
 

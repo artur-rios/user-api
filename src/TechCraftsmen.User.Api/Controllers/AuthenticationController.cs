@@ -35,10 +35,6 @@ namespace TechCraftsmen.User.Api.Controllers
             {
                 return BadRequest<AuthenticationToken>(nae);
             }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<AuthenticationToken>(nfe);
-            }
             catch (ValidationException ve)
             {
                 return BadRequest<AuthenticationToken>(ve);
