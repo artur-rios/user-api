@@ -46,7 +46,7 @@ namespace TechCraftsmen.User.Services
 
             try
             {
-                user = _userService.GetUsersByFilter(new QueryCollection(filter)).First();
+                user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials"); ;
             }
             catch (NotFoundException)
             {
