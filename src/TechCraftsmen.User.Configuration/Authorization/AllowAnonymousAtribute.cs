@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Api.Authorization
+﻿namespace TechCraftsmen.User.Configuration.Authorization
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class AllowAnonymousAttribute : Attribute

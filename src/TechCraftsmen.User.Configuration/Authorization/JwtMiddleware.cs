@@ -1,6 +1,7 @@
-﻿using TechCraftsmen.User.Core.Interfaces.Services;
+﻿using Microsoft.AspNetCore.Http;
+using TechCraftsmen.User.Core.Interfaces.Services;
 
-namespace TechCraftsmen.User.Api.Authorization
+namespace TechCraftsmen.User.Configuration.Authorization
 {
     public class JwtMiddleware(RequestDelegate next)
     {

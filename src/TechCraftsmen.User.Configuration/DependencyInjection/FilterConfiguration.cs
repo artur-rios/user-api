@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TechCraftsmen.User.Core.Filters;
 
-namespace TechCraftsmen.User.Configuration
+namespace TechCraftsmen.User.Configuration.DependencyInjection
 {
     public static class FilterConfiguration
     {

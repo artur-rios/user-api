@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Core.Enums;
 
-namespace TechCraftsmen.User.Api.Authorization
+namespace TechCraftsmen.User.Configuration.Authorization
 {
     public class RoleRequirementAttribute : TypeFilterAttribute
     {

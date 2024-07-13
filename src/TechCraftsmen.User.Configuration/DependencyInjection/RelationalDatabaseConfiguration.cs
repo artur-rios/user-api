@@ -4,7 +4,7 @@ using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Data.Relational.Configuration;
 using TechCraftsmen.User.Data.Relational.Repositories;
 
-namespace TechCraftsmen.User.Configuration
+namespace TechCraftsmen.User.Configuration.DependencyInjection
 {
     public static class RelationalDatabaseConfiguration
     {

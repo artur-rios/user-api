@@ -4,7 +4,7 @@ using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation;
 
-namespace TechCraftsmen.User.Configuration
+namespace TechCraftsmen.User.Configuration.DependencyInjection
 {
     public static class ModelValidationConfiguration
     {

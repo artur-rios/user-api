@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 
-namespace TechCraftsmen.User.Api.Authorization
+namespace TechCraftsmen.User.Configuration.Authorization
 {
     public class RoleRequirementFilter(params Roles[] authorizedRoles) : IAuthorizationFilter
     {

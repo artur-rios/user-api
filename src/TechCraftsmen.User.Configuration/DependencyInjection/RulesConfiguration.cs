@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Rules.User;
 
-namespace TechCraftsmen.User.Configuration
+namespace TechCraftsmen.User.Configuration.DependencyInjection
 {
     public static class RulesConfiguration
     {

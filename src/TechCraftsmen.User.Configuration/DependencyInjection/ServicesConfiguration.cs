@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Services;
 
-namespace TechCraftsmen.User.Configuration
+namespace TechCraftsmen.User.Configuration.DependencyInjection
 {
     public static class ServicesConfiguration
     {
