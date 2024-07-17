@@ -4,6 +4,7 @@
     public class UserMocks
     {
         public string TestPassword = "$k9!dTTW*zTe4uAHX";
+        public int TEST_ID = 2;
 
         public Core.Entities.User TestUser = new()
         {

@@ -44,7 +44,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> GetUserById(int id)
         {
             try

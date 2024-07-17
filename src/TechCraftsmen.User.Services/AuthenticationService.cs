@@ -114,6 +114,7 @@ namespace TechCraftsmen.User.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
+            // TODO catch exceptions throw by this method
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
