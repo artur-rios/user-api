@@ -1,9 +1,7 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
 
 namespace TechCraftsmen.User.Api.Controllers
@@ -11,35 +9,18 @@ namespace TechCraftsmen.User.Api.Controllers
     [ApiController]
     [Authorize]
     [Route("[controller]")]
-    public class UserController : BaseController
+    public class UserController(IUserService user) : BaseController
     {
-
-        private readonly IUserService _userService;
-
-        public UserController(ILogger<UserController> logger, IUserService user) : base(logger)
-        {
-            _userService = user;
-        }
+        private readonly IUserService _userService = user;
 
         [HttpPost]
         [Route("Create")]
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<int>> CreateUser(UserDto userDto)
         {
-            try
-            {
-                var userId = _userService.CreateUser(userDto);
+            var userId = _userService.CreateUser(userDto);
 
-                return Created(userId, "User created with success");
-            }
-            catch (ValidationException ve)
-            {
-                return BadRequest<int>(ve);
-            }
-            catch (Exception ex)
-            {
-                return Error<int>(ex);
-            }
+            return Created(userId, "User created with success");
         }
 
         [HttpGet]
@@ -47,20 +28,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> GetUserById(int id)
         {
-            try
-            {
-                var user = _userService.GetUserById(id);
+            var user = _userService.GetUserById(id);
 
-                return Success(user, "User retrieved with success");
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<UserDto>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<UserDto>(ex);
-            }
+            return Success(user, "User retrieved with success");
         }
 
         [HttpGet]
@@ -68,24 +38,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<IList<UserDto>>> GetUsersByFilter()
         {
-            try
-            {
-                var users = _userService.GetUsersByFilter(HttpContext.Request.Query);
+            var users = _userService.GetUsersByFilter(HttpContext.Request.Query);
 
-                return Success(users, "Search completed with success");
-            }
-            catch (NotAllowedException nae)
-            {
-                return BadRequest<IList<UserDto>>(nae);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<IList<UserDto>>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<IList<UserDto>>(ex);
-            }
+            return Success(users, "Search completed with success");
         }
 
         [HttpPut]
@@ -93,24 +48,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> UpdateUser(UserDto userDto)
         {
-            try
-            {
-                _userService.UpdateUser(userDto);
+            _userService.UpdateUser(userDto);
 
-                return NoContent<UserDto>("User updated with success");
-            }
-            catch (NotAllowedException nae)
-            {
-                return BadRequest<UserDto>(nae);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<UserDto>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<UserDto>(ex);
-            }
+            return NoContent<UserDto>("User updated with success");
         }
 
         [HttpPatch]
@@ -118,24 +58,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> ActivateUser(int id)
         {
-            try
-            {
-                _userService.ActivateUser(id);
+            _userService.ActivateUser(id);
 
-                return NoContent<UserDto>("User activated with success");
-            }
-            catch (NotAllowedException nae)
-            {
-                return BadRequest<UserDto>(nae);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<UserDto>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<UserDto>(ex);
-            }
+            return NoContent<UserDto>("User activated with success");
         }
 
         [HttpPatch]
@@ -143,24 +68,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> DeactivateUser(int id)
         {
-            try
-            {
-                _userService.DeactivateUser(id);
+            _userService.DeactivateUser(id);
 
-                return NoContent<UserDto>("User deactivated with success");
-            }
-            catch (NotAllowedException nae)
-            {
-                return BadRequest<UserDto>(nae);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<UserDto>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<UserDto>(ex);
-            }
+            return NoContent<UserDto>("User deactivated with success");
         }
 
         [HttpDelete]
@@ -168,24 +78,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN)]
         public ActionResult<ResultDto<UserDto>> DeleteUser(int id)
         {
-            try
-            {
-                _userService.DeleteUser(id);
+            _userService.DeleteUser(id);
 
-                return NoContent<UserDto>("User deleted with success");
-            }
-            catch (NotAllowedException nae)
-            {
-                return BadRequest<UserDto>(nae);
-            }
-            catch (NotFoundException nfe)
-            {
-                return NotFound<UserDto>(nfe);
-            }
-            catch (Exception ex)
-            {
-                return Error<UserDto>(ex);
-            }
+            return NoContent<UserDto>("User deleted with success");
         }
     }
 }

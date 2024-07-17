@@ -5,7 +5,7 @@ namespace TechCraftsmen.User.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HealthCheckController(ILogger<HealthCheckController> logger) : BaseController(logger)
+    public class HealthCheckController : BaseController
     {
         [HttpGet]
         [Route("")]

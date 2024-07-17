@@ -9,7 +9,6 @@ using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-
     public class AuthenticationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly WebApplicationFactory<Program> _factory;
@@ -75,11 +74,10 @@ namespace TechCraftsmen.User.Api.Tests
 
                 var body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ResultDto<AuthenticationToken>>(body);
+                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
-                Assert.Null(result.Data);
                 Assert.Equal("Invalid credentials", result?.Message);
             }
         }
@@ -101,11 +99,10 @@ namespace TechCraftsmen.User.Api.Tests
 
                 var body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ResultDto<AuthenticationToken>>(body);
+                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
-                Assert.Null(result.Data);
 
                 var emailValidationError = "'Email' must not be empty.";
                 var passwordValidationError = "'Password' must not be empty.";

@@ -1,5 +1,6 @@
 using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Configuration.DependencyInjection;
+using TechCraftsmen.User.Configuration.Middleware;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Mapping;
 
@@ -43,6 +44,7 @@ namespace TechCraftsmen.User.Api
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMiddleware<JwtMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
