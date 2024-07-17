@@ -7,7 +7,7 @@ using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class UserTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
+    public class GeneralTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
     {
         private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
@@ -15,13 +15,11 @@ namespace TechCraftsmen.User.Api.Tests
         private readonly ApiTestUtils _testUtils;
         private readonly UserMocks _userMocks;
 
-        private const string TEST_ENVIRONMENT = "Local";
+        private const string PRODUCTION_ENVIRONMENT = "Production";
         private const string USER_ROUTE = "/User";
 
-        public UserTests(WebApplicationFactory<Program> factory)
+        public GeneralTests(WebApplicationFactory<Program> factory)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", TEST_ENVIRONMENT);
-
             _factory = factory;
             _client = _factory.CreateClient();
 
@@ -37,7 +35,7 @@ namespace TechCraftsmen.User.Api.Tests
                 Password = _userMocks.TestPassword
             };
 
-            var authToken = await _testUtils.Authorize(credentials);
+            var authToken = await _testUtils.Authorize(credentials, PRODUCTION_ENVIRONMENT);
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
@@ -47,23 +45,23 @@ namespace TechCraftsmen.User.Api.Tests
             return Task.CompletedTask;
         }
 
+        /* Important:
+            - This test can't run along with the others, because it needs to change the ASPNETCORE_ENVIRONMENT.
+            - Once the other tests already set it's value, it does not change during excution and cause this test to fail.
+            - This test will only work properly if run alone.
+        */
         [Fact]
-        public async void Should_GetUserById()
+        public async void Should_ReturnBadRequest_IfAuthenticatedWithTestUserOutsideTestEnvironment()
         {
             var response = await _client.GetAsync($"{USER_ROUTE}/{_userMocks.TEST_ID}");
 
             var body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<ResultDto<UserDto>>(body);
+            var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.NotNull(result);
-            Assert.Equal("User retrieved with success", result.Message);
-            Assert.NotNull(result.Data);
-            Assert.Equal(_userMocks.TestUser.Name, result.Data.Name);
-            Assert.Equal(_userMocks.TestUser.Email, result.Data.Email);
-            Assert.Equal(_userMocks.TestUser.RoleId, result.Data.RoleId);
-            Assert.True(result.Data.Active);
+            Assert.Equal("Test user can't be used outside of test environment", result.Message);
         }
     }
 }

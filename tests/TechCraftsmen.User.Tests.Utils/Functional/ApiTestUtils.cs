@@ -21,14 +21,14 @@ namespace TechCraftsmen.User.Tests.Utils
 
         public ApiTestUtils(WebApplicationFactory<Program> factory)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", TEST_ENVIRONMENT);
-
             _factory = factory;
             _client = _factory.CreateClient();
         }
 
-        public async Task<string> Authorize(AuthenticationCredentialsDto credentials)
+        public async Task<string> Authorize(AuthenticationCredentialsDto credentials, string environment = TEST_ENVIRONMENT)
         {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
+
             var payload = new StringContent(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
 
             var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);
