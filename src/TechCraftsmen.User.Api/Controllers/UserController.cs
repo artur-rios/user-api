@@ -15,7 +15,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPost]
         [Route("Create")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<int>> CreateUser(UserDto userDto)
         {
             var userId = _userService.CreateUser(userDto);
@@ -35,7 +35,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpGet]
         [Route("Filter")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<IList<UserDto>>> GetUsersByFilter()
         {
             var users = _userService.GetUsersByFilter(HttpContext.Request.Query);
@@ -45,7 +45,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPut]
         [Route("Update")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> UpdateUser(UserDto userDto)
         {
             _userService.UpdateUser(userDto);
@@ -55,7 +55,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPatch]
         [Route("{id}/Activate")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> ActivateUser(int id)
         {
             _userService.ActivateUser(id);
@@ -65,7 +65,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpPatch]
         [Route("{id}/Deactivate")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> DeactivateUser(int id)
         {
             _userService.DeactivateUser(id);
@@ -75,7 +75,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpDelete]
         [Route("{id}/Delete")]
-        [RoleRequirement(Roles.ADMIN)]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<ResultDto<UserDto>> DeleteUser(int id)
         {
             _userService.DeleteUser(id);
