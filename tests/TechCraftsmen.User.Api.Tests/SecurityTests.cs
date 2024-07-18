@@ -7,7 +7,7 @@ using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class GeneralTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
+    public class SecurityTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
     {
         private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
@@ -18,7 +18,7 @@ namespace TechCraftsmen.User.Api.Tests
         private const string PRODUCTION_ENVIRONMENT = "Production";
         private const string USER_ROUTE = "/User";
 
-        public GeneralTests(WebApplicationFactory<Program> factory)
+        public SecurityTests(WebApplicationFactory<Program> factory)
         {
             _factory = factory;
             _client = _factory.CreateClient();
@@ -35,7 +35,7 @@ namespace TechCraftsmen.User.Api.Tests
                 Password = _userMocks.TestPassword
             };
 
-            var authToken = await _testUtils.Authorize(credentials, PRODUCTION_ENVIRONMENT);
+            var authToken = await _testUtils.Authorize(credentials);
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
@@ -53,6 +53,8 @@ namespace TechCraftsmen.User.Api.Tests
         [Fact]
         public async void Should_ReturnBadRequest_IfAuthenticatedWithTestUserOutsideTestEnvironment()
         {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", PRODUCTION_ENVIRONMENT);
+
             var response = await _client.GetAsync($"{USER_ROUTE}/{_userMocks.TEST_ID}");
 
             var body = await response.Content.ReadAsStringAsync();
