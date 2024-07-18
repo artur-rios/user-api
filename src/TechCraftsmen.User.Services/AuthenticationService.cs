@@ -114,23 +114,33 @@ namespace TechCraftsmen.User.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
-            // TODO catch exceptions throw by this method
-            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            try
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ClockSkew = TimeSpan.Zero
-            }, out SecurityToken validatedToken);
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
 
-            var jwtToken = (JwtSecurityToken)validatedToken;
+                var jwtToken = (JwtSecurityToken)validatedToken;
 
-            var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
-            authenticatedUser = _userService.GetUserById(userId);
+                authenticatedUser = _userService.GetUserById(userId);
 
-            return authenticatedUser is not null;
+                return authenticatedUser is not null;
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new NotAllowedException("Auth token expired. Please authenticate again");
+            }
+            catch (Exception)
+            {
+                throw new NotAllowedException("Auth token invalid");
+            }
         }
     }
 }
