@@ -19,7 +19,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForNameNullOrEmpty(string name)
         {
-            var user = _userDtoGenerator.WithDefaultEmail().WithRandomPassword().WithName(name).Generate();
+            var user = _userDtoGenerator.WithDefaultEmail().WithRandomPassword().WithName(name).WithRoleId().Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -38,7 +38,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidEmail(string email)
         {
-            var user = _userDtoGenerator.WithDefaultName().WithRandomPassword().WithEmail(email).Generate();
+            var user = _userDtoGenerator.WithDefaultName().WithRandomPassword().WithEmail(email).WithRoleId().Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -60,7 +60,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidPassword(string password)
         {
-            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithPassword(password).Generate();
+            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithPassword(password).WithRoleId().Generate();
 
             var result = _validator.TestValidate(user);
 
@@ -74,7 +74,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [Unit("UserDtoValidator")]
         public void Should_NotHaveError_ForValidUserDto()
         {
-            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().Generate();
+            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().WithRoleId().Generate();
 
             var result = _validator.TestValidate(user);
 

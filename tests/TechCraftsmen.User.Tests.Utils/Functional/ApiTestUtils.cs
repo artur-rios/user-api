@@ -15,8 +15,6 @@ namespace TechCraftsmen.User.Tests.Utils
     {
         private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
-
-        private const string TEST_ENVIRONMENT = "Local";
         private const string AUTHENTICATE_USER_ROUTE = "/Authentication/User";
 
         public ApiTestUtils(WebApplicationFactory<Program> factory)
@@ -25,10 +23,8 @@ namespace TechCraftsmen.User.Tests.Utils
             _client = _factory.CreateClient();
         }
 
-        public async Task<string> Authorize(AuthenticationCredentialsDto credentials, string environment = TEST_ENVIRONMENT)
+        public async Task<string> Authorize(AuthenticationCredentialsDto credentials)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
-
             var payload = new StringContent(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
 
             var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);

@@ -9,16 +9,10 @@ using TechCraftsmen.User.Core.Exceptions;
 namespace TechCraftsmen.User.Configuration.Middleware
 {
 
-    public class ExceptionHandlingMiddleware
+    public class ExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
-        {
-            _next = next;
-            _logger = loggerFactory.CreateLogger("ExceptionHandler");
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger _logger = loggerFactory.CreateLogger("ExceptionHandler");
 
         public async Task Invoke(HttpContext httpContext)
         {

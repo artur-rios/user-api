@@ -1,4 +1,5 @@
-﻿using TechCraftsmen.User.Core.Rules.Password;
+﻿using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Tests.Utils.Generators
@@ -14,6 +15,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         private string _email = string.Empty;
         private byte[] _password = [];
         private byte[] _salt = [];
+        private int _roleId = 0;
         private bool _status = true;
 
         public UserGenerator WithId(int id)
@@ -79,6 +81,13 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             return this;
         }
 
+        public UserGenerator WithRoleId(int roleId = (int)Roles.TEST)
+        {
+            _roleId = roleId;
+
+            return this;
+        }
+
         public UserGenerator WithStatus(bool status)
         {
             _status = status;
@@ -95,6 +104,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
                 Email = _email,
                 Password = _password,
                 Salt = _salt,
+                RoleId = _roleId,
                 Active = _status
             };
 

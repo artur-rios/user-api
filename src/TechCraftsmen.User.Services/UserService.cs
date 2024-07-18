@@ -11,34 +11,30 @@ using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Services
 {
-    public class UserService : IUserService
+    public class UserService(
+        IMapper mapper,
+        ICrudRepository<Core.Entities.User> userRepository,
+        IValidator<UserDto> userValidator,
+        UserFilterValidator userFilter,
+        UserCreationRule creationRule,
+        UserUpdateRule updateRule,
+        UserStatusUpdateRule statusUpdateRule,
+        UserDeletionRule deletionRule) : IUserService
     {
-        private readonly IMapper _mapper;
-        private readonly ICrudRepository<Core.Entities.User> _userRepository;
-        private readonly IValidator<UserDto> _userValidator;
-        private readonly UserFilterValidator _filterValidator;
-        private readonly UserCreationRule _creationRule;
-        private readonly UserUpdateRule _updateRule;
-        private readonly UserStatusUpdateRule _statusUpdateRule;
-        private readonly UserDeletionRule _deletionRule;
-
-        public UserService(IMapper mapper, ICrudRepository<Core.Entities.User> userRepository, IValidator<UserDto> userValidator, UserFilterValidator userFilter, UserCreationRule creationRule, UserUpdateRule updateRule, UserStatusUpdateRule statusUpdateRule, UserDeletionRule deletionRule)
-        {
-            _mapper = mapper;
-            _userRepository = userRepository;
-            _userValidator = userValidator;
-            _filterValidator = userFilter;
-            _creationRule = creationRule;
-            _updateRule = updateRule;
-            _statusUpdateRule = statusUpdateRule;
-            _deletionRule = deletionRule;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly ICrudRepository<Core.Entities.User> _userRepository = userRepository;
+        private readonly IValidator<UserDto> _userValidator = userValidator;
+        private readonly UserFilterValidator _filterValidator = userFilter;
+        private readonly UserCreationRule _creationRule = creationRule;
+        private readonly UserUpdateRule _updateRule = updateRule;
+        private readonly UserStatusUpdateRule _statusUpdateRule = statusUpdateRule;
+        private readonly UserDeletionRule _deletionRule = deletionRule;
 
         public int CreateUser(UserDto userDto)
         {
             _userValidator.ValidateAndThrow(userDto);
 
-            var ruleResult = _creationRule.Execute(userDto.Email);
+            var ruleResult = _creationRule.Execute(new Tuple<string, int>(userDto.Email, userDto.RoleId));
 
             if (!ruleResult.Success)
             {

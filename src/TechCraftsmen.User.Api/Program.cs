@@ -18,6 +18,8 @@ namespace TechCraftsmen.User.Api
 
             builder.Services.Configure<AuthenticationTokenConfiguration>(builder.Configuration.GetSection("AuthenticationTokenSettings"));
 
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();

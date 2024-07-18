@@ -1,4 +1,7 @@
-﻿namespace TechCraftsmen.User.Tests.Utils.Mock
+﻿using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
+
+namespace TechCraftsmen.User.Tests.Utils.Mock
 {
 
     public class UserMocks
@@ -10,7 +13,14 @@
         {
             Name = "Test User",
             Email = "test@mail.com",
-            RoleId = 3
+            RoleId = (int)Roles.TEST
+        };
+
+        public UserDto TestUserDto = new()
+        {
+            Name = "Test User",
+            Email = "test@mail.com",
+            RoleId = (int)Roles.TEST
         };
     }
 }

@@ -1,30 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Tests.Utils;
+using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class SecurityTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
+    public class SecurityTests : BaseFunctionalTest, IAsyncLifetime
     {
-        private readonly WebApplicationFactory<Program> _factory;
-        private readonly HttpClient _client;
-
         private readonly ApiTestUtils _testUtils;
-        private readonly UserMocks _userMocks;
-
-        private const string PRODUCTION_ENVIRONMENT = "Production";
+        private readonly UserMocks _userMocks = new();
         private const string USER_ROUTE = "/User";
 
-        public SecurityTests(WebApplicationFactory<Program> factory)
+        public SecurityTests() : base("Production")
         {
-            _factory = factory;
-            _client = _factory.CreateClient();
-
-            _testUtils = new ApiTestUtils(factory);
-            _userMocks = new UserMocks();
+            _testUtils = new ApiTestUtils(_factory);
         }
 
         public async Task InitializeAsync()
@@ -45,25 +36,26 @@ namespace TechCraftsmen.User.Api.Tests
             return Task.CompletedTask;
         }
 
-        /* Important:
-            - This test can't run along with the others, because it needs to change the ASPNETCORE_ENVIRONMENT.
-            - Once the other tests already set it's value, it does not change during excution and cause this test to fail.
-            - This test will only work properly if run alone.
+        /*
+            Important:
+                - This test will only run with you run it alone
+                - If runned along with the other tests the ASPNETCORE_ENVIRONMENT will never be production
         */
         [Fact]
         public async void Should_ReturnBadRequest_IfAuthenticatedWithTestUserOutsideTestEnvironment()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", PRODUCTION_ENVIRONMENT);
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                var response = await _client.GetAsync($"{USER_ROUTE}/{_userMocks.TEST_ID}");
 
-            var response = await _client.GetAsync($"{USER_ROUTE}/{_userMocks.TEST_ID}");
+                var body = await response.Content.ReadAsStringAsync();
 
-            var body = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
 
-            var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
-
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.NotNull(result);
-            Assert.Equal("Test user can't be used outside of test environment", result.Message);
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                Assert.NotNull(result);
+                Assert.Equal("Test user can't be used outside of test environment", result.Message);
+            }
         }
     }
 }

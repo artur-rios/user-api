@@ -1,37 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class AuthenticationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class AuthenticationTests : BaseFunctionalTest
     {
-        private readonly WebApplicationFactory<Program> _factory;
-        private readonly HttpClient _client;
-
-        private readonly UserMocks _userMocks;
-        private readonly RandomStringGenerator _randomStringGenerator;
-        private readonly EmailGenerator _emailGenerator;
-
-        private const string TEST_ENVIRONMENT = "Local";
+        private readonly UserMocks _userMocks = new();
+        private readonly RandomStringGenerator _randomStringGenerator = new();
+        private readonly EmailGenerator _emailGenerator = new();
         private const string AUTHENTICATE_USER_ROUTE = "/Authentication/User";
-
-        public AuthenticationTests(WebApplicationFactory<Program> factory)
-        {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", TEST_ENVIRONMENT);
-
-            _factory = factory;
-            _client = _factory.CreateClient();
-
-            _userMocks = new UserMocks();
-            _randomStringGenerator = new RandomStringGenerator();
-            _emailGenerator = new EmailGenerator();
-        }
 
         [Fact]
         public async void Should_AutheticateUser()

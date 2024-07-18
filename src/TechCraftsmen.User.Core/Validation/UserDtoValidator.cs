@@ -2,6 +2,7 @@
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Rules.Email;
 using TechCraftsmen.User.Core.Rules.Password;
+using TechCraftsmen.User.Core.Rules.Role;
 
 namespace TechCraftsmen.User.Core.Validation
 {
@@ -9,6 +10,7 @@ namespace TechCraftsmen.User.Core.Validation
     {
         private readonly EmailRule _emailRule = new();
         private readonly PasswordRule _passwordRule = new();
+        private readonly RoleRule _roleRule = new();
 
         public UserDtoValidator()
         {
@@ -30,6 +32,18 @@ namespace TechCraftsmen.User.Core.Validation
             RuleFor(user => user.Password).Custom((password, context) =>
             {
                 var ruleResult = _passwordRule.Execute(password);
+
+                if (!ruleResult.Success)
+                {
+                    foreach (var error in ruleResult.Errors)
+                    {
+                        context.AddFailure(error);
+                    }
+                }
+            });
+            RuleFor(user => user.RoleId).Custom((roleId, context) =>
+            {
+                var ruleResult = _roleRule.Execute(roleId);
 
                 if (!ruleResult.Success)
                 {

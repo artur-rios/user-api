@@ -1,16 +1,20 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Rules.Password;
+using TechCraftsmen.User.Core.Rules.Role;
 using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Generators;
+using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
@@ -21,6 +25,7 @@ namespace TechCraftsmen.User.Services.Tests
         private readonly UserService _userService;
         private readonly Mapper _mapper;
         private readonly Mock<ICrudRepository<Core.Entities.User>> _userRepository;
+        private readonly Mock<HttpContextAccessor> _httpContextAccessor;
         private readonly IValidator<UserDto> _userValidator;
         private readonly UserFilterValidator _userFilterValidator;
         private readonly UserCreationRule _creationRule;
@@ -31,6 +36,7 @@ namespace TechCraftsmen.User.Services.Tests
         private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly UserGenerator _userGenerator = new();
         private readonly UserDtoGenerator _userDtoGenerator = new();
+        private readonly UserMocks _userMocks;
 
         private readonly string _passwordMock;
         private readonly UserDto _userDtoMock;
@@ -50,12 +56,14 @@ namespace TechCraftsmen.User.Services.Tests
             _updateRule = new UserUpdateRule();
             _statusUpdateRule = new UserStatusUpdateRule();
             _deletionRule = new UserDeletionRule();
+            _httpContextAccessor = new Mock<HttpContextAccessor>();
 
             _passwordMock = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock).Generate();
+            _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock).WithRoleId((int)Roles.REGULAR).Generate();
             _userDtoMock = _mapper.Map<UserDto>(_userMock);
             _userDtoMock.Password = _passwordMock;
+            _userMocks = new UserMocks();
 
             _userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
 
@@ -90,7 +98,10 @@ namespace TechCraftsmen.User.Services.Tests
 
             _userRepository.Setup(repo => repo.Delete(It.IsAny<Core.Entities.User>()));
 
-            _creationRule = new UserCreationRule(_userRepository.Object);
+            _httpContextAccessor.Object.HttpContext = new DefaultHttpContext();
+            _httpContextAccessor.Object.HttpContext!.Items = new Dictionary<object, object?>() { { "User", _userMocks.TestUserDto } };
+
+            _creationRule = new UserCreationRule(_userRepository.Object, _httpContextAccessor.Object, new RoleRule());
 
             _userFilterValidator = new UserFilterValidator();
 
@@ -110,7 +121,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotAllowedException_When_CreationRuleFails()
         {
-            var userWithExisitingEmail = _userDtoGenerator.WithEmail(EXISTING_EMAIL).WithDefaultName().WithRandomPassword().Generate();
+            var userWithExisitingEmail = _userDtoGenerator.WithEmail(EXISTING_EMAIL).WithDefaultName().WithRandomPassword().WithRoleId().Generate();
 
             Assert.Throws<NotAllowedException>(() => _userService.CreateUser(userWithExisitingEmail));
         }

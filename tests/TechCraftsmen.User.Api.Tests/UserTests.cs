@@ -1,31 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Tests.Utils;
+using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class UserTests : IClassFixture<WebApplicationFactory<Program>>, IAsyncLifetime
+    public class UserTests : BaseFunctionalTest, IAsyncLifetime
     {
-        private readonly WebApplicationFactory<Program> _factory;
-        private readonly HttpClient _client;
-
         private readonly ApiTestUtils _testUtils;
         private readonly UserMocks _userMocks;
-
-        private const string TEST_ENVIRONMENT = "Local";
         private const string USER_ROUTE = "/User";
 
-        public UserTests(WebApplicationFactory<Program> factory)
+        public UserTests()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", TEST_ENVIRONMENT);
-
-            _factory = factory;
-            _client = _factory.CreateClient();
-
-            _testUtils = new ApiTestUtils(factory);
+            _testUtils = new ApiTestUtils(_factory);
             _userMocks = new UserMocks();
         }
 

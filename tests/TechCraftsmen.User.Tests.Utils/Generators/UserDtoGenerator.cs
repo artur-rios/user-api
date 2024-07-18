@@ -1,4 +1,5 @@
 ﻿using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Rules.Password;
 
 namespace TechCraftsmen.User.Tests.Utils.Generators
@@ -13,6 +14,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         private string _name = string.Empty;
         private string _email = string.Empty;
         private string _password = string.Empty;
+        private int _roleId = 0;
 
         public UserDtoGenerator WithId(int id)
         {
@@ -70,6 +72,13 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             return this;
         }
 
+        public UserDtoGenerator WithRoleId(int roleId = (int)Roles.TEST)
+        {
+            _roleId = roleId;
+
+            return this;
+        }
+
         public UserDto Generate()
         {
             var user = new UserDto
@@ -77,7 +86,8 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
                 Id = _id,
                 Name = _name,
                 Email = _email,
-                Password = _password
+                Password = _password,
+                RoleId = _roleId
             };
 
             return user;

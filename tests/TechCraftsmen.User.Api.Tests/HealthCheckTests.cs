@@ -1,25 +1,13 @@
-using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Tests.Utils.Functional;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class HealthCheckTests : IClassFixture<WebApplicationFactory<Program>>
+    public class HealthCheckTests : BaseFunctionalTest
     {
-        private readonly WebApplicationFactory<Program> _factory;
-        private readonly HttpClient _client;
-
-        private const string TEST_ENVIRONMENT = "Local";
         private const string HEALTH_CHECK_ROUTE = "/HealthCheck";
-
-        public HealthCheckTests(WebApplicationFactory<Program> factory)
-        {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", TEST_ENVIRONMENT);
-
-            _factory = factory;
-            _client = _factory.CreateClient();
-        }
 
         [Fact]
         public async void Should_DoHealthCheck_And_ReturnSuccess()

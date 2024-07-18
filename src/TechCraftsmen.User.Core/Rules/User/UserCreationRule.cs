@@ -1,25 +1,27 @@
-﻿using TechCraftsmen.User.Core.Dto;
+﻿using Microsoft.AspNetCore.Http;
+using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
+using TechCraftsmen.User.Core.Rules.Role;
 
 namespace TechCraftsmen.User.Core.Rules.User
 {
-    public class UserCreationRule : BaseRule<string>
+    public class UserCreationRule(ICrudRepository<Entities.User> userRepository, IHttpContextAccessor httpContextAccessor, RoleRule roleRule) : BaseRule<Tuple<string, int>>
     {
-        private readonly ICrudRepository<Entities.User> _userRepository;
+        private readonly ICrudRepository<Entities.User> _userRepository = userRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly RoleRule _roleRule = roleRule;
 
-        public UserCreationRule(ICrudRepository<Entities.User> userRepository)
+        public override RuleResultDto Execute(Tuple<string, int> parameter)
         {
-            _userRepository = userRepository;
-        }
-
-        public override RuleResultDto Execute(string email)
-        {
-            if (!IsParameterValid(email, out string validationMessage))
+            if (!IsParameterValid(parameter, out string validationMessage))
             {
                 _result.Errors.Add(validationMessage);
 
                 return Resolve();
             }
+
+            parameter.Deconstruct(out string email, out int roleId);
 
             var filter = new Dictionary<string, object>()
             {
@@ -33,14 +35,37 @@ namespace TechCraftsmen.User.Core.Rules.User
                 _result.Errors.Add("E-mail already registered");
             }
 
+            if (roleId != (int)Roles.REGULAR)
+            {
+                _httpContextAccessor.HttpContext!.Items.TryGetValue("User", out var userData);
+
+                var authenticatedUser = userData as UserDto;
+
+                if (authenticatedUser!.RoleId != (int)Roles.ADMIN)
+                {
+                    _result.Errors.Add("Only admins can register this kind of user");
+                }
+            }
+
             return Resolve();
         }
 
-        internal override bool IsParameterValid(string parameter, out string message)
+        internal override bool IsParameterValid(Tuple<string, int> parameter, out string message)
         {
-            if (string.IsNullOrEmpty(parameter))
+            parameter.Deconstruct(out string email, out int roleId);
+
+            if (string.IsNullOrEmpty(email))
             {
-                message = $"Parameter null or empty";
+                message = $"Email cannot be null or empty";
+
+                return false;
+            }
+
+            var ruleResult = _roleRule.Execute(roleId);
+
+            if (!ruleResult.Success)
+            {
+                message = $"RoleId must be valid";
 
                 return false;
             }
