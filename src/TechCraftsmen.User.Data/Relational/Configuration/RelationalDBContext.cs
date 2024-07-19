@@ -6,16 +6,10 @@ using TechCraftsmen.User.Data.Relational.Mapping;
 
 namespace TechCraftsmen.User.Data.Relational.Configuration
 {
-    public class RelationalDBContext : DbContext
+    public class RelationalDBContext(ILoggerFactory loggerFactory, IOptions<RelationalDBContextOptions> options) : DbContext
     {
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly RelationalDBContextOptions _options;
-
-        public RelationalDBContext(ILoggerFactory loggerFactory, IOptions<RelationalDBContextOptions> options)
-        {
-            _loggerFactory = loggerFactory;
-            _options = options.Value;
-        }
+        private readonly ILoggerFactory _loggerFactory = loggerFactory;
+        private readonly RelationalDBContextOptions _options = options.Value;
 
         public DbSet<Role> Roles { get; set; }
         public DbSet<Core.Entities.User> Users { get; set; }

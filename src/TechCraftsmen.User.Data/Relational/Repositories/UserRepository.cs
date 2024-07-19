@@ -7,14 +7,9 @@ using TechCraftsmen.User.Data.Relational.Configuration;
 
 namespace TechCraftsmen.User.Data.Relational.Repositories
 {
-    public class UserRepository : ICrudRepository<Core.Entities.User>
+    public class UserRepository(IDbContextFactory<RelationalDBContext> dbContextFactory) : ICrudRepository<Core.Entities.User>
     {
-        private readonly RelationalDBContext _dbContext;
-
-        public UserRepository(IDbContextFactory<RelationalDBContext> dbContextFactory)
-        {
-            _dbContext = dbContextFactory.CreateDbContext();
-        }
+        private readonly RelationalDBContext _dbContext = dbContextFactory.CreateDbContext();
 
         public int Create(Core.Entities.User user)
         {
