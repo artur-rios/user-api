@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using TechCraftsmen.User.Core.Configuration;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Core.Validation.Fluent
 {
     public class AuthenticationTokenConfigurationValidator : AbstractValidator<AuthenticationTokenConfiguration>
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
+using System.Globalization;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Filters;
@@ -13,9 +14,8 @@ namespace TechCraftsmen.User.Core.Tests.Filters
     {
         private readonly UserFilterValidator _userFilterValidator;
         private readonly RandomStringGenerator _randomStringGenerator;
-        private readonly UserGenerator _userGenerator;
 
-        private readonly Entities.User _testUser;
+        private readonly Core.Entities.User _testUser;
 
         private const string NAME_FILTER = "Name";
         private const string EMAIL_FILTER = "Email";
@@ -30,7 +30,7 @@ namespace TechCraftsmen.User.Core.Tests.Filters
             { NAME_FILTER, "Jhon Doe" },
             { EMAIL_FILTER, "john.doe@mail.com" },
             { ROLE_ID_FILTER, "2" },
-            { CREATED_AT_FILTER, DateTime.UtcNow.AddDays(-1).ToString() },
+            { CREATED_AT_FILTER, DateTime.UtcNow.AddDays(-1).ToString(CultureInfo.InvariantCulture) },
             { ACTIVE_FILTER, "true" }
         };
 
@@ -38,9 +38,9 @@ namespace TechCraftsmen.User.Core.Tests.Filters
         {
             _userFilterValidator = new UserFilterValidator();
             _randomStringGenerator = new RandomStringGenerator();
-            _userGenerator = new UserGenerator();
+            UserGenerator userGenerator = new();
 
-            _testUser = _userGenerator.WithRandomId().WithDefaultEmail().WithDefaultName().Generate();
+            _testUser = userGenerator.WithRandomId().WithDefaultEmail().WithDefaultName().Generate();
         }
 
         [Fact]
@@ -143,7 +143,7 @@ namespace TechCraftsmen.User.Core.Tests.Filters
 
             Assert.NotNull(filter);
             Assert.True(filter.Value.Key == ROLE_ID_FILTER);
-            Assert.True(filter.Value.Value is int intValue && intValue == (int)Roles.REGULAR);
+            Assert.True(filter.Value.Value is (int)Roles.REGULAR);
         }
 
         [Fact]
@@ -161,7 +161,7 @@ namespace TechCraftsmen.User.Core.Tests.Filters
         [Unit("UserFilterValidator")]
         public void Should_NotParseAndValidate_CreatedAtFilter_WithInvalidDate()
         {
-            var createdAtFilter = new KeyValuePair<string, StringValues>(CREATED_AT_FILTER, DateTime.UtcNow.AddDays(1).ToString());
+            var createdAtFilter = new KeyValuePair<string, StringValues>(CREATED_AT_FILTER, DateTime.UtcNow.AddDays(1).ToString(CultureInfo.InvariantCulture));
 
             var filter = _userFilterValidator.ParseAndValidateFilter(createdAtFilter);
 
@@ -174,7 +174,7 @@ namespace TechCraftsmen.User.Core.Tests.Filters
         {
             var testDateTime = DateTime.UtcNow.AddDays(-1);
 
-            var createdAtFilter = new KeyValuePair<string, StringValues>(CREATED_AT_FILTER, testDateTime.ToString());
+            var createdAtFilter = new KeyValuePair<string, StringValues>(CREATED_AT_FILTER, testDateTime.ToString(CultureInfo.InvariantCulture));
 
             var filter = _userFilterValidator.ParseAndValidateFilter(createdAtFilter);
 
@@ -238,7 +238,7 @@ namespace TechCraftsmen.User.Core.Tests.Filters
             {
                 { nameFilter.Key, nameFilter.Value },
                 { emailFilter.Key, emailFilter.Value },
-                { CREATED_AT_FILTER, DateTime.UtcNow.AddDays(1).ToString() }
+                { CREATED_AT_FILTER, DateTime.UtcNow.AddDays(1).ToString(CultureInfo.InvariantCulture) }
             };
 
             var validFilters = _userFilterValidator.ParseAndValidateFilters(filtersToTest.ToQueryCollection());

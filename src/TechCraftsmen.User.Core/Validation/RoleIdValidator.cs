@@ -1,15 +1,15 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 
-namespace TechCraftsmen.User.Core.Rules.Role
+namespace TechCraftsmen.User.Core.Validation
 {
-    public class RoleRule : BaseRule<int>
+    public class RoleIdValidator : BaseValidator<int>
     {
-        public override RuleResultDto Execute(int roleId)
+        public override SimpleResultDto Validate(int roleId)
         {
             if (!IsParameterValid(roleId, out string validationMessage))
             {
-                _result.Errors.Add(validationMessage);
+                Result.Errors.Add(validationMessage);
 
                 return Resolve();
             }
@@ -27,7 +27,7 @@ namespace TechCraftsmen.User.Core.Rules.Role
 
             if (!validRole)
             {
-                _result.Errors.Add("Email should be valid");
+                Result.Errors.Add("Role should be valid");
             }
 
             return Resolve();

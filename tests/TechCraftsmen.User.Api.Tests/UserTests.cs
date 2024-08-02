@@ -44,7 +44,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             var body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<ResultDto<UserDto>>(body);
+            var result = JsonConvert.DeserializeObject<DataResultDto<UserDto>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
@@ -54,6 +54,29 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal(_userMocks.TestUser.Email, result.Data.Email);
             Assert.Equal(_userMocks.TestUser.RoleId, result.Data.RoleId);
             Assert.True(result.Data.Active);
+        }
+
+        [Fact]
+        public async void Should_GetUsersByFilter()
+        {
+            var query = $"?Email={_userMocks.TestUser.Email}";
+
+            var response = await _client.GetAsync($"{USER_ROUTE}/Filter{query}");
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<DataResultDto<IList<UserDto>>>(body);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(result);
+            Assert.Equal("Search completed with success", result.Message);
+            Assert.NotNull(result.Data);
+
+            var userFound = result.Data.FirstOrDefault();
+
+            Assert.Equal(_userMocks.TestUser.Name, userFound?.Name);
+            Assert.Equal(_userMocks.TestUser.Email, userFound?.Email);
+            Assert.Equal(_userMocks.TestUser.RoleId, userFound?.RoleId);
         }
     }
 }

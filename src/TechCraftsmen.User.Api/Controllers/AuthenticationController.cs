@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [HttpPost]
         [Route("User")]
         [AllowAnonymous]
-        public ActionResult<ResultDto<AuthenticationToken>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
+        public ActionResult<DataResultDto<AuthenticationToken>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
             var authToken = _authService.AuthenticateUser(credentialsDto);
 

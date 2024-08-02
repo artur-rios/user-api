@@ -44,7 +44,7 @@ namespace TechCraftsmen.User.Core.Filters
         {
             var parsedFilters = new Dictionary<string, object>();
 
-            if (query is not null || query?.Count > 0)
+            if (query is not null && query?.Count > 0)
             {
                 foreach (var item in query)
                 {

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Tests.Utils;
 using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
@@ -11,7 +10,7 @@ namespace TechCraftsmen.User.Api.Tests
     {
         private readonly ApiTestUtils _testUtils;
         private readonly UserMocks _userMocks = new();
-        private const string USER_ROUTE = "/User";
+        private const string UserRoute = "/User";
 
         public SecurityTests() : base("Production")
         {
@@ -46,11 +45,11 @@ namespace TechCraftsmen.User.Api.Tests
         {
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
-                var response = await _client.GetAsync($"{USER_ROUTE}/{_userMocks.TEST_ID}");
+                var response = await _client.GetAsync($"{UserRoute}/{_userMocks.TEST_ID}");
 
                 var body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
+                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);

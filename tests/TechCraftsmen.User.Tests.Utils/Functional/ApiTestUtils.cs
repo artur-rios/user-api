@@ -8,26 +8,19 @@ using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
 using Xunit;
 
-namespace TechCraftsmen.User.Tests.Utils
+namespace TechCraftsmen.User.Tests.Utils.Functional
 {
 
-    public class ApiTestUtils : IClassFixture<WebApplicationFactory<Program>>
+    public class ApiTestUtils(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
     {
-        private readonly WebApplicationFactory<Program> _factory;
-        private readonly HttpClient _client;
-        private const string AUTHENTICATE_USER_ROUTE = "/Authentication/User";
-
-        public ApiTestUtils(WebApplicationFactory<Program> factory)
-        {
-            _factory = factory;
-            _client = _factory.CreateClient();
-        }
+        private readonly HttpClient _client = factory.CreateClient();
+        private const string AuthenticateUserRoute = "/Authentication/User";
 
         public async Task<string> Authorize(AuthenticationCredentialsDto credentials)
         {
             var payload = new StringContent(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);
+            var response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -36,9 +29,9 @@ namespace TechCraftsmen.User.Tests.Utils
 
             var body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<ResultDto<AuthenticationToken>>(body);
+            var result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
 
-            return result!.Data!.AccessToken!;
+            return result!.Data.AccessToken!;
         }
     }
 }

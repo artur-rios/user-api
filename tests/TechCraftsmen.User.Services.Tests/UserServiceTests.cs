@@ -8,11 +8,9 @@ using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
-using TechCraftsmen.User.Core.Rules.Password;
-using TechCraftsmen.User.Core.Rules.Role;
-using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
@@ -24,88 +22,75 @@ namespace TechCraftsmen.User.Services.Tests
     {
         private readonly UserService _userService;
         private readonly Mapper _mapper;
-        private readonly Mock<ICrudRepository<Core.Entities.User>> _userRepository;
-        private readonly Mock<HttpContextAccessor> _httpContextAccessor;
-        private readonly IValidator<UserDto> _userValidator;
-        private readonly UserFilterValidator _userFilterValidator;
-        private readonly UserCreationRule _creationRule;
-        private readonly UserUpdateRule _updateRule;
-        private readonly UserStatusUpdateRule _statusUpdateRule;
-        private readonly UserDeletionRule _deletionRule;
 
         private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly UserGenerator _userGenerator = new();
         private readonly UserDtoGenerator _userDtoGenerator = new();
-        private readonly UserMocks _userMocks;
 
         private readonly string _passwordMock;
         private readonly UserDto _userDtoMock;
         private readonly Core.Entities.User _userMock;
 
-        private const int EXISTING_ID = 1;
-        private const int INEXISTING_ID = 2;
-        private const int INACTIVE_ID = 3;
-        private const string EXISTING_EMAIL = "exists@mail.com";
-        private const string INEXISTING_EMAIL = "inexists@mail.com";
+        private const int ExistingId = 1;
+        private const int NonexistentId = 2;
+        private const int InactiveId = 3;
+        private const string ExistingEmail = "exists@mail.com";
+        private const string NonexistentEmail = "inexists@mail.com";
 
         public UserServiceTests()
         {
             _mapper = new Mapper(AutoMapperConfiguration.UserMapping);
-            _userRepository = new Mock<ICrudRepository<Core.Entities.User>>();
-            _userValidator = new UserDtoValidator();
-            _updateRule = new UserUpdateRule();
-            _statusUpdateRule = new UserStatusUpdateRule();
-            _deletionRule = new UserDeletionRule();
-            _httpContextAccessor = new Mock<HttpContextAccessor>();
+            Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
+            IValidator<UserDto> userValidator = new UserDtoValidator();
+            Mock<HttpContextAccessor> httpContextAccessor = new();
 
-            _passwordMock = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
+            _passwordMock = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
             _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock).WithRoleId((int)Roles.REGULAR).Generate();
             _userDtoMock = _mapper.Map<UserDto>(_userMock);
             _userDtoMock.Password = _passwordMock;
-            _userMocks = new UserMocks();
+            UserMocks userMocks = new();
 
-            _userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
+            userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
 
-            _userRepository.Setup(repo => repo.GetById(It.IsAny<int>()))
+            userRepository.Setup(repo => repo.GetById(It.IsAny<int>()))
                 .Returns((int id) =>
                 {
-                    if (id == EXISTING_ID)
+                    if (id == ExistingId)
                     {
-                        return _userGenerator.WithId(EXISTING_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().Generate();
+                        return _userGenerator.WithId(ExistingId).WithDefaultEmail().WithDefaultName().WithRandomPassword().Generate();
                     }
 
-                    if (id == INACTIVE_ID)
+                    if (id == InactiveId)
                     {
-                        return _userGenerator.WithId(INACTIVE_ID).WithDefaultEmail().WithDefaultName().WithRandomPassword().WithStatus(false).Generate();
+                        return _userGenerator.WithId(InactiveId).WithDefaultEmail().WithDefaultName().WithRandomPassword().WithStatus(false).Generate();
                     }
 
                     return null;
                 });
 
-            _userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>()))
+            userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>()))
                 .Returns((Dictionary<string, object> filter) =>
                 {
-                    if (filter.FirstOrDefault().Value as string == EXISTING_EMAIL)
+                    if (filter.FirstOrDefault().Value as string == ExistingEmail)
                     {
-                        return new List<Core.Entities.User>() { _userGenerator.WithId(EXISTING_ID).WithEmail(EXISTING_EMAIL).WithRandomPassword().Generate() }.AsQueryable();
+                        return new List<Core.Entities.User>() { _userGenerator.WithId(ExistingId).WithEmail(ExistingEmail).WithRandomPassword().Generate() }.AsQueryable();
                     }
 
                     return new List<Core.Entities.User>().AsQueryable();
                 });
 
-            _userRepository.Setup(repo => repo.Update(It.IsAny<Core.Entities.User>()));
+            userRepository.Setup(repo => repo.Update(It.IsAny<Core.Entities.User>()));
 
-            _userRepository.Setup(repo => repo.Delete(It.IsAny<Core.Entities.User>()));
+            userRepository.Setup(repo => repo.Delete(It.IsAny<Core.Entities.User>()));
 
-            _httpContextAccessor.Object.HttpContext = new DefaultHttpContext();
-            _httpContextAccessor.Object.HttpContext!.Items = new Dictionary<object, object?>() { { "User", _userMocks.TestUserDto } };
+            httpContextAccessor.Object.HttpContext = new DefaultHttpContext();
+            httpContextAccessor.Object.HttpContext!.Items = new Dictionary<object, object?>() { { "User", userMocks.TestUserDto } };
+            
 
-            _creationRule = new UserCreationRule(_userRepository.Object, _httpContextAccessor.Object, new RoleRule());
+            UserFilterValidator userFilterValidator = new();
 
-            _userFilterValidator = new UserFilterValidator();
-
-            _userService = new UserService(_mapper, _userRepository.Object, _userValidator, _userFilterValidator, _creationRule, _updateRule, _statusUpdateRule, _deletionRule);
+            _userService = new UserService(userRepository.Object, httpContextAccessor.Object, _mapper,  userValidator, userFilterValidator);
         }
 
         [Fact]
@@ -121,9 +106,9 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotAllowedException_When_CreationRuleFails()
         {
-            var userWithExisitingEmail = _userDtoGenerator.WithEmail(EXISTING_EMAIL).WithDefaultName().WithRandomPassword().WithRoleId().Generate();
+            var userWithNonexistentEmail = _userDtoGenerator.WithEmail(ExistingEmail).WithDefaultName().WithRandomPassword().WithRoleId().Generate();
 
-            Assert.Throws<NotAllowedException>(() => _userService.CreateUser(userWithExisitingEmail));
+            Assert.Throws<NotAllowedException>(() => _userService.CreateUser(userWithNonexistentEmail));
         }
 
         [Fact]
@@ -139,7 +124,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_When_IdNotOnDatabase()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUserById(INEXISTING_ID));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUserById(NonexistentId));
 
             Assert.Equal("User not found!", exception.Message);
         }
@@ -148,10 +133,10 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ReturnUser_When_IdIsOnDatabase()
         {
-            var user = _userService.GetUserById(EXISTING_ID);
+            var user = _userService.GetUserById(ExistingId);
 
             Assert.NotNull(user);
-            Assert.Equal(EXISTING_ID, user.Id);
+            Assert.Equal(ExistingId, user.Id);
         }
 
         [Fact]
@@ -167,7 +152,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_When_FilterDoesNotReturnAnyResult()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", INEXISTING_EMAIL)));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", NonexistentEmail)));
 
             Assert.Equal("No users found with the given filter", exception.Message);
         }
@@ -176,18 +161,18 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ReturnUsers_For_ValidAndExistingFilter()
         {
-            var users = _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", EXISTING_EMAIL));
+            var users = _userService.GetUsersByFilter(FilterUtils.CreateQuery("Email", ExistingEmail));
 
             Assert.NotNull(users);
             Assert.NotEmpty(users);
-            Assert.True(users.FirstOrDefault(user => user.Email == EXISTING_EMAIL) is not null);
+            Assert.True(users.FirstOrDefault(user => user.Email == ExistingEmail) is not null);
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.GetPasswordByUserId(INEXISTING_ID));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.GetPasswordByUserId(NonexistentId));
 
             Assert.Equal("User not found!", exception.Message);
         }
@@ -196,7 +181,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ReturnPassword_When_IdIsOnDatabase()
         {
-            var hashDto = _userService.GetPasswordByUserId(EXISTING_ID);
+            var hashDto = _userService.GetPasswordByUserId(ExistingId);
 
             Assert.NotNull(hashDto);
             Assert.NotEmpty(hashDto.Hash);
@@ -207,7 +192,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotUpdateUser()
         {
-            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(INEXISTING_ID).WithPassword(_passwordMock).Generate();
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId).WithPassword(_passwordMock).Generate();
             var userDto = _mapper.Map<UserDto>(userMock);
 
             var exception = Assert.Throws<NotFoundException>(() => _userService.UpdateUser(userDto));
@@ -219,7 +204,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotNotAllowedException_WhenUserIsInactive()
         {
-            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(INACTIVE_ID).WithPassword(_passwordMock).Generate();
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId).WithPassword(_passwordMock).Generate();
             var userDto = _mapper.Map<UserDto>(userMock);
 
             var exception = Assert.Throws<NotAllowedException>(() => _userService.UpdateUser(userDto));
@@ -231,7 +216,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_UpdateUser()
         {
-            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(EXISTING_ID).WithPassword(_passwordMock).Generate();
+            var userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(ExistingId).WithPassword(_passwordMock).Generate();
             var userDto = _mapper.Map<UserDto>(userMock);
 
             var exception = Record.Exception(() => _userService.UpdateUser(userDto));
@@ -243,7 +228,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotActivateUser()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.ActivateUser(INEXISTING_ID));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.ActivateUser(NonexistentId));
 
             Assert.Equal("User not found!", exception.Message);
         }
@@ -252,7 +237,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotNotAllowedException_WhenUserIsActive()
         {
-            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.ActivateUser(EXISTING_ID));
+            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.ActivateUser(ExistingId));
 
             Assert.Equal("User already active", exception.Message);
         }
@@ -261,7 +246,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ActivateUser()
         {
-            var exception = Record.Exception(() => _userService.ActivateUser(INACTIVE_ID));
+            var exception = Record.Exception(() => _userService.ActivateUser(InactiveId));
 
             Assert.Null(exception);
         }
@@ -270,7 +255,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeactivateUser()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.DeactivateUser(INEXISTING_ID));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.DeactivateUser(NonexistentId));
 
             Assert.Equal("User not found!", exception.Message);
         }
@@ -279,7 +264,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotNotAllowedException_WhenUserIsInactive_On_Deactivation()
         {
-            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.DeactivateUser(INACTIVE_ID));
+            var exception = Assert.Throws<EntityNotChangedException>(() => _userService.DeactivateUser(InactiveId));
 
             Assert.Equal("User already inactive", exception.Message);
         }
@@ -288,7 +273,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_DeactivateUser()
         {
-            var exception = Record.Exception(() => _userService.DeactivateUser(EXISTING_ID));
+            var exception = Record.Exception(() => _userService.DeactivateUser(ExistingId));
 
             Assert.Null(exception);
         }
@@ -297,7 +282,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeleteUser()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _userService.DeleteUser(INEXISTING_ID));
+            var exception = Assert.Throws<NotFoundException>(() => _userService.DeleteUser(NonexistentId));
 
             Assert.Equal("User not found!", exception.Message);
         }
@@ -306,7 +291,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_ThrowNotAllowedException_WhenIdNotOnDatabaseAndCannotDeleteUser()
         {
-            var exception = Assert.Throws<NotAllowedException>(() => _userService.DeleteUser(EXISTING_ID));
+            var exception = Assert.Throws<NotAllowedException>(() => _userService.DeleteUser(ExistingId));
 
             Assert.Equal("Can't delete active user", exception.Message);
         }
@@ -315,7 +300,7 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("UserService")]
         public void Should_DeleteUser()
         {
-            var exception = Record.Exception(() => _userService.DeleteUser(INACTIVE_ID));
+            var exception = Record.Exception(() => _userService.DeleteUser(InactiveId));
 
             Assert.Null(exception);
         }

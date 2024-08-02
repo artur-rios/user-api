@@ -21,16 +21,14 @@ namespace TechCraftsmen.User.Services
         private readonly AuthenticationTokenConfiguration _authTokenConfig;
         private readonly IUserService _userService;
         private readonly IValidator<AuthenticationCredentialsDto> _authCredentialsValidator;
-        private readonly IValidator<AuthenticationTokenConfiguration> _authTokenConfigValidator;
 
         public AuthenticationService(IOptions<AuthenticationTokenConfiguration> authTokenConfig, IValidator<AuthenticationCredentialsDto> authCredentialsValidator, IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator, IUserService userService)
         {
             _authCredentialsValidator = authCredentialsValidator;
             _authTokenConfig = authTokenConfig.Value;
-            _authTokenConfigValidator = authTokenConfigValidator;
             _userService = userService;
 
-            _authTokenConfigValidator.ValidateAndThrow(_authTokenConfig);
+            authTokenConfigValidator.ValidateAndThrow(_authTokenConfig);
         }
 
         public AuthenticationToken AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
@@ -46,7 +44,7 @@ namespace TechCraftsmen.User.Services
 
             try
             {
-                user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials"); ;
+                user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
             }
             catch (NotFoundException)
             {
@@ -131,7 +129,7 @@ namespace TechCraftsmen.User.Services
 
                 authenticatedUser = _userService.GetUserById(userId);
 
-                return authenticatedUser is not null;
+                return true;
             }
             catch (SecurityTokenExpiredException)
             {

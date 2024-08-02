@@ -1,22 +1,22 @@
-﻿using TechCraftsmen.User.Core.Rules.Password;
+﻿using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
-namespace TechCraftsmen.User.Core.Tests.Rules.Password
+namespace TechCraftsmen.User.Core.Tests.Validation
 {
-    public class PasswordRuleTests
+    public class PasswordValidatorTests
     {
-        private readonly PasswordRule _rule = new();
+        private readonly PasswordValidator _validator = new();
         private readonly RandomStringGenerator _randomStringGenerator = new();
 
         [Fact]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         public void Should_ReturnFalse_ForPassword_WithNoNumber()
         {
-            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().Generate();
+            var password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().Generate();
 
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -24,12 +24,12 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         }
 
         [Fact]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         public void Should_ReturnFalse_ForPassword_WithNoLowerChar()
         {
-            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithUpperChars().Generate();
+            var password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithUpperChars().Generate();
 
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -37,12 +37,12 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         }
 
         [Fact]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         public void Should_ReturnFalse_ForPassword_WithNoUpperChar()
         {
-            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().Generate();
+            var password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithLowerChars().Generate();
 
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -50,26 +50,26 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         }
 
         [Fact]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         public void Should_ReturnFalse_ForPassword_WithLessThanMinimumLength()
         {
-            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH - 1).WithNumbers().WithLowerChars().WithUpperChars().Generate();
+            var password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH - 1).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
-            Assert.Equal($"Password must contain at least {PasswordRule.MINIMUM_LENGTH} characters", result.Errors.FirstOrDefault());
+            Assert.Equal($"Password must contain at least {PasswordValidator.MINIMUM_LENGTH} characters", result.Errors.FirstOrDefault());
         }
 
         [Theory]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         [InlineData("")]
         [InlineData(null)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForPassword_NullOrEmpty(string password)
         {
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -77,12 +77,12 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Password
         }
 
         [Fact]
-        [Unit("PasswordRule")]
+        [Unit("PasswordValidator")]
         public void Should_ReturnTrue_ForValidPassword()
         {
-            var password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
+            var password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            var result = _rule.Execute(password);
+            var result = _validator.Validate(password);
 
             Assert.True(result.Success);
             Assert.False(result.Errors.Any());

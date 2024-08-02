@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.Validation.Fluent;
 
 namespace TechCraftsmen.User.Configuration.DependencyInjection
 {

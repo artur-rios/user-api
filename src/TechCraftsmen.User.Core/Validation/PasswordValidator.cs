@@ -1,38 +1,38 @@
 ﻿using TechCraftsmen.User.Core.Collections;
 using TechCraftsmen.User.Core.Dto;
 
-namespace TechCraftsmen.User.Core.Rules.Password
+namespace TechCraftsmen.User.Core.Validation
 {
-    public class PasswordRule : BaseRule<string>
+    public class PasswordValidator : BaseValidator<string>
     {
         public const int MINIMUM_LENGTH = 8;
-        public override RuleResultDto Execute(string password)
+        public override SimpleResultDto Validate(string password)
         {
             if (!IsParameterValid(password, out string validationMessage))
             {
-                _result.Errors.Add(validationMessage);
+                Result.Errors.Add(validationMessage);
 
                 return Resolve();
             }
 
             if (!RegexCollection.HasNumber().IsMatch(password))
             {
-                _result.Errors.Add("Password must contain a number");
+                Result.Errors.Add("Password must contain a number");
             }
 
             if (!RegexCollection.HasLowerChar().IsMatch(password))
             {
-                _result.Errors.Add("Password must contain a lower char");
+                Result.Errors.Add("Password must contain a lower char");
             }
 
             if (!RegexCollection.HasUpperChar().IsMatch(password))
             {
-                _result.Errors.Add("Password must contain a upper char");
+                Result.Errors.Add("Password must contain a upper char");
             }
 
             if (password.Length < MINIMUM_LENGTH)
             {
-                _result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
+                Result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
             }
 
             return Resolve();

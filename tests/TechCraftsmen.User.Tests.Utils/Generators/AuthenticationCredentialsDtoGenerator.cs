@@ -1,5 +1,5 @@
 ﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Rules.Password;
+using TechCraftsmen.User.Core.Validation;
 
 namespace TechCraftsmen.User.Tests.Utils.Generators
 {
@@ -34,7 +34,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public AuthenticationCredentialsDtoGenerator WithRandomPassword()
         {
-            _password = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
+            _password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
 
             return this;
         }

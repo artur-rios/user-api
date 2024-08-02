@@ -6,72 +6,73 @@ using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Interfaces.Services;
-using TechCraftsmen.User.Core.Rules.User;
 using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Services
 {
     public class UserService(
-        IMapper mapper,
         ICrudRepository<Core.Entities.User> userRepository,
+        IHttpContextAccessor httpContextAccessor,
+        IMapper mapper,
         IValidator<UserDto> userValidator,
-        UserFilterValidator userFilter,
-        UserCreationRule creationRule,
-        UserUpdateRule updateRule,
-        UserStatusUpdateRule statusUpdateRule,
-        UserDeletionRule deletionRule) : IUserService
+        UserFilterValidator userFilter
+    ) : IUserService
     {
-        private readonly IMapper _mapper = mapper;
-        private readonly ICrudRepository<Core.Entities.User> _userRepository = userRepository;
-        private readonly IValidator<UserDto> _userValidator = userValidator;
-        private readonly UserFilterValidator _filterValidator = userFilter;
-        private readonly UserCreationRule _creationRule = creationRule;
-        private readonly UserUpdateRule _updateRule = updateRule;
-        private readonly UserStatusUpdateRule _statusUpdateRule = statusUpdateRule;
-        private readonly UserDeletionRule _deletionRule = deletionRule;
-
         public int CreateUser(UserDto userDto)
         {
-            _userValidator.ValidateAndThrow(userDto);
+            userValidator.ValidateAndThrow(userDto);
 
-            var ruleResult = _creationRule.Execute(new Tuple<string, int>(userDto.Email, userDto.RoleId));
+            var filter = new Dictionary<string, object>() { { "Email", userDto.Email } };
 
-            if (!ruleResult.Success)
+            var userSearch = userRepository.GetByFilter(filter);
+
+            if (userSearch.Any())
             {
-                var exceptionMessage = string.Join("|", ruleResult.Errors);
+                throw new NotAllowedException("E-mail already registered");
+            }
+
+            var user = mapper.Map<Core.Entities.User>(userDto);
+
+            httpContextAccessor.HttpContext!.Items.TryGetValue("User", out var userData);
+
+            var authenticatedUser = userData as UserDto;
+
+            var canRegister = user.CanRegister(authenticatedUser!.RoleId);
+
+            if (!canRegister.Success)
+            {
+                var exceptionMessage = string.Join(" | ", canRegister.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }
-
-            var user = _mapper.Map<Core.Entities.User>(userDto);
 
             var hashResult = HashUtils.HashText(userDto.Password);
 
             user.Password = hashResult.Hash;
             user.Salt = hashResult.Salt;
 
-            return _userRepository.Create(user);
+            return userRepository.Create(user);
         }
 
         public UserDto GetUserById(int id)
         {
-            var user = _userRepository.GetById(id);
+            var user = userRepository.GetById(id);
 
             return user is null
                 ? throw new NotFoundException("User not found!")
-                : _mapper.Map<UserDto>(user);
+                : mapper.Map<UserDto>(user);
         }
 
         public IList<UserDto> GetUsersByFilter(IQueryCollection query)
         {
-            Dictionary<string, object> validFilters = _filterValidator.ParseAndValidateFilters(query);
+            Dictionary<string, object> validFilters = userFilter.ParseAndValidateFilters(query);
 
             if (validFilters.Count == 0)
             {
                 throw new NotAllowedException("No valid filters were passed!");
             }
 
-            var users = _userRepository.GetByFilter(validFilters).ToList();
+            var users = userRepository.GetByFilter(validFilters).ToList();
 
             if (users is null || users.Count == 0)
             {
@@ -82,7 +83,7 @@ namespace TechCraftsmen.User.Services
 
             foreach (var user in users)
             {
-                userDtos.Add(_mapper.Map<UserDto>(user));
+                userDtos.Add(mapper.Map<UserDto>(user));
             }
 
             return userDtos;
@@ -90,7 +91,7 @@ namespace TechCraftsmen.User.Services
 
         public HashDto GetPasswordByUserId(int id)
         {
-            var user = _userRepository.GetById(id);
+            var user = userRepository.GetById(id);
 
             return user is null
                 ? throw new NotFoundException("User not found!")
@@ -99,74 +100,74 @@ namespace TechCraftsmen.User.Services
 
         public void UpdateUser(UserDto userDto)
         {
-            var currentUser = _userRepository.GetById(userDto.Id) ?? throw new NotFoundException("User not found!");
+            var currentUser = userRepository.GetById(userDto.Id) ?? throw new NotFoundException("User not found!");
 
-            var ruleResult = _updateRule.Execute(currentUser!.Active);
+            var canUpdate = currentUser.CanUpdate();
 
-            if (!ruleResult.Success)
+            if (!canUpdate.Success)
             {
-                var exceptionMessage = string.Join("|", ruleResult.Errors);
+                var exceptionMessage = string.Join("|", canUpdate.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            var user = _mapper.Map<Core.Entities.User>(userDto);
+            var user = mapper.Map<Core.Entities.User>(userDto);
 
             MergeUser(user, currentUser);
 
-            _userRepository.Update(user);
+            userRepository.Update(user);
         }
 
         public void ActivateUser(int id)
         {
-            var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            var ruleResult = _statusUpdateRule.Execute(Tuple.Create(user.Active, true));
+            var canActivate = user.CanActivate();
 
-            if (!ruleResult.Success)
+            if (!canActivate.Success)
             {
-                var exceptionMessage = string.Join("|", ruleResult.Errors);
+                var exceptionMessage = string.Join("|", canActivate.Errors);
 
                 throw new EntityNotChangedException(exceptionMessage);
             }
 
             user.Active = true;
 
-            _userRepository.Update(user);
+            userRepository.Update(user);
         }
 
         public void DeactivateUser(int id)
         {
-            var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            var ruleResult = _statusUpdateRule.Execute(Tuple.Create(user.Active, false));
+            var canDeactivate = user.CanDeactivate();
 
-            if (!ruleResult.Success)
+            if (!canDeactivate.Success)
             {
-                var exceptionMessage = string.Join("|", ruleResult.Errors);
+                var exceptionMessage = string.Join("|", canDeactivate.Errors);
 
                 throw new EntityNotChangedException(exceptionMessage);
             }
 
             user.Active = false;
 
-            _userRepository.Update(user);
+            userRepository.Update(user);
         }
 
         public void DeleteUser(int id)
         {
-            var user = _userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
 
-            var ruleResult = _deletionRule.Execute(user.Active);
+            var canDelete = user.CanDelete();
 
-            if (!ruleResult.Success)
+            if (!canDelete.Success)
             {
-                var exceptionMessage = string.Join("|", ruleResult.Errors);
+                var exceptionMessage = string.Join("|", canDelete.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            _userRepository.Delete(user);
+            userRepository.Delete(user);
         }
 
         private static void MergeUser(Core.Entities.User source, Core.Entities.User target, bool mergeStatus = true)

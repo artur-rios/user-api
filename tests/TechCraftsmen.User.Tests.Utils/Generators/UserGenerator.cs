@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Rules.Password;
 using TechCraftsmen.User.Core.Utils;
+using TechCraftsmen.User.Core.Validation;
 
 namespace TechCraftsmen.User.Tests.Utils.Generators
 {
@@ -72,7 +72,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserGenerator WithRandomPassword()
         {
-            var randomString = _randomStringGenerator.WithLength(PasswordRule.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
+            var randomString = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
             var hashResult = HashUtils.HashText(randomString);
 
             _password = hashResult.Hash;

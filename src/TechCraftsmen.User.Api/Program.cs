@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Configuration.DependencyInjection;
 using TechCraftsmen.User.Configuration.Middleware;
@@ -32,6 +33,11 @@ namespace TechCraftsmen.User.Api
             builder.Services.AddDomainRules();
             builder.Services.AddServices();
             builder.Services.AddFilterValidators();
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             var app = builder.Build();
 

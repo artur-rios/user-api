@@ -28,17 +28,17 @@ namespace TechCraftsmen.User.Configuration.Middleware
 
         private async Task HandleException(HttpContext context, Exception exception)
         {
-            ResultDto<string> response;
+            DataResultDto<string> response;
             HttpStatusCode httpStatus;
 
             if (exception is NotAllowedException)
             {
-                response = new ResultDto<string>("The request was unsuccessful", exception.Message, false);
+                response = new DataResultDto<string>("The request was unsuccessful", exception.Message, false);
                 httpStatus = HttpStatusCode.BadRequest;
             }
             else if (exception is NotFoundException)
             {
-                response = new ResultDto<string>("The resource request was not found", exception.Message, false);
+                response = new DataResultDto<string>("The resource request was not found", exception.Message, false);
                 httpStatus = HttpStatusCode.NotFound;
             }
             else if (exception is ValidationException)
@@ -55,12 +55,12 @@ namespace TechCraftsmen.User.Configuration.Middleware
                     }
                 }
 
-                response = new ResultDto<string>("Validation error", string.Join(" | ", errorList), false);
+                response = new DataResultDto<string>("Validation error", string.Join(" | ", errorList), false);
                 httpStatus = HttpStatusCode.BadRequest;
             }
             else
             {
-                response = new ResultDto<string>("An error has ocurred", "Internal error, please try again later", false);
+                response = new DataResultDto<string>("An error has ocurred", "Internal error, please try again later", false);
                 httpStatus = HttpStatusCode.InternalServerError;
             }
 

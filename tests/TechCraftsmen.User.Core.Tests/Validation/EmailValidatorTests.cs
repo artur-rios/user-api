@@ -1,15 +1,14 @@
-﻿using TechCraftsmen.User.Core.Rules.Email;
+﻿using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
-namespace TechCraftsmen.User.Core.Tests.Rules.Email
+namespace TechCraftsmen.User.Core.Tests.Validation
 {
-    public class EmailRuleTests
+    public class EmailValidatorTests
     {
-        private readonly EmailRule _rule = new();
+        private readonly EmailValidator _validator = new();
 
-        private static readonly string[] _invalidEmails = [
-            " ",
+        private static readonly string[] InvalidEmails = [
             "-------",
             "@majjf.com",
             "A@b@c@example.com",
@@ -27,7 +26,7 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
             "MA@hostname.coMCom"
         ];
 
-        private static readonly string[] _validEmails = [
+        private static readonly string[] ValidEmails = [
             "ma_@jjf.com",
             "12@hostname.com",
             "d.j@server1.proseware.com",
@@ -47,16 +46,16 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
             "ma@1hostname.com"
         ];
 
-        public static TheoryData<string> InvalidEmails => new(_invalidEmails);
+        public static TheoryData<string> InvalidEmailsData => new(InvalidEmails);
 
-        public static TheoryData<string> ValidEmails => new(_validEmails);
+        public static TheoryData<string> ValidEmailsData => new(ValidEmails);
 
         [Theory]
-        [Unit("EmailRule")]
-        [MemberData(nameof(InvalidEmails))]
+        [Unit("EmailValidator")]
+        [MemberData(nameof(InvalidEmailsData))]
         public void Should_ReturnFalse_For_InvalidEmails(string email)
         {
-            var result = _rule.Execute(email);
+            var result = _validator.Validate(email);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -64,25 +63,26 @@ namespace TechCraftsmen.User.Core.Tests.Rules.Email
         }
 
         [Theory]
-        [Unit("EmailRule")]
+        [Unit("EmailValidator")]
         [InlineData("")]
+        [InlineData(" ")]
         [InlineData(null)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_For_NullOrEmptyEmail(string email)
         {
-            var result = _rule.Execute(email);
+            var result = _validator.Validate(email);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
-            Assert.Equal("Parameter null or empty", result.Errors.FirstOrDefault());
+            Assert.Equal("Email must not be null or empty", result.Errors.FirstOrDefault());
         }
 
         [Theory]
-        [Unit("EmailRule")]
-        [MemberData(nameof(ValidEmails))]
+        [Unit("EmailValidator")]
+        [MemberData(nameof(ValidEmailsData))]
         public void Should_ReturnTrue_For_ValidEmail(string email)
         {
-            var result = _rule.Execute(email);
+            var result = _validator.Validate(email);
 
             Assert.True(result.Success);
             Assert.False(result.Errors.Any());

@@ -1,27 +1,27 @@
 ﻿using System.Text.RegularExpressions;
 using TechCraftsmen.User.Core.Dto;
 
-namespace TechCraftsmen.User.Core.Rules.Email
+namespace TechCraftsmen.User.Core.Validation
 {
-    public partial class EmailRule : BaseRule<string>
+    public partial class EmailValidator : BaseValidator<string>
     {
         private static readonly Regex _emailRegex = EmailRegex();
 
         [GeneratedRegex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$")]
         private static partial Regex EmailRegex();
-
-        public override RuleResultDto Execute(string email)
+        
+        public override SimpleResultDto Validate(string email)
         {
             if (!IsParameterValid(email, out string validationMessage))
             {
-                _result.Errors.Add(validationMessage);
+                Result.Errors.Add(validationMessage);
 
                 return Resolve();
             }
 
             if (!_emailRegex.IsMatch(email))
             {
-                _result.Errors.Add("Email should be valid");
+                Result.Errors.Add("Email should be valid");
             }
 
             return Resolve();
@@ -29,9 +29,9 @@ namespace TechCraftsmen.User.Core.Rules.Email
 
         internal override bool IsParameterValid(string parameter, out string message)
         {
-            if (string.IsNullOrEmpty(parameter))
+            if (string.IsNullOrWhiteSpace(parameter))
             {
-                message = $"Parameter null or empty";
+                message = $"Email must not be null or empty";
 
                 return false;
             }

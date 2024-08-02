@@ -1,10 +1,10 @@
 ﻿using FluentValidation.TestHelper;
-using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
-namespace TechCraftsmen.User.Core.Tests.Validation
+namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 {
     public class AuthenticationTokenConfigurationValidatorTests
     {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using TechCraftsmen.User.Core.Dto;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Core.Validation.Fluent
 {
     public class AuthenticationCredentialsDtoValidator : AbstractValidator<AuthenticationCredentialsDto>
     {

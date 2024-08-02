@@ -14,10 +14,10 @@ namespace TechCraftsmen.User.Api.Tests
         private readonly UserMocks _userMocks = new();
         private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly EmailGenerator _emailGenerator = new();
-        private const string AUTHENTICATE_USER_ROUTE = "/Authentication/User";
+        private const string AuthenticateUserRoute = "/Authentication/User";
 
         [Fact]
-        public async void Should_AutheticateUser()
+        public async void Should_AuthenticateUser()
         {
             var credentialsDto = new AuthenticationCredentialsDto()
             {
@@ -27,62 +27,62 @@ namespace TechCraftsmen.User.Api.Tests
 
             var payload = new StringContent(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);
+            var response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
             var body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<ResultDto<AuthenticationToken>>(body);
+            var result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
-            Assert.False(string.IsNullOrWhiteSpace(result?.Data?.AccessToken));
-            Assert.True(result?.Data?.Authenticated);
-            Assert.Equal("User authenticated with success", result?.Message);
+            Assert.False(string.IsNullOrWhiteSpace(result.Data.AccessToken));
+            Assert.True(result.Data.Authenticated);
+            Assert.Equal("User authenticated with success", result.Message);
         }
 
         [Fact]
         public async void Should_NotAuthenticate_ForIncorrectCredentials()
         {
-            List<AuthenticationCredentialsDto> _incorrectCredentials = [
+            List<AuthenticationCredentialsDto> incorrectCredentials = [
                 new(_userMocks.TestUser.Email, _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([_userMocks.TestPassword]).Generate()),
             new(_emailGenerator.Generate(), _userMocks.TestPassword),
             new(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([_userMocks.TestPassword]).Generate())
             ];
 
-            foreach (var credentialDto in _incorrectCredentials)
+            foreach (var credentialDto in incorrectCredentials)
             {
                 var payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);
+                var response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
                 var body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
+                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
-                Assert.Equal("Invalid credentials", result?.Message);
+                Assert.Equal("Invalid credentials", result.Message);
             }
         }
 
         [Fact]
         public async void Should_NotAuthenticate_ForInvalidCredentials()
         {
-            List<AuthenticationCredentialsDto> _invalidCredentials = [
+            List<AuthenticationCredentialsDto> invalidCredentials = [
                 new(string.Empty, _userMocks.TestPassword),
             new(_userMocks.TestUser.Email, string.Empty),
             new()
             ];
 
-            foreach (var credentialDto in _invalidCredentials)
+            foreach (var credentialDto in invalidCredentials)
             {
                 var payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AUTHENTICATE_USER_ROUTE, payload);
+                var response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
                 var body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<ResultDto<string>>(body);
+                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
@@ -104,7 +104,7 @@ namespace TechCraftsmen.User.Api.Tests
                     expectedValidationError = passwordValidationError;
                 }
 
-                Assert.Equal(expectedValidationError, result?.Message);
+                Assert.Equal(expectedValidationError, result.Message);
             }
         }
     }
