@@ -19,11 +19,6 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
             return user.Id;
         }
 
-        public Core.Entities.User? GetById(int id)
-        {
-            return _dbContext.Find<Core.Entities.User>(id);
-        }
-
         public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters)
         {
             RelationalDBConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
@@ -35,7 +30,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
 
             var query = new StringBuilder($"SELECT * FROM sc_user_api.{tableName}");
 
-            if (filters != null && filters.Count > 0)
+            if (filters.Count > 0)
             {
                 query.Append(" WHERE ");
 

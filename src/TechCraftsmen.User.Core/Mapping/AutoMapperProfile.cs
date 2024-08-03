@@ -12,11 +12,5 @@ namespace TechCraftsmen.User.Core.Mapping
             CreateMap<Entities.User, UserDto>().ForMember(user => user.Password, option => option.Ignore());
             CreateMap<UserDto, Entities.User>().ForMember(user => user.Password, option => option.Ignore());
         }
-
-        private void CreateTwoWayMap<T1, T2>()
-        {
-            CreateMap<T1, T2>();
-            CreateMap<T2, T1>();
-        }
     }
 }

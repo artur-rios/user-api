@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Interfaces.Services;
@@ -14,39 +15,38 @@ namespace TechCraftsmen.User.Services
         ICrudRepository<Core.Entities.User> userRepository,
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,
-        IValidator<UserDto> userValidator,
-        UserFilterValidator userFilter
+        IValidator<UserDto> userValidator
     ) : IUserService
     {
         public int CreateUser(UserDto userDto)
         {
             userValidator.ValidateAndThrow(userDto);
 
-            var filter = new Dictionary<string, object>() { { "Email", userDto.Email } };
+            Dictionary<string, object> filter = new() { { "Email", userDto.Email } };
 
-            var userSearch = userRepository.GetByFilter(filter);
+            IQueryable<Core.Entities.User> userSearch = userRepository.GetByFilter(filter);
 
             if (userSearch.Any())
             {
                 throw new NotAllowedException("E-mail already registered");
             }
 
-            var user = mapper.Map<Core.Entities.User>(userDto);
+            Core.Entities.User? user = mapper.Map<Core.Entities.User>(userDto);
 
-            httpContextAccessor.HttpContext!.Items.TryGetValue("User", out var userData);
+            httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
 
-            var authenticatedUser = userData as UserDto;
+            UserDto? authenticatedUser = userData as UserDto;
 
-            var canRegister = user.CanRegister(authenticatedUser!.RoleId);
+            SimpleResultDto canRegister = user.CanRegister(authenticatedUser!.RoleId);
 
             if (!canRegister.Success)
             {
-                var exceptionMessage = string.Join(" | ", canRegister.Errors);
+                string exceptionMessage = string.Join(" | ", canRegister.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            var hashResult = HashUtils.HashText(userDto.Password);
+            HashDto hashResult = HashUtils.HashText(userDto.Password);
 
             user.Password = hashResult.Hash;
             user.Salt = hashResult.Salt;
@@ -54,44 +54,21 @@ namespace TechCraftsmen.User.Services
             return userRepository.Create(user);
         }
 
-        public UserDto GetUserById(int id)
+        public IList<UserDto> GetUsersByFilter(UserFilter filter)
         {
-            var user = userRepository.GetById(id);
-
-            return user is null
-                ? throw new NotFoundException("User not found!")
-                : mapper.Map<UserDto>(user);
-        }
-
-        public IList<UserDto> GetUsersByFilter(IQueryCollection query)
-        {
-            Dictionary<string, object> validFilters = userFilter.ParseAndValidateFilters(query);
-
-            if (validFilters.Count == 0)
-            {
-                throw new NotAllowedException("No valid filters were passed!");
-            }
-
-            var users = userRepository.GetByFilter(validFilters).ToList();
+            List<Core.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary()).ToList();
 
             if (users is null || users.Count == 0)
             {
                 throw new NotFoundException("No users found with the given filter");
             }
 
-            var userDtos = new List<UserDto>();
-
-            foreach (var user in users)
-            {
-                userDtos.Add(mapper.Map<UserDto>(user));
-            }
-
-            return userDtos;
+            return users.Select(mapper.Map<UserDto>).ToList();
         }
 
         public HashDto GetPasswordByUserId(int id)
         {
-            var user = userRepository.GetById(id);
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
 
             return user is null
                 ? throw new NotFoundException("User not found!")
@@ -100,18 +77,18 @@ namespace TechCraftsmen.User.Services
 
         public void UpdateUser(UserDto userDto)
         {
-            var currentUser = userRepository.GetById(userDto.Id) ?? throw new NotFoundException("User not found!");
+            Core.Entities.User currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
 
-            var canUpdate = currentUser.CanUpdate();
+            SimpleResultDto canUpdate = currentUser.CanUpdate();
 
             if (!canUpdate.Success)
             {
-                var exceptionMessage = string.Join("|", canUpdate.Errors);
+                string exceptionMessage = string.Join(" | ", canUpdate.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            var user = mapper.Map<Core.Entities.User>(userDto);
+            Core.Entities.User? user = mapper.Map<Core.Entities.User>(userDto);
 
             MergeUser(user, currentUser);
 
@@ -120,13 +97,13 @@ namespace TechCraftsmen.User.Services
 
         public void ActivateUser(int id)
         {
-            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
 
-            var canActivate = user.CanActivate();
+            SimpleResultDto canActivate = user.CanActivate();
 
             if (!canActivate.Success)
             {
-                var exceptionMessage = string.Join("|", canActivate.Errors);
+                string exceptionMessage = string.Join(" | ", canActivate.Errors);
 
                 throw new EntityNotChangedException(exceptionMessage);
             }
@@ -138,13 +115,13 @@ namespace TechCraftsmen.User.Services
 
         public void DeactivateUser(int id)
         {
-            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
 
-            var canDeactivate = user.CanDeactivate();
+            SimpleResultDto canDeactivate = user.CanDeactivate();
 
             if (!canDeactivate.Success)
             {
-                var exceptionMessage = string.Join("|", canDeactivate.Errors);
+                string exceptionMessage = string.Join(" | ", canDeactivate.Errors);
 
                 throw new EntityNotChangedException(exceptionMessage);
             }
@@ -156,13 +133,13 @@ namespace TechCraftsmen.User.Services
 
         public void DeleteUser(int id)
         {
-            var user = userRepository.GetById(id) ?? throw new NotFoundException("User not found!");
+            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
 
-            var canDelete = user.CanDelete();
+            SimpleResultDto canDelete = user.CanDelete();
 
             if (!canDelete.Success)
             {
-                var exceptionMessage = string.Join("|", canDelete.Errors);
+                string exceptionMessage = string.Join(" | ", canDelete.Errors);
 
                 throw new NotAllowedException(exceptionMessage);
             }

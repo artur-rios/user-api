@@ -3,6 +3,7 @@ using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Configuration.DependencyInjection;
 using TechCraftsmen.User.Configuration.Middleware;
 using TechCraftsmen.User.Core.Configuration;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Mapping;
 
 namespace TechCraftsmen.User.Api
@@ -32,11 +33,23 @@ namespace TechCraftsmen.User.Api
             builder.Services.AddRelationalRepositories();
             builder.Services.AddDomainRules();
             builder.Services.AddServices();
-            builder.Services.AddFilterValidators();
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
-                options.SuppressModelStateInvalidFilter = true;
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(e => e.Value?.Errors.Count > 0)
+                        .Select(e => new ErrorDto()
+                        {
+                            Parameter = e.Key,
+                            Error = e.Value?.Errors.First().ErrorMessage
+                        }).ToArray();
+
+                    var result = new DataResultDto<ErrorDto[]>(errors, "Invalid query string");
+
+                    return new BadRequestObjectResult(result);
+                };
             });
 
             var app = builder.Build();

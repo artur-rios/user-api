@@ -12,15 +12,5 @@ namespace TechCraftsmen.User.Core.Utils
                 { key, value }
             };
         }
-
-        public static QueryCollection CreateQuery(string key, string value)
-        {
-            Dictionary<string, StringValues> query = new()
-            {
-                { key, value }
-            };
-
-            return new QueryCollection(query);
-        }
     }
 }

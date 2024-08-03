@@ -1,6 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Core.Filters;
 
 namespace TechCraftsmen.User.Api.Controllers
 {
@@ -12,9 +14,17 @@ namespace TechCraftsmen.User.Api.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
-        public ActionResult<ResultDto<string>> HelloWorld()
+        public ActionResult<DataResultDto<string>> HelloWorld()
         {
             return Success("Hello world!", "User Api ON");
+        }
+
+        [HttpGet]
+        [Route("Query")]
+        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
+        public ActionResult<DataResultDto<UserFilter>> TestQuery([FromQuery] UserFilter filter)
+        {
+            return Success(filter, "Filter parsed with success");
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,6 +8,7 @@ using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
 
@@ -35,23 +34,18 @@ namespace TechCraftsmen.User.Services
         {
             _authCredentialsValidator.ValidateAndThrow(credentialsDto);
 
-            Dictionary<string, StringValues> filter = new()
-            {
-                { "Email",  credentialsDto.Email },
-            };
-
             UserDto? user;
 
             try
             {
-                user = _userService.GetUsersByFilter(new QueryCollection(filter)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
+                user = _userService.GetUsersByFilter(new UserFilter(credentialsDto.Email)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
             }
             catch (NotFoundException)
             {
                 throw new NotAllowedException("Invalid credentials");
             }
 
-            var password = _userService.GetPasswordByUserId(user.Id);
+            HashDto password = _userService.GetPasswordByUserId(user.Id);
 
             if (!HashUtils.VerifyHash(credentialsDto.Password, password))
             {
@@ -63,15 +57,15 @@ namespace TechCraftsmen.User.Services
 
         public AuthenticationToken GenerateJwtToken(int userId)
         {
-            var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
+            byte[] key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
             ClaimsIdentity identity = new([new Claim("id", userId.ToString())]);
 
             DateTime creationDate = DateTime.Now;
             DateTime expirationDate = creationDate + TimeSpan.FromSeconds(_authTokenConfig.Seconds);
 
-            var handler = new JwtSecurityTokenHandler();
-            var securityToken = handler.CreateToken(new SecurityTokenDescriptor
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            SecurityToken? securityToken = handler.CreateToken(new SecurityTokenDescriptor
             {
                 Issuer = _authTokenConfig.Issuer,
                 Audience = _authTokenConfig.Audience,
@@ -80,7 +74,7 @@ namespace TechCraftsmen.User.Services
                 NotBefore = creationDate,
                 Expires = expirationDate
             });
-            var token = handler.WriteToken(securityToken);
+            string? token = handler.WriteToken(securityToken);
 
             return new()
             {
@@ -93,9 +87,9 @@ namespace TechCraftsmen.User.Services
 
         public int GetUserIdFromJwtToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jsonToken = tokenHandler.ReadToken(token);
-            var jwtSecurityToken = jsonToken as JwtSecurityToken;
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken? jsonToken = tokenHandler.ReadToken(token);
+            JwtSecurityToken? jwtSecurityToken = jsonToken as JwtSecurityToken;
 
             return int.Parse(jwtSecurityToken!.Claims.First(x => x.Type == "id").Value);
         }
@@ -109,8 +103,8 @@ namespace TechCraftsmen.User.Services
                 return false;
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
             try
             {
@@ -123,13 +117,13 @@ namespace TechCraftsmen.User.Services
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                var jwtToken = (JwtSecurityToken)validatedToken;
+                JwtSecurityToken? jwtToken = (JwtSecurityToken)validatedToken;
 
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
-                authenticatedUser = _userService.GetUserById(userId);
+                authenticatedUser = _userService.GetUsersByFilter(new UserFilter(userId)).FirstOrDefault();
 
-                return true;
+                return authenticatedUser is not null;
             }
             catch (SecurityTokenExpiredException)
             {
