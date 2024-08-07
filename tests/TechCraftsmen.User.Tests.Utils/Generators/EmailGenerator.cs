@@ -5,9 +5,9 @@
         public const string DEFAULT_DOMAIN_NAME = "mail.com";
         public const string DEFAULT_USER_NAME = "jhon.doe";
 
-        private string? _customDomainName = null;
-        private string? _customUsername = null;
-        private int? _id = null;
+        private string? _customDomainName;
+        private string? _customUsername;
+        private int? _id;
 
         public EmailGenerator WithCustomDomainName(string domainName)
         {

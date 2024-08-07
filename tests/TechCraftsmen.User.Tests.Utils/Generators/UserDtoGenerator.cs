@@ -10,11 +10,11 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         private static readonly EmailGenerator EmailGenerator = new();
         private static readonly RandomStringGenerator RandomStringGenerator = new();
 
-        private int _id = 0;
+        private int _id;
         private string _name = string.Empty;
         private string _email = string.Empty;
         private string _password = string.Empty;
-        private int _roleId = 0;
+        private int _roleId;
 
         public UserDtoGenerator WithId(int id)
         {

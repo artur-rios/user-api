@@ -4,7 +4,7 @@
     {
         private const string DefaultUserName = "Jhon Doe";
 
-        private int? _id = null;
+        private int? _id;
 
         public NameGenerator WithId(int id)
         {
