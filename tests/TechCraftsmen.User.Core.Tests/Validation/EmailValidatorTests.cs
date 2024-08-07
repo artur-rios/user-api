@@ -1,4 +1,5 @@
-﻿using TechCraftsmen.User.Core.Validation;
+﻿using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
 
@@ -55,7 +56,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [MemberData(nameof(InvalidEmailsData))]
         public void Should_ReturnFalse_For_InvalidEmails(string email)
         {
-            var result = _validator.Validate(email);
+            SimpleResultDto result = _validator.Validate(email);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -70,7 +71,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_For_NullOrEmptyEmail(string email)
         {
-            var result = _validator.Validate(email);
+            SimpleResultDto result = _validator.Validate(email);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -82,7 +83,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [MemberData(nameof(ValidEmailsData))]
         public void Should_ReturnTrue_For_ValidEmail(string email)
         {
-            var result = _validator.Validate(email);
+            SimpleResultDto result = _validator.Validate(email);
 
             Assert.True(result.Success);
             Assert.False(result.Errors.Any());

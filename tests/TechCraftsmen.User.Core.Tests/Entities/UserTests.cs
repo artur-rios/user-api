@@ -40,14 +40,14 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_NotAllowCreationOfAdmins_IfAuthenticatedUserNotAnAdmin()
         {
-            var user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
+            Core.Entities.User user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
                 .WithRoleId((int)Roles.ADMIN).Generate();
                 
-            _httpContextAccessor.Object.HttpContext!.Items.TryGetValue("User", out var userData);
+            _httpContextAccessor.Object.HttpContext!.Items.TryGetValue("User", out object? userData);
 
-            var authenticatedUser = userData as UserDto;
+            UserDto? authenticatedUser = userData as UserDto;
 
-            var canRegister = user.CanRegister(authenticatedUser!.RoleId);
+            SimpleResultDto canRegister = user.CanRegister(authenticatedUser!.RoleId);
 
             Assert.False(canRegister.Success);
             Assert.True(canRegister.Errors.Any());
@@ -58,9 +58,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_NotAllowDeletion_ForActiveUser()
         {
-            var user = _userGenerator.WithStatus(true).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            var canDelete = user.CanDelete();
+            SimpleResultDto canDelete = user.CanDelete();
 
             Assert.False(canDelete.Success);
             Assert.True(canDelete.Errors.Any());
@@ -71,9 +71,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_AllowDeletion_ForInactiveUser()
         {
-            var user = _userGenerator.WithStatus(false).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            var canDelete = user.CanDelete();
+            SimpleResultDto canDelete = user.CanDelete();
 
             Assert.True(canDelete.Success);
             Assert.False(canDelete.Errors.Any());
@@ -83,9 +83,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_NotAllowActivation_ForActiveUser()
         {
-            var user = _userGenerator.WithStatus(true).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            var canActivate = user.CanActivate();
+            SimpleResultDto canActivate = user.CanActivate();
 
             Assert.False(canActivate.Success);
             Assert.True(canActivate.Errors.Any());
@@ -96,9 +96,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_AllowActivation_ForInactiveUser()
         {
-            var user = _userGenerator.WithStatus(false).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            var canActivate = user.CanActivate();
+            SimpleResultDto canActivate = user.CanActivate();
 
             Assert.True(canActivate.Success);
             Assert.False(canActivate.Errors.Any());
@@ -108,9 +108,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_NotAllowDeactivation_ForInactiveUser()
         {
-            var user = _userGenerator.WithStatus(false).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            var canDeactivate = user.CanDeactivate();
+            SimpleResultDto canDeactivate = user.CanDeactivate();
 
             Assert.False(canDeactivate.Success);
             Assert.True(canDeactivate.Errors.Any());
@@ -121,9 +121,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_AllowDeactivation_ForInactiveUser()
         {
-            var user = _userGenerator.WithStatus(true).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            var canDeactivate = user.CanDeactivate();
+            SimpleResultDto canDeactivate = user.CanDeactivate();
 
             Assert.True(canDeactivate.Success);
             Assert.False(canDeactivate.Errors.Any());
@@ -133,9 +133,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_NotUpdate_InactiveUser()
         {
-            var user = _userGenerator.WithStatus(false).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
             
-            var canUpdate = user.CanUpdate();
+            SimpleResultDto canUpdate = user.CanUpdate();
 
             Assert.False(canUpdate.Success);
             Assert.True(canUpdate.Errors.Any());
@@ -146,9 +146,9 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [Unit("User")]
         public void Should_Update_ActiveUser()
         {
-            var user = _userGenerator.WithStatus(true).Generate();
+            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
             
-            var canUpdate = user.CanUpdate();
+            SimpleResultDto canUpdate = user.CanUpdate();
 
             Assert.True(canUpdate.Success);
             Assert.False(canUpdate.Errors.Any());

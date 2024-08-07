@@ -1,4 +1,5 @@
 ﻿using FluentValidation.TestHelper;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
@@ -19,9 +20,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForEmailNullOrEmpty(string email)
         {
-            var credentialsDto = _authCredentialsGenerator.WithEmail(email).WithRandomPassword().Generate();
+            AuthenticationCredentialsDto credentialsDto = _authCredentialsGenerator.WithEmail(email).WithRandomPassword().Generate();
 
-            var result = _validator.TestValidate(credentialsDto);
+            TestValidationResult<AuthenticationCredentialsDto>? result = _validator.TestValidate(credentialsDto);
 
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Password);
@@ -36,9 +37,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForPasswordNullOrEmpty(string password)
         {
-            var credentialsDto = _authCredentialsGenerator.WithDefaultEmail().WithPassword(password).Generate();
+            AuthenticationCredentialsDto credentialsDto = _authCredentialsGenerator.WithDefaultEmail().WithPassword(password).Generate();
 
-            var result = _validator.TestValidate(credentialsDto);
+            TestValidationResult<AuthenticationCredentialsDto>? result = _validator.TestValidate(credentialsDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Password);
@@ -52,9 +53,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForPasswordAndEmailNullOrEmpty(string invalidString)
         {
-            var credentialsDto = _authCredentialsGenerator.WithEmail(invalidString).WithPassword(invalidString).Generate();
+            AuthenticationCredentialsDto credentialsDto = _authCredentialsGenerator.WithEmail(invalidString).WithPassword(invalidString).Generate();
 
-            var result = _validator.TestValidate(credentialsDto);
+            TestValidationResult<AuthenticationCredentialsDto>? result = _validator.TestValidate(credentialsDto);
 
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Password);
@@ -64,9 +65,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [Unit("AuthenticationCredentialsDtoValidator")]
         public void Should_NotHaveError_ForValidAuthCredentials()
         {
-            var credentialsDto = _authCredentialsGenerator.WithDefaultEmail().WithRandomPassword().Generate();
+            AuthenticationCredentialsDto credentialsDto = _authCredentialsGenerator.WithDefaultEmail().WithRandomPassword().Generate();
 
-            var result = _validator.TestValidate(credentialsDto);
+            TestValidationResult<AuthenticationCredentialsDto>? result = _validator.TestValidate(credentialsDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Password);

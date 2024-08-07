@@ -19,13 +19,13 @@ namespace TechCraftsmen.User.Api.Tests
 
         public async Task InitializeAsync()
         {
-            var credentials = new AuthenticationCredentialsDto()
+            AuthenticationCredentialsDto credentials = new()
             {
                 Email = _userMocks.TestUser.Email,
                 Password = _userMocks.TestPassword
             };
 
-            var authToken = await _testUtils.Authorize(credentials);
+            string authToken = await _testUtils.Authorize(credentials);
 
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
@@ -45,11 +45,11 @@ namespace TechCraftsmen.User.Api.Tests
         {
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
-                var response = await _client.GetAsync($"{UserRoute}/{_userMocks.TEST_ID}");
+                HttpResponseMessage response = await _client.GetAsync($"{UserRoute}/{_userMocks.TEST_ID}");
 
-                var body = await response.Content.ReadAsStringAsync();
+                string body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);

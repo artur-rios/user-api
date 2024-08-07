@@ -18,18 +18,18 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
         public async Task<string> Authorize(AuthenticationCredentialsDto credentials)
         {
-            var payload = new StringContent(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
+            StringContent payload = new(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync(AuthenticateUserRoute, payload);
+            HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new NotAllowedException("Could not authenticate with the provided credentials");
             }
 
-            var body = await response.Content.ReadAsStringAsync();
+            string body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
+            DataResultDto<AuthenticationToken>? result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
 
             return result!.Data.AccessToken!;
         }

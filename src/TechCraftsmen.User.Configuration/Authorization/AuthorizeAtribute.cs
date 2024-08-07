@@ -10,13 +10,13 @@ namespace TechCraftsmen.User.Configuration.Authorization
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+            bool allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
 
             if (allowAnonymous)
             {
                 return;
             }
-            var user = (UserDto?)context.HttpContext.Items["User"];
+            UserDto? user = (UserDto?)context.HttpContext.Items["User"];
 
             if (user is null)
             {

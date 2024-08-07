@@ -11,9 +11,9 @@ namespace TechCraftsmen.User.Configuration.Authorization
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var user = context.HttpContext.Items["User"] as UserDto;
+            UserDto? user = context.HttpContext.Items["User"] as UserDto;
 
-            var authorized = false;
+            bool authorized = false;
 
             if (user is not null)
             {

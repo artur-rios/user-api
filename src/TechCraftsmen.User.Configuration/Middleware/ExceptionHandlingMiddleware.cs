@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -45,11 +46,11 @@ namespace TechCraftsmen.User.Configuration.Middleware
             {
                 IList<string> errorList = [];
 
-                var validationException = exception as ValidationException;
+                ValidationException? validationException = exception as ValidationException;
 
                 if (validationException is not null)
                 {
-                    foreach (var error in validationException.Errors)
+                    foreach (ValidationFailure? error in validationException.Errors)
                     {
                         errorList.Add(error.ErrorMessage);
                     }

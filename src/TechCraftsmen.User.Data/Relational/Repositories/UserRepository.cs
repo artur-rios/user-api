@@ -28,7 +28,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
                 throw new NotFoundException("Entity not mapped to relational table!");
             }
 
-            var query = new StringBuilder($"SELECT * FROM sc_user_api.{tableName}");
+            StringBuilder query = new($"SELECT * FROM sc_user_api.{tableName}");
 
             if (filters.Count > 0)
             {
@@ -36,7 +36,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
 
                 for (int index = 0; index < filters.Count; index++)
                 {
-                    var filter = filters.ElementAt(index);
+                    KeyValuePair<string, object> filter = filters.ElementAt(index);
 
                     if (filter.Value is string || filter.Value is DateTime)
                     {

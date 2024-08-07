@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Interfaces.Services;
@@ -11,13 +12,13 @@ namespace TechCraftsmen.User.Configuration.Authorization
 
         public async Task Invoke(HttpContext context, IAuthenticationService authService)
         {
-            var token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
+            string? token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
 
-            if (authService.ValidateJwtToken(token!, out var authenticatedUser))
+            if (authService.ValidateJwtToken(token!, out UserDto? authenticatedUser))
             {
                 if (authenticatedUser!.RoleId == (int)Roles.TEST)
                 {
-                    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
                     if (!environment!.Equals("Local"))
                     {

@@ -39,8 +39,8 @@
 
         public string Generate()
         {
-            var username = _customUsername is null ? DEFAULT_USER_NAME : _customUsername;
-            var domainName = _customDomainName is null ? DEFAULT_DOMAIN_NAME : _customDomainName;
+            string? username = _customUsername is null ? DEFAULT_USER_NAME : _customUsername;
+            string? domainName = _customDomainName is null ? DEFAULT_DOMAIN_NAME : _customDomainName;
 
             if (_id is not null)
             {

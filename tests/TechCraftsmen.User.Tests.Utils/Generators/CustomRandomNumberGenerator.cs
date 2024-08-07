@@ -6,14 +6,14 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
     {
         public static int RandomStrongInt(bool allowNegatives = false, int startIndex = 0)
         {
-            var buffer = new byte[4];
+            byte[] buffer = new byte[4];
 
-            using (var rng = RandomNumberGenerator.Create())
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(buffer);
             }
 
-            var random = BitConverter.ToInt32(buffer, startIndex);
+            int random = BitConverter.ToInt32(buffer, startIndex);
 
             return allowNegatives ? random : random * -1;
         }
@@ -22,7 +22,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         {
             end++;
 
-            var random = RandomNumberGenerator.GetInt32(start, end);
+            int random = RandomNumberGenerator.GetInt32(start, end);
 
             if (differentFrom is not null)
             {
@@ -38,7 +38,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         public static int RandomWeakIntOnRange(int start, int end, int? differentFrom = null)
         {
             Random rng = new();
-            var random = rng.Next(start, end);
+            int random = rng.Next(start, end);
 
             if (differentFrom is not null)
             {

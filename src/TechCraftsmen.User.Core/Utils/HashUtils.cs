@@ -20,7 +20,7 @@ namespace TechCraftsmen.User.Core.Utils
         {
             salt ??= CreateSalt();
 
-            var argon2id = new Argon2id(Encoding.UTF8.GetBytes(text))
+            Argon2id argon2id = new Argon2id(Encoding.UTF8.GetBytes(text))
             {
                 Salt = salt,
                 DegreeOfParallelism = DEGREE_OF_PARALLELISM,
@@ -33,16 +33,16 @@ namespace TechCraftsmen.User.Core.Utils
 
         public static bool VerifyHash(string text, HashDto hashDto)
         {
-            var result = HashText(text, hashDto.Salt);
+            HashDto result = HashText(text, hashDto.Salt);
 
             return hashDto.Hash.SequenceEqual(result.Hash);
         }
 
         public static byte[] CreateSalt()
         {
-            var buffer = new byte[16];
+            byte[] buffer = new byte[16];
 
-            using (var rng = RandomNumberGenerator.Create())
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(buffer);
             }

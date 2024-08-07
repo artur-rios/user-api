@@ -1,4 +1,5 @@
 ﻿using FluentValidation.TestHelper;
+using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
@@ -19,9 +20,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForNameNullOrEmpty(string name)
         {
-            var user = _userDtoGenerator.WithDefaultEmail().WithRandomPassword().WithName(name).WithRoleId().Generate();
+            UserDto user = _userDtoGenerator.WithDefaultEmail().WithRandomPassword().WithName(name).WithRoleId().Generate();
 
-            var result = _validator.TestValidate(user);
+            TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
             result.ShouldHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);
@@ -38,9 +39,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidEmail(string email)
         {
-            var user = _userDtoGenerator.WithDefaultName().WithRandomPassword().WithEmail(email).WithRoleId().Generate();
+            UserDto user = _userDtoGenerator.WithDefaultName().WithRandomPassword().WithEmail(email).WithRoleId().Generate();
 
-            var result = _validator.TestValidate(user);
+            TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldHaveValidationErrorFor(user => user.Email);
@@ -60,9 +61,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_HaveError_ForInvalidPassword(string password)
         {
-            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithPassword(password).WithRoleId().Generate();
+            UserDto user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithPassword(password).WithRoleId().Generate();
 
-            var result = _validator.TestValidate(user);
+            TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);
@@ -74,9 +75,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [Unit("UserDtoValidator")]
         public void Should_NotHaveError_ForValidUserDto()
         {
-            var user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().WithRoleId().Generate();
+            UserDto user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().WithRoleId().Generate();
 
-            var result = _validator.TestValidate(user);
+            TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
             result.ShouldNotHaveValidationErrorFor(user => user.Name);
             result.ShouldNotHaveValidationErrorFor(user => user.Email);

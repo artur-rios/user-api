@@ -18,7 +18,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [AllowAnonymous]
         public ActionResult<DataResultDto<AuthenticationToken>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
-            var authToken = _authService.AuthenticateUser(credentialsDto);
+            AuthenticationToken authToken = _authService.AuthenticateUser(credentialsDto);
 
             return Success(authToken, "User authenticated with success");
         }

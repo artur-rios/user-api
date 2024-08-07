@@ -1,4 +1,5 @@
 ﻿using FluentValidation.TestHelper;
+using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Traits;
@@ -18,9 +19,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [InlineData(null)]
         public void Should_HaveError_ForAudienceNullOrEmpty(string? audience)
         {
-            var authTokenConfigDto = _authTokenConfigGenerator.WithAudience(audience).WithIssuer("issuer").WithSeconds(60).WithSecret("secret").Generate();
+            AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience(audience).WithIssuer("issuer").WithSeconds(60).WithSecret("secret").Generate();
 
-            var result = _validator.TestValidate(authTokenConfigDto);
+            TestValidationResult<AuthenticationTokenConfiguration>? result = _validator.TestValidate(authTokenConfigDto);
 
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Audience);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Issuer);
@@ -35,9 +36,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [InlineData(null)]
         public void Should_HaveError_ForIssuerNullOrEmpty(string? issuer)
         {
-            var authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer(issuer).WithSeconds(60).WithSecret("secret").Generate();
+            AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer(issuer).WithSeconds(60).WithSecret("secret").Generate();
 
-            var result = _validator.TestValidate(authTokenConfigDto);
+            TestValidationResult<AuthenticationTokenConfiguration>? result = _validator.TestValidate(authTokenConfigDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Audience);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Issuer);
@@ -49,9 +50,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [Unit("AuthenticationTokenConfigurationValidator")]
         public void Should_HaveError_ForZeroSeconds()
         {
-            var authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(0).WithSecret("secret").Generate();
+            AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(0).WithSecret("secret").Generate();
 
-            var result = _validator.TestValidate(authTokenConfigDto);
+            TestValidationResult<AuthenticationTokenConfiguration>? result = _validator.TestValidate(authTokenConfigDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Audience);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Issuer);
@@ -66,9 +67,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [InlineData(null)]
         public void Should_HaveError_ForSecretNullOrEmpty(string? secret)
         {
-            var authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(60).WithSecret(secret).Generate();
+            AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(60).WithSecret(secret).Generate();
 
-            var result = _validator.TestValidate(authTokenConfigDto);
+            TestValidationResult<AuthenticationTokenConfiguration>? result = _validator.TestValidate(authTokenConfigDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Audience);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Issuer);
@@ -80,9 +81,9 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
         [Unit("AuthenticationTokenConfigurationValidator")]
         public void Should_NotHaveError_ForValidAuthCredentials()
         {
-            var authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(60).WithSecret("secret").Generate();
+            AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(60).WithSecret("secret").Generate();
 
-            var result = _validator.TestValidate(authTokenConfigDto);
+            TestValidationResult<AuthenticationTokenConfiguration>? result = _validator.TestValidate(authTokenConfigDto);
 
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Audience);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Issuer);

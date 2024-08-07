@@ -14,7 +14,7 @@ namespace TechCraftsmen.User.Core.Validation
                 return Resolve();
             }
 
-            var validRole = false;
+            bool validRole = false;
 
             foreach (Roles role in Enum.GetValues(typeof(Roles)))
             {

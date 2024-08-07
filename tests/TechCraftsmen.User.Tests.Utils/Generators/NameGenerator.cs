@@ -22,7 +22,7 @@
 
         public string Generate()
         {
-            var name = DEFAULT_USER_NAME;
+            string name = DEFAULT_USER_NAME;
 
             if (_id is not null)
             {

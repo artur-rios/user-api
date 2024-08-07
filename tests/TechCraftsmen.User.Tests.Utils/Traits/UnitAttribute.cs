@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Tests.Utils.Traits
 
         public IEnumerable<KeyValuePair<string, string>> GetTraits(IAttributeInfo traitAttribute)
         {
-            var name = traitAttribute.GetNamedArgument<string>("Name");
+            string? name = traitAttribute.GetNamedArgument<string>("Name");
 
             if (!string.IsNullOrWhiteSpace(name))
             {

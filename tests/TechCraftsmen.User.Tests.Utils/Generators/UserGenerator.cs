@@ -1,4 +1,5 @@
-﻿using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
 
@@ -10,12 +11,12 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
         private static readonly EmailGenerator _emailGenerator = new();
         private static readonly RandomStringGenerator _randomStringGenerator = new();
 
-        private int _id = 0;
+        private int _id;
         private string _name = string.Empty;
         private string _email = string.Empty;
         private byte[] _password = [];
         private byte[] _salt = [];
-        private int _roleId = 0;
+        private int _roleId;
         private bool _status = true;
 
         public UserGenerator WithId(int id)
@@ -62,7 +63,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserGenerator WithPassword(string password)
         {
-            var hashResult = HashUtils.HashText(password);
+            HashDto hashResult = HashUtils.HashText(password);
 
             _password = hashResult.Hash;
             _salt = hashResult.Salt;
@@ -72,8 +73,8 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserGenerator WithRandomPassword()
         {
-            var randomString = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
-            var hashResult = HashUtils.HashText(randomString);
+            string randomString = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
+            HashDto hashResult = HashUtils.HashText(randomString);
 
             _password = hashResult.Hash;
             _salt = hashResult.Salt;
@@ -97,7 +98,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public Core.Entities.User Generate()
         {
-            var user = new Core.Entities.User
+            Core.Entities.User user = new Core.Entities.User
             {
                 Id = _id,
                 Name = _name,

@@ -12,9 +12,9 @@ namespace TechCraftsmen.User.Api
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            var appSettings = $"appsettings.api.{builder.Environment.EnvironmentName}.json";
+            string appSettings = $"appsettings.api.{builder.Environment.EnvironmentName}.json";
 
             builder.Configuration.AddJsonFile(appSettings, optional: false, reloadOnChange: false);
 
@@ -38,7 +38,7 @@ namespace TechCraftsmen.User.Api
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
-                    var errors = context.ModelState
+                    ErrorDto[] errors = context.ModelState
                         .Where(e => e.Value?.Errors.Count > 0)
                         .Select(e => new ErrorDto()
                         {
@@ -46,13 +46,13 @@ namespace TechCraftsmen.User.Api
                             Error = e.Value?.Errors.First().ErrorMessage
                         }).ToArray();
 
-                    var result = new DataResultDto<ErrorDto[]>(errors, "Invalid query string");
+                    DataResultDto<ErrorDto[]> result = new DataResultDto<ErrorDto[]>(errors, "Invalid query string");
 
                     return new BadRequestObjectResult(result);
                 };
             });
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
 
             if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
             {

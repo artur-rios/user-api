@@ -12,11 +12,11 @@ namespace TechCraftsmen.User.Api.Tests
         [Fact]
         public async void Should_DoHealthCheck_And_ReturnSuccess()
         {
-            var response = await _client.GetAsync(HealthCheckRoute);
+            HttpResponseMessage response = await _client.GetAsync(HealthCheckRoute);
 
-            var body = await response.Content.ReadAsStringAsync();
+            string body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+            DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);

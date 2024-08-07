@@ -81,7 +81,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserDto Generate()
         {
-            var user = new UserDto
+            UserDto user = new()
             {
                 Id = _id,
                 Name = _name,

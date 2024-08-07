@@ -15,11 +15,11 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             RuleFor(user => user.Email).NotEmpty();
             RuleFor(user => user.Email).Custom((email, context) =>
             {
-                var ruleResult = _emailRule.Validate(email);
+                SimpleResultDto ruleResult = _emailRule.Validate(email);
 
                 if (!ruleResult.Success)
                 {
-                    foreach (var error in ruleResult.Errors)
+                    foreach (string? error in ruleResult.Errors)
                     {
                         context.AddFailure(error);
                     }
@@ -28,11 +28,11 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             RuleFor(user => user.Password).NotEmpty();
             RuleFor(user => user.Password).Custom((password, context) =>
             {
-                var ruleResult = _passwordValidator.Validate(password);
+                SimpleResultDto ruleResult = _passwordValidator.Validate(password);
 
                 if (!ruleResult.Success)
                 {
-                    foreach (var error in ruleResult.Errors)
+                    foreach (string? error in ruleResult.Errors)
                     {
                         context.AddFailure(error);
                     }
@@ -40,11 +40,11 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             });
             RuleFor(user => user.RoleId).Custom((roleId, context) =>
             {
-                var ruleResult = _roleIdValidator.Validate(roleId);
+                SimpleResultDto ruleResult = _roleIdValidator.Validate(roleId);
 
                 if (!ruleResult.Success)
                 {
-                    foreach (var error in ruleResult.Errors)
+                    foreach (string? error in ruleResult.Errors)
                     {
                         context.AddFailure(error);
                     }

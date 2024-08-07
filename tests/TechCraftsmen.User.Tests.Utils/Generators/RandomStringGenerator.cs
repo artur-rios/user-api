@@ -54,7 +54,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public string Generate()
         {
-            var chars = "";
+            string chars = "";
 
             StringBuilder result = new(_length);
 
@@ -82,12 +82,12 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
             for (int i = 0; i < _length; i++)
             {
-                var index = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, i - 1);
+                int index = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, i - 1);
 
                 result.Append(charPool[index]);
             }
 
-            var generatedString = result.ToString();
+            string generatedString = result.ToString();
             int? lastIndex = null;
             int randomIndex;
 
@@ -95,7 +95,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                var numbersIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, NUMBERS.Length);
+                int numbersIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, NUMBERS.Length);
 
                 result[randomIndex] = NUMBERS.ToCharArray()[numbersIndex];
 
@@ -106,7 +106,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                var lowerCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, LOWER_CHARS.Length);
+                int lowerCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, LOWER_CHARS.Length);
 
                 result[randomIndex] = LOWER_CHARS.ToCharArray()[lowerCharIndex];
 
@@ -117,13 +117,13 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                var upperCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, UPPER_CHARS.Length);
+                int upperCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, UPPER_CHARS.Length);
 
                 result[randomIndex] = UPPER_CHARS.ToCharArray()[upperCharIndex];
             }
 
-            var finalString = result.ToString();
-            var matchesExcludedString = false;
+            string finalString = result.ToString();
+            bool matchesExcludedString = false;
 
             if (_excludedStrings.Length > 0)
             {

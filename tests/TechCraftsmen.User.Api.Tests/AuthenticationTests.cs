@@ -19,19 +19,19 @@ namespace TechCraftsmen.User.Api.Tests
         [Fact]
         public async void Should_AuthenticateUser()
         {
-            var credentialsDto = new AuthenticationCredentialsDto()
+            AuthenticationCredentialsDto credentialsDto = new AuthenticationCredentialsDto()
             {
                 Email = _userMocks.TestUser.Email,
                 Password = _userMocks.TestPassword
             };
 
-            var payload = new StringContent(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
+            StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync(AuthenticateUserRoute, payload);
+            HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
-            var body = await response.Content.ReadAsStringAsync();
+            string body = await response.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
+            DataResultDto<AuthenticationToken>? result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
@@ -49,15 +49,15 @@ namespace TechCraftsmen.User.Api.Tests
             new(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([_userMocks.TestPassword]).Generate())
             ];
 
-            foreach (var credentialDto in incorrectCredentials)
+            foreach (AuthenticationCredentialsDto? credentialDto in incorrectCredentials)
             {
-                var payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
+                StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AuthenticateUserRoute, payload);
+                HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
-                var body = await response.Content.ReadAsStringAsync();
+                string body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
@@ -69,27 +69,27 @@ namespace TechCraftsmen.User.Api.Tests
         public async void Should_NotAuthenticate_ForInvalidCredentials()
         {
             List<AuthenticationCredentialsDto> invalidCredentials = [
-                new(string.Empty, _userMocks.TestPassword),
-            new(_userMocks.TestUser.Email, string.Empty),
-            new()
+                new AuthenticationCredentialsDto(string.Empty, _userMocks.TestPassword),
+            new AuthenticationCredentialsDto(_userMocks.TestUser.Email, string.Empty),
+            new AuthenticationCredentialsDto()
             ];
 
-            foreach (var credentialDto in invalidCredentials)
+            foreach (AuthenticationCredentialsDto? credentialDto in invalidCredentials)
             {
-                var payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
+                StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AuthenticateUserRoute, payload);
+                HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
 
-                var body = await response.Content.ReadAsStringAsync();
+                string body = await response.Content.ReadAsStringAsync();
 
-                var result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
 
-                var emailValidationError = "'Email' must not be empty.";
-                var passwordValidationError = "'Password' must not be empty.";
-                var expectedValidationError = string.Empty;
+                const string emailValidationError = "'Email' must not be empty.";
+                const string passwordValidationError = "'Password' must not be empty.";
+                string expectedValidationError = string.Empty;
 
                 if (string.IsNullOrEmpty(credentialDto.Email) && string.IsNullOrEmpty(credentialDto.Password))
                 {

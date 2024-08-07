@@ -19,7 +19,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<DataResultDto<int>> CreateUser([FromBody] UserDto userDto)
         {
-            var userId = _userService.CreateUser(userDto);
+            int userId = _userService.CreateUser(userDto);
 
             return Created(userId, "User created with success");
         }
@@ -29,7 +29,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.ADMIN, Roles.TEST)]
         public ActionResult<DataResultDto<IList<UserDto>>> GetUsersByFilter([FromQuery] UserFilter filter)
         {
-            var users = _userService.GetUsersByFilter(filter);
+            IList<UserDto> users = _userService.GetUsersByFilter(filter);
 
             return Success(users, "Search completed with success");
         }
