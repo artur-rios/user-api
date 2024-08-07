@@ -12,7 +12,7 @@ namespace TechCraftsmen.User.Api.Tests
         [Fact]
         public async void Should_DoHealthCheck_And_ReturnSuccess()
         {
-            HttpResponseMessage response = await _client.GetAsync(HealthCheckRoute);
+            HttpResponseMessage response = await Client.GetAsync(HealthCheckRoute);
 
             string body = await response.Content.ReadAsStringAsync();
 

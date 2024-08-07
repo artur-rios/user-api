@@ -10,7 +10,7 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
     {
         public static void Configure(this EntityTypeBuilder<Role> role)
         {
-            RelationalDBConfiguration.Tables.TryGetValue(nameof(Role), out string? tableName);
+            RelationalDbConfiguration.Tables.TryGetValue(nameof(Role), out string? tableName);
 
             if (tableName is null)
             {

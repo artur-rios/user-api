@@ -14,7 +14,7 @@ namespace TechCraftsmen.User.Api.Tests
 
         public UserTests()
         {
-            _testUtils = new ApiTestUtils(_factory);
+            _testUtils = new ApiTestUtils(Factory);
             _userMocks = new UserMocks();
         }
 
@@ -28,7 +28,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             string authToken = await _testUtils.Authorize(credentials);
 
-            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
 
         public Task DisposeAsync()
@@ -41,7 +41,7 @@ namespace TechCraftsmen.User.Api.Tests
         {
             string query = $"?Email={_userMocks.TestUser.Email}";
 
-            HttpResponseMessage response = await _client.GetAsync($"{UserRoute}/Filter{query}");
+            HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/Filter{query}");
 
             string body = await response.Content.ReadAsStringAsync();
 

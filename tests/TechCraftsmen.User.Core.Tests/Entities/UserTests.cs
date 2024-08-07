@@ -41,7 +41,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         public void Should_NotAllowCreationOfAdmins_IfAuthenticatedUserNotAnAdmin()
         {
             Core.Entities.User user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
-                .WithRoleId((int)Roles.ADMIN).Generate();
+                .WithRoleId((int)Roles.Admin).Generate();
                 
             _httpContextAccessor.Object.HttpContext!.Items.TryGetValue("User", out object? userData);
 

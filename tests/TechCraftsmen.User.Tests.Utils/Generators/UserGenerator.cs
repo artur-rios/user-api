@@ -8,8 +8,8 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
     public class UserGenerator
     {
         private readonly NameGenerator _nameGenerator = new();
-        private static readonly EmailGenerator _emailGenerator = new();
-        private static readonly RandomStringGenerator _randomStringGenerator = new();
+        private static readonly EmailGenerator EmailGenerator = new();
+        private static readonly RandomStringGenerator RandomStringGenerator = new();
 
         private int _id;
         private string _name = string.Empty;
@@ -56,7 +56,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserGenerator WithDefaultEmail()
         {
-            _email = _emailGenerator.Generate();
+            _email = EmailGenerator.Generate();
 
             return this;
         }
@@ -73,7 +73,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public UserGenerator WithRandomPassword()
         {
-            string randomString = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
+            string randomString = RandomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
             HashDto hashResult = HashUtils.HashText(randomString);
 
             _password = hashResult.Hash;
@@ -82,7 +82,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             return this;
         }
 
-        public UserGenerator WithRoleId(int roleId = (int)Roles.TEST)
+        public UserGenerator WithRoleId(int roleId = (int)Roles.Test)
         {
             _roleId = roleId;
 

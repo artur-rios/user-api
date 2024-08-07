@@ -7,9 +7,9 @@ using TechCraftsmen.User.Data.Relational.Configuration;
 
 namespace TechCraftsmen.User.Data.Relational.Repositories
 {
-    public class UserRepository(IDbContextFactory<RelationalDBContext> dbContextFactory) : ICrudRepository<Core.Entities.User>
+    public class UserRepository(IDbContextFactory<RelationalDbContext> dbContextFactory) : ICrudRepository<Core.Entities.User>
     {
-        private readonly RelationalDBContext _dbContext = dbContextFactory.CreateDbContext();
+        private readonly RelationalDbContext _dbContext = dbContextFactory.CreateDbContext();
 
         public int Create(Core.Entities.User user)
         {
@@ -21,7 +21,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
 
         public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters)
         {
-            RelationalDBConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
+            RelationalDbConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
 
             if (tableName is null)
             {

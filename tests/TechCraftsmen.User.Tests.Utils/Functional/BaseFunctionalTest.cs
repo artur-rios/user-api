@@ -5,15 +5,15 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 {
     public class BaseFunctionalTest
     {
-        protected readonly WebApplicationFactory<Program> _factory = new();
-        protected readonly HttpClient _client;
-        private const string LOCAL_ENVIRONMENT = "Local";
+        protected readonly WebApplicationFactory<Program> Factory = new();
+        protected readonly HttpClient Client;
+        private const string LocalEnvironment = "Local";
 
-        public BaseFunctionalTest(string environment = LOCAL_ENVIRONMENT)
+        public BaseFunctionalTest(string environment = LocalEnvironment)
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
 
-            _client = _factory.CreateClient();
+            Client = Factory.CreateClient();
         }
     }
 }

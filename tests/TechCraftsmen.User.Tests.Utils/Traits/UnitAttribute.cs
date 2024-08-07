@@ -3,7 +3,7 @@ using Xunit.Sdk;
 
 namespace TechCraftsmen.User.Tests.Utils.Traits
 {
-    [TraitDiscoverer(UnitDiscoverer.DiscovererTypeName, TraitConstants.AssemblyName)]
+    [TraitDiscoverer(UnitDiscoverer.DISCOVERER_TYPE_NAME, TraitConstants.ASSEMBLY_NAME)]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class UnitAttribute(string name) : Attribute, ITraitAttribute
     {
@@ -12,7 +12,7 @@ namespace TechCraftsmen.User.Tests.Utils.Traits
 
     public class UnitDiscoverer : ITraitDiscoverer
     {
-        internal const string DiscovererTypeName = $"{TraitConstants.AssemblyName}.{nameof(UnitDiscoverer)}";
+        internal const string DISCOVERER_TYPE_NAME = $"{TraitConstants.ASSEMBLY_NAME}.{nameof(UnitDiscoverer)}";
 
         public IEnumerable<KeyValuePair<string, string>> GetTraits(IAttributeInfo traitAttribute)
         {

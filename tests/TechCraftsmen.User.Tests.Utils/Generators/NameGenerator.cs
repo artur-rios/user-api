@@ -2,7 +2,7 @@
 {
     public class NameGenerator
     {
-        private const string DEFAULT_USER_NAME = "Jhon Doe";
+        private const string DefaultUserName = "Jhon Doe";
 
         private int? _id = null;
 
@@ -22,7 +22,7 @@
 
         public string Generate()
         {
-            string name = DEFAULT_USER_NAME;
+            string name = DefaultUserName;
 
             if (_id is not null)
             {

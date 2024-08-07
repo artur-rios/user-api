@@ -1,6 +1,6 @@
 ﻿namespace TechCraftsmen.User.Data.Relational.Configuration
 {
-    internal static class RelationalDBConfiguration
+    internal static class RelationalDbConfiguration
     {
         internal static IDictionary<string, string> Tables
         {

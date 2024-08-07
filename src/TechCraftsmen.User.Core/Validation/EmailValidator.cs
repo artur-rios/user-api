@@ -5,7 +5,7 @@ namespace TechCraftsmen.User.Core.Validation
 {
     public partial class EmailValidator : BaseValidator<string>
     {
-        private static readonly Regex _emailRegex = EmailRegex();
+        private static readonly Regex ValidatorRegex = EmailRegex();
 
         [GeneratedRegex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$")]
         private static partial Regex EmailRegex();
@@ -19,7 +19,7 @@ namespace TechCraftsmen.User.Core.Validation
                 return Resolve();
             }
 
-            if (!_emailRegex.IsMatch(email))
+            if (!ValidatorRegex.IsMatch(email))
             {
                 Result.Errors.Add("Email should be valid");
             }

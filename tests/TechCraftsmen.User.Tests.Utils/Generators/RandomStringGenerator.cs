@@ -6,9 +6,9 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 {
     public class RandomStringGenerator
     {
-        private const string LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
-        private const string UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const string NUMBERS = "0123456789";
+        private const string LowerChars = "abcdefghijklmnopqrstuvwxyz";
+        private const string UpperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private const string Numbers = "0123456789";
 
         private int _length;
         private bool _lowerChars;
@@ -60,17 +60,17 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
             if (_lowerChars)
             {
-                chars += LOWER_CHARS;
+                chars += LowerChars;
             }
 
             if (_upperChars)
             {
-                chars += UPPER_CHARS;
+                chars += UpperChars;
             }
 
             if (_numbers)
             {
-                chars += NUMBERS;
+                chars += Numbers;
             }
 
             if (chars == "")
@@ -95,9 +95,9 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                int numbersIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, NUMBERS.Length);
+                int numbersIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, Numbers.Length);
 
-                result[randomIndex] = NUMBERS.ToCharArray()[numbersIndex];
+                result[randomIndex] = Numbers.ToCharArray()[numbersIndex];
 
                 lastIndex = randomIndex;
             }
@@ -106,9 +106,9 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                int lowerCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, LOWER_CHARS.Length);
+                int lowerCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, LowerChars.Length);
 
-                result[randomIndex] = LOWER_CHARS.ToCharArray()[lowerCharIndex];
+                result[randomIndex] = LowerChars.ToCharArray()[lowerCharIndex];
 
                 lastIndex = randomIndex;
             }
@@ -117,9 +117,9 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
             {
                 randomIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, _length - 1, lastIndex);
 
-                int upperCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, UPPER_CHARS.Length);
+                int upperCharIndex = CustomRandomNumberGenerator.RandomWeakIntOnRange(0, UpperChars.Length);
 
-                result[randomIndex] = UPPER_CHARS.ToCharArray()[upperCharIndex];
+                result[randomIndex] = UpperChars.ToCharArray()[upperCharIndex];
             }
 
             string finalString = result.ToString();

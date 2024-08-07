@@ -14,7 +14,7 @@ namespace TechCraftsmen.User.Api.Tests
 
         public SecurityTests() : base("Production")
         {
-            _testUtils = new ApiTestUtils(_factory);
+            _testUtils = new ApiTestUtils(Factory);
         }
 
         public async Task InitializeAsync()
@@ -27,7 +27,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             string authToken = await _testUtils.Authorize(credentials);
 
-            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
 
         public Task DisposeAsync()
@@ -45,7 +45,7 @@ namespace TechCraftsmen.User.Api.Tests
         {
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
-                HttpResponseMessage response = await _client.GetAsync($"{UserRoute}/{_userMocks.TEST_ID}");
+                HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{_userMocks.TestId}");
 
                 string body = await response.Content.ReadAsStringAsync();
 

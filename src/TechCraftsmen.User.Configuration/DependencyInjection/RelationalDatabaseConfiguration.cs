@@ -10,10 +10,10 @@ namespace TechCraftsmen.User.Configuration.DependencyInjection
     {
         public static void AddRelationalContext(this IServiceCollection services, IConfigurationSection configuration)
         {
-            services.Configure<RelationalDBContextOptions>(configuration);
+            services.Configure<RelationalDbContextOptions>(configuration);
 
-            services.AddDbContext<RelationalDBContext>(optionsLifetime: ServiceLifetime.Singleton);
-            services.AddDbContextFactory<RelationalDBContext>();
+            services.AddDbContext<RelationalDbContext>(optionsLifetime: ServiceLifetime.Singleton);
+            services.AddDbContextFactory<RelationalDbContext>();
         }
 
         public static void AddRelationalRepositories(this IServiceCollection services)

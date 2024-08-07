@@ -2,6 +2,6 @@
 {
     internal class TraitConstants
     {
-        internal const string AssemblyName = $"{nameof(Xunit)}.Traits";
+        internal const string ASSEMBLY_NAME = $"{nameof(Xunit)}.Traits";
     }
 }

@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Configuration.Authorization
 
             if (authService.ValidateJwtToken(token!, out UserDto? authenticatedUser))
             {
-                if (authenticatedUser!.RoleId == (int)Roles.TEST)
+                if (authenticatedUser!.RoleId == (int)Roles.Test)
                 {
                     string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 

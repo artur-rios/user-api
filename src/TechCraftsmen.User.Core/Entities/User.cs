@@ -65,9 +65,9 @@ namespace TechCraftsmen.User.Core.Entities
         {
             SimpleResultDto result = new SimpleResultDto();
             
-            if (RoleId != (int)Roles.REGULAR)
+            if (RoleId != (int)Roles.Regular)
             {
-                if (authenticatedRoleId != (int)Roles.ADMIN)
+                if (authenticatedRoleId != (int)Roles.Admin)
                 {
                     result.Errors.Add("Only admins can register this kind of user");
                 }

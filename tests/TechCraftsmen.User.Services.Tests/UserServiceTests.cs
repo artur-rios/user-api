@@ -47,7 +47,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithLowerChars().WithUpperChars().Generate();
 
             _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock)
-                .WithRoleId((int)Roles.REGULAR).Generate();
+                .WithRoleId((int)Roles.Regular).Generate();
             _userDtoMock = _mapper.Map<UserDto>(_userMock);
             _userDtoMock.Password = _passwordMock;
             UserMocks userMocks = new();

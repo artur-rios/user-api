@@ -12,7 +12,7 @@ namespace TechCraftsmen.User.Core.Dto
 
         public string Password { get; set; } = string.Empty;
 
-        public int RoleId { get; set; } = (int)Roles.REGULAR;
+        public int RoleId { get; set; } = (int)Roles.Regular;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

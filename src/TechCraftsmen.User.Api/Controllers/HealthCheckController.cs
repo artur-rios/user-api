@@ -21,7 +21,7 @@ namespace TechCraftsmen.User.Api.Controllers
 
         [HttpGet]
         [Route("Query")]
-        [RoleRequirement(Roles.ADMIN, Roles.TEST)]
+        [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<UserFilter>> TestQuery([FromQuery] UserFilter filter)
         {
             return Success(filter, "Filter parsed with success");

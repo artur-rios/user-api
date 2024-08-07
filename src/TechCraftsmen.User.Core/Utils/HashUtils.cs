@@ -8,27 +8,27 @@ namespace TechCraftsmen.User.Core.Utils
     public static class HashUtils
     {
         // No. of CPU Cores x 2
-        private const int DEGREE_OF_PARALLELISM = 16;
+        private const int DegreeOfParallelism = 16;
 
         // Recommended minimum value
-        private const int NUMBER_OF_ITERATIONS = 4;
+        private const int NumberOfIterations = 4;
 
         // 600 MB
-        private const int MEMORY_TO_USE_IN_KB = 600000;
+        private const int MemoryToUseInKb = 600000;
 
         public static HashDto HashText(string text, byte[]? salt = null)
         {
             salt ??= CreateSalt();
 
-            Argon2id argon2id = new Argon2id(Encoding.UTF8.GetBytes(text))
+            Argon2id argon2Id = new Argon2id(Encoding.UTF8.GetBytes(text))
             {
                 Salt = salt,
-                DegreeOfParallelism = DEGREE_OF_PARALLELISM,
-                Iterations = NUMBER_OF_ITERATIONS,
-                MemorySize = MEMORY_TO_USE_IN_KB
+                DegreeOfParallelism = DegreeOfParallelism,
+                Iterations = NumberOfIterations,
+                MemorySize = MemoryToUseInKb
             };
 
-            return new() { Hash = argon2id.GetBytes(128), Salt = salt };
+            return new() { Hash = argon2Id.GetBytes(128), Salt = salt };
         }
 
         public static bool VerifyHash(string text, HashDto hashDto)

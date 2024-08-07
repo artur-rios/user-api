@@ -19,7 +19,7 @@ namespace TechCraftsmen.User.Api.Tests
         [Fact]
         public async void Should_AuthenticateUser()
         {
-            AuthenticationCredentialsDto credentialsDto = new AuthenticationCredentialsDto()
+            AuthenticationCredentialsDto credentialsDto = new()
             {
                 Email = _userMocks.TestUser.Email,
                 Password = _userMocks.TestPassword
@@ -27,7 +27,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
+            HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
             string body = await response.Content.ReadAsStringAsync();
 
@@ -53,7 +53,7 @@ namespace TechCraftsmen.User.Api.Tests
             {
                 StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
+                HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
                 string body = await response.Content.ReadAsStringAsync();
 
@@ -78,7 +78,7 @@ namespace TechCraftsmen.User.Api.Tests
             {
                 StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _client.PostAsync(AuthenticateUserRoute, payload);
+                HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
                 string body = await response.Content.ReadAsStringAsync();
 
