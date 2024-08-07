@@ -9,7 +9,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
         protected readonly HttpClient Client;
         private const string LocalEnvironment = "Local";
 
-        public BaseFunctionalTest(string environment = LocalEnvironment)
+        protected BaseFunctionalTest(string environment = LocalEnvironment)
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
 

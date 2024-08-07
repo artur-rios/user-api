@@ -22,10 +22,10 @@ namespace TechCraftsmen.User.Api.Tests
             AuthenticationCredentialsDto credentialsDto = new()
             {
                 Email = _userMocks.TestUser.Email,
-                Password = _userMocks.TestPassword
+                Password = UserMocks.TEST_PASSWORD
             };
 
-            StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
+            StringContent payload = new(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
@@ -44,14 +44,14 @@ namespace TechCraftsmen.User.Api.Tests
         public async void Should_NotAuthenticate_ForIncorrectCredentials()
         {
             List<AuthenticationCredentialsDto> incorrectCredentials = [
-                new(_userMocks.TestUser.Email, _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([_userMocks.TestPassword]).Generate()),
-            new(_emailGenerator.Generate(), _userMocks.TestPassword),
-            new(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([_userMocks.TestPassword]).Generate())
+                new AuthenticationCredentialsDto(_userMocks.TestUser.Email, _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMocks.TEST_PASSWORD]).Generate()),
+            new AuthenticationCredentialsDto(_emailGenerator.Generate(), UserMocks.TEST_PASSWORD),
+            new AuthenticationCredentialsDto(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMocks.TEST_PASSWORD]).Generate())
             ];
 
             foreach (AuthenticationCredentialsDto? credentialDto in incorrectCredentials)
             {
-                StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
+                StringContent payload = new(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
@@ -69,7 +69,7 @@ namespace TechCraftsmen.User.Api.Tests
         public async void Should_NotAuthenticate_ForInvalidCredentials()
         {
             List<AuthenticationCredentialsDto> invalidCredentials = [
-                new AuthenticationCredentialsDto(string.Empty, _userMocks.TestPassword),
+                new AuthenticationCredentialsDto(string.Empty, UserMocks.TEST_PASSWORD),
             new AuthenticationCredentialsDto(_userMocks.TestUser.Email, string.Empty),
             new AuthenticationCredentialsDto()
             ];

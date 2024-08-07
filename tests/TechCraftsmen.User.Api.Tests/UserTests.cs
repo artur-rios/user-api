@@ -20,10 +20,10 @@ namespace TechCraftsmen.User.Api.Tests
 
         public async Task InitializeAsync()
         {
-            AuthenticationCredentialsDto credentials = new AuthenticationCredentialsDto()
+            AuthenticationCredentialsDto credentials = new()
             {
                 Email = _userMocks.TestUser.Email,
-                Password = _userMocks.TestPassword
+                Password = UserMocks.TEST_PASSWORD
             };
 
             string authToken = await _testUtils.Authorize(credentials);

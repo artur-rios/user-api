@@ -22,7 +22,7 @@ namespace TechCraftsmen.User.Api.Tests
             AuthenticationCredentialsDto credentials = new()
             {
                 Email = _userMocks.TestUser.Email,
-                Password = _userMocks.TestPassword
+                Password = UserMocks.TEST_PASSWORD
             };
 
             string authToken = await _testUtils.Authorize(credentials);
@@ -45,7 +45,7 @@ namespace TechCraftsmen.User.Api.Tests
         {
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
-                HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{_userMocks.TestId}");
+                HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{UserMocks.TEST_ID}");
 
                 string body = await response.Content.ReadAsStringAsync();
 
