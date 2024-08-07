@@ -2,8 +2,8 @@
 {
     public class EmailGenerator
     {
-        public const string DEFAULT_DOMAIN_NAME = "mail.com";
-        public const string DEFAULT_USER_NAME = "jhon.doe";
+        private const string DefaultDomainName = "mail.com";
+        private const string DefaultUserName = "jhon.doe";
 
         private string? _customDomainName;
         private string? _customUsername;
@@ -39,8 +39,8 @@
 
         public string Generate()
         {
-            string? username = _customUsername is null ? DEFAULT_USER_NAME : _customUsername;
-            string? domainName = _customDomainName is null ? DEFAULT_DOMAIN_NAME : _customDomainName;
+            string? username = _customUsername ?? DefaultUserName;
+            string? domainName = _customDomainName ?? DefaultDomainName;
 
             if (_id is not null)
             {

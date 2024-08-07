@@ -98,7 +98,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
         public Core.Entities.User Generate()
         {
-            Core.Entities.User user = new Core.Entities.User
+            Core.Entities.User user = new()
             {
                 Id = _id,
                 Name = _name,
