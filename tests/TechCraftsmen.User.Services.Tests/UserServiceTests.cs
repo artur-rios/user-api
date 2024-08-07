@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using TechCraftsmen.User.Core.Dto;
@@ -20,7 +19,6 @@ namespace TechCraftsmen.User.Services.Tests
     public class UserServiceTests
     {
         private readonly UserService _userService;
-        private readonly Mapper _mapper;
 
         private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly UserGenerator _userGenerator = new();
@@ -38,7 +36,6 @@ namespace TechCraftsmen.User.Services.Tests
 
         public UserServiceTests()
         {
-            _mapper = new Mapper(AutoMapperConfiguration.UserMapping);
             Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
             IValidator<UserDto> userValidator = new UserDtoValidator();
             Mock<HttpContextAccessor> httpContextAccessor = new();
@@ -48,7 +45,7 @@ namespace TechCraftsmen.User.Services.Tests
 
             _userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithPassword(_passwordMock)
                 .WithRoleId((int)Roles.Regular).Generate();
-            _userDtoMock = _mapper.Map<UserDto>(_userMock);
+            _userDtoMock = _userMock.ToDto();
             _userDtoMock.Password = _passwordMock;
             UserMocks userMocks = new();
 
@@ -103,7 +100,7 @@ namespace TechCraftsmen.User.Services.Tests
             httpContextAccessor.Object.HttpContext!.Items =
                 new Dictionary<object, object?> { { "User", userMocks.TestUserDto } };
 
-            _userService = new UserService(userRepository.Object, httpContextAccessor.Object, _mapper, userValidator);
+            _userService = new UserService(userRepository.Object, httpContextAccessor.Object, userValidator);
         }
 
         [Fact]
@@ -202,7 +199,7 @@ namespace TechCraftsmen.User.Services.Tests
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId)
                 .WithPassword(_passwordMock).Generate();
-            UserDto? userDto = _mapper.Map<UserDto>(userMock);
+            UserDto userDto = userMock.ToDto();
 
             NotFoundException exception = Assert.Throws<NotFoundException>(() => _userService.UpdateUser(userDto));
 
@@ -215,7 +212,7 @@ namespace TechCraftsmen.User.Services.Tests
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId)
                 .WithPassword(_passwordMock).Generate();
-            UserDto? userDto = _mapper.Map<UserDto>(userMock);
+            UserDto userDto = userMock.ToDto();
 
             NotAllowedException exception = Assert.Throws<NotAllowedException>(() => _userService.UpdateUser(userDto));
 
@@ -228,7 +225,7 @@ namespace TechCraftsmen.User.Services.Tests
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(ExistingId)
                 .WithPassword(_passwordMock).Generate();
-            UserDto? userDto = _mapper.Map<UserDto>(userMock);
+            UserDto userDto = userMock.ToDto();
 
             Exception? exception = Record.Exception(() => _userService.UpdateUser(userDto));
 

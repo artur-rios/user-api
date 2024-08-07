@@ -4,7 +4,6 @@ using TechCraftsmen.User.Configuration.DependencyInjection;
 using TechCraftsmen.User.Configuration.Middleware;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Mapping;
 
 namespace TechCraftsmen.User.Api
 {
@@ -26,8 +25,7 @@ namespace TechCraftsmen.User.Api
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+            
             builder.Services.AddRelationalContext(builder.Configuration.GetSection("ConnectionStrings"));
             builder.Services.AddModelValidators();
             builder.Services.AddRelationalRepositories();
@@ -46,7 +44,7 @@ namespace TechCraftsmen.User.Api
                             Error = e.Value?.Errors.First().ErrorMessage
                         }).ToArray();
 
-                    DataResultDto<ErrorDto[]> result = new DataResultDto<ErrorDto[]>(errors, "Invalid query string");
+                    DataResultDto<ErrorDto[]> result = new(errors, "Invalid query string");
 
                     return new BadRequestObjectResult(result);
                 };

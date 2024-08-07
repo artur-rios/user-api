@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
@@ -7,6 +6,7 @@ using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Utils;
 
 namespace TechCraftsmen.User.Services
@@ -14,7 +14,6 @@ namespace TechCraftsmen.User.Services
     public class UserService(
         ICrudRepository<Core.Entities.User> userRepository,
         IHttpContextAccessor httpContextAccessor,
-        IMapper mapper,
         IValidator<UserDto> userValidator
     ) : IUserService
     {
@@ -31,7 +30,7 @@ namespace TechCraftsmen.User.Services
                 throw new NotAllowedException("E-mail already registered");
             }
 
-            Core.Entities.User? user = mapper.Map<Core.Entities.User>(userDto);
+            Core.Entities.User user = userDto.ToEntity();
 
             httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
 
@@ -63,7 +62,7 @@ namespace TechCraftsmen.User.Services
                 throw new NotFoundException("No users found with the given filter");
             }
 
-            return users.Select(mapper.Map<UserDto>).ToList();
+            return users.Select(user => user.ToDto()).ToList();
         }
 
         public HashDto GetPasswordByUserId(int id)
@@ -88,7 +87,7 @@ namespace TechCraftsmen.User.Services
                 throw new NotAllowedException(exceptionMessage);
             }
 
-            Core.Entities.User? user = mapper.Map<Core.Entities.User>(userDto);
+            Core.Entities.User user = userDto.ToEntity();
 
             MergeUser(user, currentUser);
 
