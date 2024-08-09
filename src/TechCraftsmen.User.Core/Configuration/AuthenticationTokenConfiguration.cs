@@ -2,9 +2,9 @@
 {
     public class AuthenticationTokenConfiguration
     {
-        public string? Audience { get; set; }
-        public string? Issuer { get; set; }
-        public int Seconds { get; set; }
-        public string? Secret { get; set; }
+        public string? Audience { get; init; }
+        public string? Issuer { get; init; }
+        public int Seconds { get; init; }
+        public string? Secret { get; init; }
     }
 }

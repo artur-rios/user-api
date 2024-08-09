@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
@@ -12,14 +10,13 @@ namespace TechCraftsmen.User.Configuration.Middleware
 
     public class ExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
     {
-        private readonly RequestDelegate _next = next;
         private readonly ILogger _logger = loggerFactory.CreateLogger("ExceptionHandler");
 
         public async Task Invoke(HttpContext httpContext)
         {
             try
             {
-                await _next(httpContext);
+                await next(httpContext);
             }
             catch (Exception ex)
             {
@@ -29,43 +26,23 @@ namespace TechCraftsmen.User.Configuration.Middleware
 
         private async Task HandleException(HttpContext context, Exception exception)
         {
-            DataResultDto<string> response;
-            HttpStatusCode httpStatus;
-
-            if (exception is NotAllowedException)
+            string[] messages = ["Internal server error, please try again later"];
+            
+            if (exception is CustomException customException)
             {
-                response = new DataResultDto<string>("The request was unsuccessful", exception.Message, false);
-                httpStatus = HttpStatusCode.BadRequest;
+                messages = customException.Messages;
             }
-            else if (exception is NotFoundException)
-            {
-                response = new DataResultDto<string>("The resource request was not found", exception.Message, false);
-                httpStatus = HttpStatusCode.NotFound;
-            }
-            else if (exception is ValidationException)
-            {
-                IList<string> errorList = [];
-
-                ValidationException? validationException = exception as ValidationException;
-
-                if (validationException is not null)
-                {
-                    foreach (ValidationFailure? error in validationException.Errors)
-                    {
-                        errorList.Add(error.ErrorMessage);
-                    }
-                }
-
-                response = new DataResultDto<string>("Validation error", string.Join(" | ", errorList), false);
-                httpStatus = HttpStatusCode.BadRequest;
-            }
-            else
-            {
-                response = new DataResultDto<string>("An error has ocurred", "Internal error, please try again later", false);
-                httpStatus = HttpStatusCode.InternalServerError;
-            }
-
+            
+            DataResultDto<string> response = new(string.Empty, messages);
+            const HttpStatusCode httpStatus = HttpStatusCode.InternalServerError;
+            
             _logger.LogError("Error: {error}", exception.Message);
+
+            foreach (string message in messages)
+            {
+                _logger.LogError("Message: {message}", message);
+            }
+            
             _logger.LogError("Stack: {stack}", exception.StackTrace);
 
             if (exception.InnerException is not null)

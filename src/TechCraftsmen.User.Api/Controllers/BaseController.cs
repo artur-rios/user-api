@@ -1,29 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Mapping;
+using Results = TechCraftsmen.User.Core.Enums.Results;
 
 namespace TechCraftsmen.User.Api.Controllers
 {
     public abstract class BaseController : Controller
     {
-        public ActionResult<DataResultDto<T>> Created<T>(T data, string message)
+        protected static ActionResult<DataResultDto<T>> Resolve<T>(OperationResultDto<T> operationResult)
         {
-            DataResultDto<T> result = new DataResultDto<T>(data, message, true);
-
-            return new ObjectResult(result) { StatusCode = StatusCodes.Status201Created };
+            return new ObjectResult(operationResult.ToDataResult()){ StatusCode = ToStatusCode(operationResult.Result) };
         }
 
-        public ActionResult<DataResultDto<T>> NoContent<T>(string message)
+        private static int ToStatusCode(Results result) => result switch
         {
-            DataResultDto<T> result = new DataResultDto<T>(default, message, false);
-
-            return new ObjectResult(result) { StatusCode = StatusCodes.Status204NoContent };
-        }
-
-        public ActionResult<DataResultDto<T>> Success<T>(T data, string message)
-        {
-            DataResultDto<T> result = new DataResultDto<T>(data, message, true);
-
-            return Ok(result);
-        }
+            Results.Created => StatusCodes.Status201Created,
+            Results.InternalError => StatusCodes.Status500InternalServerError,
+            Results.NotAllowed => StatusCodes.Status400BadRequest,
+            Results.NotFound => StatusCodes.Status404NotFound,
+            Results.EntityNotChanged => StatusCodes.Status204NoContent,
+            Results.ValidationError => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status200OK
+        };
     }
 }

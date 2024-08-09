@@ -12,17 +12,18 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
         public UserDtoValidator()
         {
             RuleFor(user => user.Name).NotEmpty();
-            RuleFor(user => user.Email).NotEmpty();
             RuleFor(user => user.Email).Custom((email, context) =>
             {
                 SimpleResultDto ruleResult = _emailRule.Validate(email);
 
-                if (!ruleResult.Success)
+                if (ruleResult.Success)
                 {
-                    foreach (string? error in ruleResult.Errors)
-                    {
-                        context.AddFailure(error);
-                    }
+                    return;
+                }
+
+                foreach (string? error in ruleResult.Errors)
+                {
+                    context.AddFailure(error);
                 }
             });
             RuleFor(user => user.Password).NotEmpty();
@@ -30,24 +31,28 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             {
                 SimpleResultDto ruleResult = _passwordValidator.Validate(password);
 
-                if (!ruleResult.Success)
+                if (ruleResult.Success)
                 {
-                    foreach (string? error in ruleResult.Errors)
-                    {
-                        context.AddFailure(error);
-                    }
+                    return;
+                }
+
+                foreach (string? error in ruleResult.Errors)
+                {
+                    context.AddFailure(error);
                 }
             });
             RuleFor(user => user.RoleId).Custom((roleId, context) =>
             {
                 SimpleResultDto ruleResult = _roleIdValidator.Validate(roleId);
 
-                if (!ruleResult.Success)
+                if (ruleResult.Success)
                 {
-                    foreach (string? error in ruleResult.Errors)
-                    {
-                        context.AddFailure(error);
-                    }
+                    return;
+                }
+
+                foreach (string? error in ruleResult.Errors)
+                {
+                    context.AddFailure(error);
                 }
             });
         }

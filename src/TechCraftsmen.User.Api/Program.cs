@@ -17,7 +17,8 @@ namespace TechCraftsmen.User.Api
 
             builder.Configuration.AddJsonFile(appSettings, optional: false, reloadOnChange: false);
 
-            builder.Services.Configure<AuthenticationTokenConfiguration>(builder.Configuration.GetSection("AuthenticationTokenSettings"));
+            builder.Services.Configure<AuthenticationTokenConfiguration>(
+                builder.Configuration.GetSection("AuthenticationTokenSettings"));
 
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -25,7 +26,7 @@ namespace TechCraftsmen.User.Api
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            
+
             builder.Services.AddRelationalContext(builder.Configuration.GetSection("ConnectionStrings"));
             builder.Services.AddModelValidators();
             builder.Services.AddRelationalRepositories();
@@ -36,15 +37,11 @@ namespace TechCraftsmen.User.Api
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
-                    ErrorDto[] errors = context.ModelState
+                    string[] errors = context.ModelState
                         .Where(e => e.Value?.Errors.Count > 0)
-                        .Select(e => new ErrorDto()
-                        {
-                            Parameter = e.Key,
-                            Error = e.Value?.Errors.First().ErrorMessage
-                        }).ToArray();
+                        .Select(e => $"Parameter: {e.Key} | Error: {e.Value?.Errors.First().ErrorMessage}").ToArray();
 
-                    DataResultDto<ErrorDto[]> result = new(errors, "Invalid query string");
+                    DataResultDto<string> result = new(string.Empty, errors);
 
                     return new BadRequestObjectResult(result);
                 };

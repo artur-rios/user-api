@@ -6,16 +6,10 @@ using TechCraftsmen.User.Tests.Utils.Mock;
 
 namespace TechCraftsmen.User.Api.Tests
 {
-    public class SecurityTests : BaseFunctionalTest, IAsyncLifetime
+    public class SecurityTests() : BaseFunctionalTest("Production"), IAsyncLifetime
     {
-        private readonly ApiTestUtils _testUtils;
         private readonly UserMocks _userMocks = new();
         private const string UserRoute = "/User";
-
-        public SecurityTests() : base("Production")
-        {
-            _testUtils = new ApiTestUtils(Factory);
-        }
 
         public async Task InitializeAsync()
         {
@@ -25,7 +19,7 @@ namespace TechCraftsmen.User.Api.Tests
                 Password = UserMocks.TEST_PASSWORD
             };
 
-            string authToken = await _testUtils.Authorize(credentials);
+            string authToken = await Authorize(credentials);
 
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
@@ -34,27 +28,27 @@ namespace TechCraftsmen.User.Api.Tests
         {
             return Task.CompletedTask;
         }
-
-        /*
-            Important:
-                - This test will only run with you run it alone
-                - If runned along with the other tests the ASPNETCORE_ENVIRONMENT will never be production
-        */
+        
         [Fact]
         public async void Should_ReturnBadRequest_IfAuthenticatedWithTestUserOutsideTestEnvironment()
         {
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
             {
-                HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{UserMocks.TEST_ID}");
-
-                string body = await response.Content.ReadAsStringAsync();
-
-                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
-
-                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-                Assert.NotNull(result);
-                Assert.Equal("Test user can't be used outside of test environment", result.Message);
+                return;
             }
+
+            const string filter = "Filter?Id=4"; // {UserMocks.TEST_ID}
+
+            HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{filter}");
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.NotNull(response);
+            Assert.False(result!.Success);
+            Assert.Equal("Test user can't be used outside of test environment", result.Messages.First());
         }
     }
 }

@@ -19,9 +19,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<int>> CreateUser([FromBody] UserDto userDto)
         {
-            int userId = _userService.CreateUser(userDto);
+            OperationResultDto<int> userId = _userService.CreateUser(userDto);
 
-            return Created(userId, "User created with success");
+            return Resolve(userId);
         }
 
         [HttpGet]
@@ -29,9 +29,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<IList<UserDto>>> GetUsersByFilter([FromQuery] UserFilter filter)
         {
-            IList<UserDto> users = _userService.GetUsersByFilter(filter);
+            OperationResultDto<IList<UserDto>> users = _userService.GetUsersByFilter(filter);
 
-            return Success(users, "Search completed with success");
+            return Resolve(users);
         }
 
         [HttpPut]
@@ -39,39 +39,39 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<UserDto>> UpdateUser([FromBody] UserDto userDto)
         {
-            _userService.UpdateUser(userDto);
+            OperationResultDto<UserDto?> updatedUser = _userService.UpdateUser(userDto);
 
-            return NoContent<UserDto>("User updated with success");
+            return Resolve(updatedUser)!;
         }
 
         [HttpPatch]
-        [Route("{id}/Activate")]
+        [Route("{id:int}/Activate")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<DataResultDto<UserDto>> ActivateUser([FromRoute] int id)
+        public ActionResult<DataResultDto<int>> ActivateUser([FromRoute] int id)
         {
-            _userService.ActivateUser(id);
+            OperationResultDto<int> activatedUserId = _userService.ActivateUser(id);
 
-            return NoContent<UserDto>("User activated with success");
+            return Resolve(activatedUserId);
         }
 
         [HttpPatch]
-        [Route("{id}/Deactivate")]
+        [Route("{id:int}/Deactivate")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<DataResultDto<UserDto>> DeactivateUser([FromRoute] int id)
+        public ActionResult<DataResultDto<int>> DeactivateUser([FromRoute] int id)
         {
-            _userService.DeactivateUser(id);
+            OperationResultDto<int> deactivatedUserId = _userService.DeactivateUser(id);
 
-            return NoContent<UserDto>("User deactivated with success");
+            return Resolve(deactivatedUserId);
         }
 
         [HttpDelete]
-        [Route("{id}/Delete")]
+        [Route("{id:int}/Delete")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<DataResultDto<UserDto>> DeleteUser([FromRoute] int id)
+        public ActionResult<DataResultDto<int>> DeleteUser([FromRoute] int id)
         {
-            _userService.DeleteUser(id);
+            OperationResultDto<int> deletedUserId = _userService.DeleteUser(id);
 
-            return NoContent<UserDto>("User deleted with success");
+            return Resolve(deletedUserId);
         }
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
@@ -13,6 +12,7 @@ using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
 using TechCraftsmen.User.Tests.Utils.Traits;
 using Xunit;
+using Results = TechCraftsmen.User.Core.Enums.Results;
 
 namespace TechCraftsmen.User.Services.Tests
 {
@@ -105,118 +105,141 @@ namespace TechCraftsmen.User.Services.Tests
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowValidationException_When_UserDtoIsInvalid()
+        public void Should_ReturnValidationError_When_UserDtoIsInvalid()
         {
-            UserDto invalidDto = _userDtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword().Generate();
+            UserDto invalidDto = _userDtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword().WithRoleId().Generate();
 
-            Assert.Throws<ValidationException>(() => _userService.CreateUser(invalidDto));
+            OperationResultDto<int> result = _userService.CreateUser(invalidDto);
+            
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.ValidationError, result.Result);
+            Assert.Equal("Email must not be null or empty", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotAllowedException_When_CreationRuleFails()
+        public void Should_ReturnNotAllowedError_When_ForAlreadyRegisteredEmail()
         {
-            UserDto userWithNonexistentEmail = _userDtoGenerator.WithEmail(ExistingEmail).WithDefaultName()
+            UserDto userWithExistingEmail = _userDtoGenerator.WithEmail(ExistingEmail).WithDefaultName()
                 .WithRandomPassword().WithRoleId().Generate();
 
-            Assert.Throws<NotAllowedException>(() => _userService.CreateUser(userWithNonexistentEmail));
+            OperationResultDto<int> result = _userService.CreateUser(userWithExistingEmail);
+            
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("E-mail already registered", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_CreateUser_And_ReturnId_ForValidDto()
         {
-            int newId = _userService.CreateUser(_userDtoMock);
-
-            Assert.Equal(_userMock.Id, newId);
+            OperationResultDto<int> result = _userService.CreateUser(_userDtoMock);
+            
+            Assert.Equal(_userMock.Id, result.Data);
+            Assert.Equal(Results.Created, result.Result);
+            Assert.Equal("User created with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_When_IdNotOnDatabase()
+        public void Should_ReturnNotFoundError_When_IdNotOnDatabase()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.GetUsersByFilter(new UserFilter(NonexistentId)));
+            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentId));
 
-            Assert.Equal("No users found with the given filter", exception.Message);
+            Assert.Empty(result.Data!);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("No users found for the given filter", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_ReturnUser_When_IdIsOnDatabase()
         {
-            UserDto? user = _userService.GetUsersByFilter(new UserFilter(ExistingId)).FirstOrDefault();
-
-            Assert.NotNull(user);
-            Assert.Equal(ExistingId, user.Id);
+            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingId));
+            
+            Assert.NotNull(result.Data);
+            Assert.Equal(ExistingId, result.Data.First().Id);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("Search completed with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_When_FilterDoesNotReturnAnyResult()
+        public void Should_ReturnNotFoundError_When_FilterDoesNotReturnAnyResult()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.GetUsersByFilter(new UserFilter(NonexistentEmail)));
+            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentEmail));
 
-            Assert.Equal("No users found with the given filter", exception.Message);
+            Assert.Empty(result.Data!);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("No users found for the given filter", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_ReturnUsers_For_ValidAndExistingFilter()
         {
-            IList<UserDto> users = _userService.GetUsersByFilter(new UserFilter(ExistingEmail));
+            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingEmail));
 
-            Assert.NotNull(users);
-            Assert.NotEmpty(users);
-            Assert.True(users.FirstOrDefault(user => user.Email == ExistingEmail) is not null);
+            Assert.NotNull(result.Data);
+            Assert.NotEmpty(result.Data);
+            Assert.True(result.Data.First(user => user.Email == ExistingEmail) is not null);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("Search completed with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
+        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.GetPasswordByUserId(NonexistentId));
+            OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(NonexistentId);
 
-            Assert.Equal("User not found!", exception.Message);
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("User not found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_ReturnPassword_When_IdIsOnDatabase()
         {
-            HashDto hashDto = _userService.GetPasswordByUserId(ExistingId);
+            OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(ExistingId);
 
-            Assert.NotNull(hashDto);
-            Assert.NotEmpty(hashDto.Hash);
-            Assert.NotEmpty(hashDto.Salt);
+            Assert.NotNull(result.Data);
+            Assert.NotEmpty(result.Data.Hash);
+            Assert.NotEmpty(result.Data.Salt);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("Password found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotUpdateUser()
+        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotUpdateUser()
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId)
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            NotFoundException exception = Assert.Throws<NotFoundException>(() => _userService.UpdateUser(userDto));
+            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
 
-            Assert.Equal("User not found!", exception.Message);
+            Assert.Null(result.Data);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("User not found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotNotAllowedException_WhenUserIsInactive()
+        public void Should_ReturnNotNotAllowedError_WhenUserIsInactive()
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId)
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            NotAllowedException exception = Assert.Throws<NotAllowedException>(() => _userService.UpdateUser(userDto));
+            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
 
-            Assert.Equal("Can't update inactive user", exception.Message);
+            Assert.Null(result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("Can't update inactive user", result.Messages.First());
         }
 
         [Fact]
@@ -227,96 +250,110 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            Exception? exception = Record.Exception(() => _userService.UpdateUser(userDto));
+            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
 
-            Assert.Null(exception);
+            Assert.NotNull(result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("User updated with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotActivateUser()
+        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotActivateUser()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.ActivateUser(NonexistentId));
+            OperationResultDto<int> result = _userService.ActivateUser(NonexistentId);
 
-            Assert.Equal("User not found!", exception.Message);
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("User not found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotNotAllowedException_WhenUserIsActive()
+        public void Should_ReturnEntityNotChanged_WhenUserIsActive_On_Activation()
         {
-            EntityNotChangedException exception =
-                Assert.Throws<EntityNotChangedException>(() => _userService.ActivateUser(ExistingId));
+            OperationResultDto<int> result = _userService.ActivateUser(ExistingId);
 
-            Assert.Equal("User already active", exception.Message);
+            Assert.Equal(ExistingId, result.Data);
+            Assert.Equal(Results.EntityNotChanged, result.Result);
+            Assert.Equal("User already active", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_ActivateUser()
         {
-            Exception? exception = Record.Exception(() => _userService.ActivateUser(InactiveId));
+            OperationResultDto<int> result = _userService.ActivateUser(InactiveId);
 
-            Assert.Null(exception);
+            Assert.Equal(InactiveId, result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("User activated with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeactivateUser()
+        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeactivateUser()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.DeactivateUser(NonexistentId));
+            OperationResultDto<int> result = _userService.DeactivateUser(NonexistentId);
 
-            Assert.Equal("User not found!", exception.Message);
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("User not found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotNotAllowedException_WhenUserIsInactive_On_Deactivation()
+        public void Should_ReturnEntityNotChanged_WhenUserIsInactive_On_Deactivation()
         {
-            EntityNotChangedException exception =
-                Assert.Throws<EntityNotChangedException>(() => _userService.DeactivateUser(InactiveId));
+            OperationResultDto<int> result = _userService.DeactivateUser(InactiveId);
 
-            Assert.Equal("User already inactive", exception.Message);
+            Assert.Equal(InactiveId, result.Data);
+            Assert.Equal(Results.EntityNotChanged, result.Result);
+            Assert.Equal("User already inactive", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_DeactivateUser()
         {
-            Exception? exception = Record.Exception(() => _userService.DeactivateUser(ExistingId));
+            OperationResultDto<int> result = _userService.DeactivateUser(ExistingId);
 
-            Assert.Null(exception);
+            Assert.Equal(ExistingId, result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("User deactivated with success", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotFoundException_WhenIdNotOnDatabaseAndCannotDeleteUser()
+        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeleteUser()
         {
-            NotFoundException exception =
-                Assert.Throws<NotFoundException>(() => _userService.DeleteUser(NonexistentId));
+            OperationResultDto<int> result = _userService.DeleteUser(NonexistentId);
 
-            Assert.Equal("User not found!", exception.Message);
+            Assert.Equal(default, result.Data);
+            Assert.Equal(Results.NotFound, result.Result);
+            Assert.Equal("User not found", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
-        public void Should_ThrowNotAllowedException_WhenIdNotOnDatabaseAndCannotDeleteUser()
+        public void Should_ReturnNotAllowedError_WhenUserIsActive()
         {
-            NotAllowedException exception =
-                Assert.Throws<NotAllowedException>(() => _userService.DeleteUser(ExistingId));
-
-            Assert.Equal("Can't delete active user", exception.Message);
+            OperationResultDto<int> result = _userService.DeleteUser(ExistingId);
+            
+            Assert.Equal(ExistingId, result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("Can't delete active user", result.Messages.First());
         }
 
         [Fact]
         [Unit("UserService")]
         public void Should_DeleteUser()
         {
-            Exception? exception = Record.Exception(() => _userService.DeleteUser(InactiveId));
+            OperationResultDto<int> result = _userService.DeleteUser(InactiveId);
 
-            Assert.Null(exception);
+            Assert.Equal(InactiveId, result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("User deleted with success", result.Messages.First());
         }
     }
 }

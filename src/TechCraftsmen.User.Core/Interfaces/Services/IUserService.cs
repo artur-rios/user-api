@@ -6,12 +6,12 @@ namespace TechCraftsmen.User.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        int CreateUser(UserDto userDto);
-        IList<UserDto> GetUsersByFilter(UserFilter filter);
-        HashDto GetPasswordByUserId(int id);
-        void UpdateUser(UserDto userDto);
-        public void ActivateUser(int id);
-        public void DeactivateUser(int id);
-        void DeleteUser(int id);
+        OperationResultDto<int> CreateUser(UserDto userDto);
+        OperationResultDto<IList<UserDto>> GetUsersByFilter(UserFilter filter);
+        OperationResultDto<HashDto?> GetPasswordByUserId(int id);
+        OperationResultDto<UserDto?> UpdateUser(UserDto userDto);
+        OperationResultDto<int> ActivateUser(int id);
+        OperationResultDto<int> DeactivateUser(int id);
+        OperationResultDto<int>  DeleteUser(int id);
     }
 }

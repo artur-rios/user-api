@@ -75,7 +75,7 @@ namespace TechCraftsmen.User.Tests.Utils.Generators
 
             if (chars == "")
             {
-                throw new NotAllowedException("No options provided");
+                throw new CustomException(["No options provided"]);
             }
 
             char[] charPool = chars.ToCharArray();

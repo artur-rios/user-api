@@ -7,8 +7,6 @@ namespace TechCraftsmen.User.Configuration.Authorization
 {
     public class RoleRequirementFilter(params Roles[] authorizedRoles) : IAuthorizationFilter
     {
-        private readonly Roles[] _authorizedRoles = authorizedRoles;
-
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             UserDto? user = context.HttpContext.Items["User"] as UserDto;
@@ -17,7 +15,7 @@ namespace TechCraftsmen.User.Configuration.Authorization
 
             if (user is not null)
             {
-                authorized = _authorizedRoles.Any(role => role == (Roles)user.RoleId);
+                authorized = authorizedRoles.Any(role => role == (Roles)user.RoleId);
             }
 
             if (!authorized)

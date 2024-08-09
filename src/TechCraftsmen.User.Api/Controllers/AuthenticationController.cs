@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using TechCraftsmen.User.Configuration.Authorization;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Interfaces.Services;
@@ -11,16 +11,14 @@ namespace TechCraftsmen.User.Api.Controllers
     [Route("[controller]")]
     public class AuthenticationController(IAuthenticationService authService) : BaseController
     {
-        private readonly IAuthenticationService _authService = authService;
-
         [HttpPost]
         [Route("User")]
         [AllowAnonymous]
-        public ActionResult<DataResultDto<AuthenticationToken>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
+        public ActionResult<DataResultDto<AuthenticationToken?>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
-            AuthenticationToken authToken = _authService.AuthenticateUser(credentialsDto);
+            OperationResultDto<AuthenticationToken?> authToken = authService.AuthenticateUser(credentialsDto);
 
-            return Success(authToken, "User authenticated with success");
+            return Resolve(authToken);
         }
     }
 }

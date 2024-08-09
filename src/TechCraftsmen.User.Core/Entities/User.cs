@@ -21,7 +21,7 @@ namespace TechCraftsmen.User.Core.Entities
 
         public SimpleResultDto CanActivate()
         {
-            SimpleResultDto result = new SimpleResultDto();
+            SimpleResultDto result = new();
             
             if (Active)
             {
@@ -35,7 +35,7 @@ namespace TechCraftsmen.User.Core.Entities
         
         public SimpleResultDto CanDeactivate()
         {
-            SimpleResultDto result = new SimpleResultDto();
+            SimpleResultDto result = new();
             
             if (!Active)
             {
@@ -49,7 +49,7 @@ namespace TechCraftsmen.User.Core.Entities
         
         public SimpleResultDto CanDelete()
         {
-            SimpleResultDto result = new SimpleResultDto();
+            SimpleResultDto result = new();
             
             if (Active)
             {
@@ -63,7 +63,7 @@ namespace TechCraftsmen.User.Core.Entities
 
         public SimpleResultDto CanRegister(int authenticatedRoleId)
         {
-            SimpleResultDto result = new SimpleResultDto();
+            SimpleResultDto result = new();
             
             if (RoleId != (int)Roles.Regular)
             {
@@ -80,7 +80,7 @@ namespace TechCraftsmen.User.Core.Entities
 
         public SimpleResultDto CanUpdate()
         {
-            SimpleResultDto result = new SimpleResultDto();
+            SimpleResultDto result = new();
             
             if (!Active)
             {

@@ -8,15 +8,8 @@ namespace TechCraftsmen.User.Api.Tests
 {
     public class UserTests : BaseFunctionalTest, IAsyncLifetime
     {
-        private readonly ApiTestUtils _testUtils;
-        private readonly UserMocks _userMocks;
+        private readonly UserMocks _userMocks = new();
         private const string UserRoute = "/User";
-
-        public UserTests()
-        {
-            _testUtils = new ApiTestUtils(Factory);
-            _userMocks = new UserMocks();
-        }
 
         public async Task InitializeAsync()
         {
@@ -26,7 +19,7 @@ namespace TechCraftsmen.User.Api.Tests
                 Password = UserMocks.TEST_PASSWORD
             };
 
-            string authToken = await _testUtils.Authorize(credentials);
+            string authToken = await Authorize(credentials);
 
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
         }
@@ -49,7 +42,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
-            Assert.Equal("Search completed with success", result.Message);
+            Assert.Equal("Search completed with success", result.Messages.First());
             Assert.NotNull(result.Data);
 
             UserDto? userFound = result.Data.FirstOrDefault();

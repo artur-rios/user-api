@@ -37,7 +37,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.NotNull(result);
             Assert.False(string.IsNullOrWhiteSpace(result.Data.AccessToken));
             Assert.True(result.Data.Authenticated);
-            Assert.Equal("User authenticated with success", result.Message);
+            Assert.Equal("User authenticated with success", result.Messages.First());
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace TechCraftsmen.User.Api.Tests
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
-                Assert.Equal("Invalid credentials", result.Message);
+                Assert.Equal("Invalid credentials", result.Messages.First());
             }
         }
 
@@ -76,7 +76,7 @@ namespace TechCraftsmen.User.Api.Tests
 
             foreach (AuthenticationCredentialsDto? credentialDto in invalidCredentials)
             {
-                StringContent payload = new StringContent(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
+                StringContent payload = new(JsonConvert.SerializeObject(credentialDto), Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
 
@@ -93,18 +93,22 @@ namespace TechCraftsmen.User.Api.Tests
 
                 if (string.IsNullOrEmpty(credentialDto.Email) && string.IsNullOrEmpty(credentialDto.Password))
                 {
-                    expectedValidationError = $"{emailValidationError} | {passwordValidationError}";
+                    Assert.Equal(emailValidationError, result.Messages.First());
+                    Assert.Equal(passwordValidationError, result.Messages[1]);
                 }
-                else if (string.IsNullOrEmpty(credentialDto.Email))
+                else
                 {
-                    expectedValidationError = emailValidationError;
-                }
-                else if (string.IsNullOrEmpty(credentialDto.Password))
-                {
-                    expectedValidationError = passwordValidationError;
-                }
+                    if (string.IsNullOrEmpty(credentialDto.Email))
+                    {
+                        expectedValidationError = emailValidationError;
+                    }
+                    else if (string.IsNullOrEmpty(credentialDto.Password))
+                    {
+                        expectedValidationError = passwordValidationError;
+                    }
 
-                Assert.Equal(expectedValidationError, result.Message);
+                    Assert.Equal(expectedValidationError, result.Messages.First());
+                }
             }
         }
     }

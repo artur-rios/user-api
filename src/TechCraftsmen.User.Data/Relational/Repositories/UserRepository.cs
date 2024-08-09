@@ -25,32 +25,34 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
 
             if (tableName is null)
             {
-                throw new NotFoundException("Entity not mapped to relational table!");
+                throw new CustomException(["Entity not mapped to relational table"]);
             }
 
             StringBuilder query = new($"SELECT * FROM sc_user_api.{tableName}");
 
-            if (filters.Count > 0)
+            if (filters.Count == 0)
             {
-                query.Append(" WHERE ");
+                return _dbContext.Users.FromSql(FormattableStringFactory.Create(query.ToString()));
+            }
 
-                for (int index = 0; index < filters.Count; index++)
+            query.Append(" WHERE ");
+
+            for (int index = 0; index < filters.Count; index++)
+            {
+                KeyValuePair<string, object> filter = filters.ElementAt(index);
+
+                if (filter.Value is string or DateTime)
                 {
-                    KeyValuePair<string, object> filter = filters.ElementAt(index);
+                    query.Append($"{filter.Key} = '{filter.Value}'");
+                }
+                else
+                {
+                    query.Append($"{filter.Key} = {filter.Value}");
+                }
 
-                    if (filter.Value is string || filter.Value is DateTime)
-                    {
-                        query.Append($"{filter.Key} = '{filter.Value}'");
-                    }
-                    else
-                    {
-                        query.Append($"{filter.Key} = {filter.Value}");
-                    }
-
-                    if (index < filters.Count - 1)
-                    {
-                        query.Append(" AND ");
-                    }
+                if (index < filters.Count - 1)
+                {
+                    query.Append(" AND ");
                 }
             }
 

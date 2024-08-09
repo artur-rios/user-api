@@ -1,13 +1,14 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Utils;
+using Results = TechCraftsmen.User.Core.Enums.Results;
 
 namespace TechCraftsmen.User.Services
 {
@@ -17,9 +18,17 @@ namespace TechCraftsmen.User.Services
         IValidator<UserDto> userValidator
     ) : IUserService
     {
-        public int CreateUser(UserDto userDto)
+        public OperationResultDto<int> CreateUser(UserDto userDto)
         {
-            userValidator.ValidateAndThrow(userDto);
+            ValidationResult? validationResult = userValidator.Validate(userDto);
+            
+            string[] validationErrors = validationResult.Errors.Select(vf => vf.ErrorMessage).ToArray();
+
+            if (!validationResult.IsValid)
+            {
+                return new OperationResultDto<int>(default, validationErrors,
+                    Results.ValidationError);
+            }
 
             Dictionary<string, object> filter = new() { { "Email", userDto.Email } };
 
@@ -27,10 +36,10 @@ namespace TechCraftsmen.User.Services
 
             if (userSearch.Any())
             {
-                throw new NotAllowedException("E-mail already registered");
+                return new OperationResultDto<int>(default, ["E-mail already registered"], Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity();
+            Core.Entities.User user = userDto.ToEntity()!;
 
             httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
 
@@ -40,9 +49,7 @@ namespace TechCraftsmen.User.Services
 
             if (!canRegister.Success)
             {
-                string exceptionMessage = string.Join(" | ", canRegister.Errors);
-
-                throw new NotAllowedException(exceptionMessage);
+                return new OperationResultDto<int>(default, canRegister.Errors.ToArray(), Results.NotAllowed);
             }
 
             HashDto hashResult = HashUtils.HashText(userDto.Password);
@@ -50,100 +57,124 @@ namespace TechCraftsmen.User.Services
             user.Password = hashResult.Hash;
             user.Salt = hashResult.Salt;
 
-            return userRepository.Create(user);
+            int createdId = userRepository.Create(user);
+
+            return new OperationResultDto<int>(createdId, ["User created with success"], Results.Created);
         }
 
-        public IList<UserDto> GetUsersByFilter(UserFilter filter)
+        public OperationResultDto<IList<UserDto>> GetUsersByFilter(UserFilter filter)
         {
             List<Core.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary()).ToList();
 
-            if (users is null || users.Count == 0)
+            if (users.Count == 0)
             {
-                throw new NotFoundException("No users found with the given filter");
+                return new OperationResultDto<IList<UserDto>>([], ["No users found for the given filter"], Results.NotFound);
             }
 
-            return users.Select(user => user.ToDto()).ToList();
+            List<UserDto> usersFound = users.Select(user => user.ToDto()).ToList();
+
+            return new OperationResultDto<IList<UserDto>>(usersFound, ["Search completed with success"]);
         }
 
-        public HashDto GetPasswordByUserId(int id)
+        public OperationResultDto<HashDto?> GetPasswordByUserId(int id)
         {
             Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
 
             return user is null
-                ? throw new NotFoundException("User not found!")
-                : new HashDto() { Hash = user.Password, Salt = user.Salt };
+                ? new OperationResultDto<HashDto?>(default, ["User not found"], Results.NotFound)
+                : new OperationResultDto<HashDto?>(new HashDto() { Hash = user.Password, Salt = user.Salt }, ["Password found"]);
         }
 
-        public void UpdateUser(UserDto userDto)
+        public OperationResultDto<UserDto?> UpdateUser(UserDto userDto)
         {
-            Core.Entities.User currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
+            Core.Entities.User? currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id")).FirstOrDefault();
+            
+            if (currentUser == null)
+            {
+                return new OperationResultDto<UserDto?>(default, ["User not found"], Results.NotFound);
+            }
 
             SimpleResultDto canUpdate = currentUser.CanUpdate();
 
             if (!canUpdate.Success)
             {
-                string exceptionMessage = string.Join(" | ", canUpdate.Errors);
-
-                throw new NotAllowedException(exceptionMessage);
+                return new OperationResultDto<UserDto?>(default, canUpdate.Errors.ToArray(), Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity();
+            Core.Entities.User user = userDto.ToEntity()!;
 
             MergeUser(user, currentUser);
 
             userRepository.Update(user);
+
+            return new OperationResultDto<UserDto?>(user.ToDto(), ["User updated with success"]);
         }
 
-        public void ActivateUser(int id)
+        public OperationResultDto<int> ActivateUser(int id)
         {
-            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            
+            if (user == null)
+            {
+                return new OperationResultDto<int>(default, ["User not found"], Results.NotFound);
+            }
 
             SimpleResultDto canActivate = user.CanActivate();
 
             if (!canActivate.Success)
             {
-                string exceptionMessage = string.Join(" | ", canActivate.Errors);
-
-                throw new EntityNotChangedException(exceptionMessage);
+                return new OperationResultDto<int>(id, canActivate.Errors.ToArray(), Results.EntityNotChanged);
             }
 
             user.Active = true;
 
             userRepository.Update(user);
+
+            return new OperationResultDto<int>(id, ["User activated with success"]);
         }
 
-        public void DeactivateUser(int id)
+        public OperationResultDto<int> DeactivateUser(int id)
         {
-            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            
+            if (user == null)
+            {
+                return new OperationResultDto<int>(default, ["User not found"], Results.NotFound);
+            }
 
             SimpleResultDto canDeactivate = user.CanDeactivate();
 
             if (!canDeactivate.Success)
             {
-                string exceptionMessage = string.Join(" | ", canDeactivate.Errors);
-
-                throw new EntityNotChangedException(exceptionMessage);
+                return new OperationResultDto<int>(id, canDeactivate.Errors.ToArray(), Results.EntityNotChanged);
             }
 
             user.Active = false;
 
             userRepository.Update(user);
+            
+            return new OperationResultDto<int>(id, ["User deactivated with success"]);
         }
 
-        public void DeleteUser(int id)
+        public OperationResultDto<int> DeleteUser(int id)
         {
-            Core.Entities.User user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault() ?? throw new NotFoundException("User not found!");
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            
+            if (user == null)
+            {
+                return new OperationResultDto<int>(default, ["User not found"], Results.NotFound);
+            }
 
             SimpleResultDto canDelete = user.CanDelete();
 
             if (!canDelete.Success)
             {
-                string exceptionMessage = string.Join(" | ", canDelete.Errors);
-
-                throw new NotAllowedException(exceptionMessage);
+                return new OperationResultDto<int>(id, canDelete.Errors.ToArray(), Results.NotAllowed);
             }
 
             userRepository.Delete(user);
+            
+            return new OperationResultDto<int>(id, ["User deleted with success"]);
         }
 
         private static void MergeUser(Core.Entities.User source, Core.Entities.User target, bool mergeStatus = true)

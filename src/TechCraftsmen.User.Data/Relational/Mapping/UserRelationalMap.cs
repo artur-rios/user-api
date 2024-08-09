@@ -14,7 +14,7 @@ namespace TechCraftsmen.User.Data.Relational.Mapping
 
             if (tableName is null)
             {
-                throw new NotFoundException("Entity not mapped to relational table!");
+                throw new CustomException(["Entity not mapped to relational table"]);
             }
 
             user.ToTable(tableName, schema: "sc_user_api");

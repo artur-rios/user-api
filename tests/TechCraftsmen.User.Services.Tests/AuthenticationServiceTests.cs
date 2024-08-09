@@ -1,9 +1,9 @@
-﻿using FluentValidation;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Moq;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Services;
@@ -50,18 +50,20 @@ namespace TechCraftsmen.User.Services.Tests
                 {
                     if (filter.Id == TestId || filter.Email is ExistingEmail)
                     {
-                        return
+                        return new OperationResultDto<IList<UserDto>>(
                         [
                             _userDtoGenerator.WithId(TestId).WithEmail(ExistingEmail).WithPassword(CorrectPassword)
                                 .Generate()
-                        ];
+                        ], ["Search completed with success"]);
                     }
 
-                    return [];
+                    return new OperationResultDto<IList<UserDto>>([], ["No users found for the given filter"],
+                        Results.NotFound);
                 });
 
             _userService.Setup(service => service.GetPasswordByUserId(TestId))
-                .Returns(() => HashUtils.HashText(CorrectPassword));
+                .Returns(
+                    () => new OperationResultDto<HashDto?>(HashUtils.HashText(CorrectPassword), ["Password found"]));
 
             _authenticationService = new AuthenticationService(_authTokenConfig.Object, _authCredentialsValidator,
                 _authTokenConfigValidator, _userService.Object);
@@ -74,7 +76,7 @@ namespace TechCraftsmen.User.Services.Tests
             _authTokenConfig.Setup(config => config.Value).Returns(_authTokenConfigGenerator.WithAudience("audience")
                 .WithIssuer("issuer").WithSeconds(0).WithSecret("").Generate());
 
-            Assert.Throws<ValidationException>(() => new AuthenticationService(_authTokenConfig.Object,
+            Assert.Throws<CustomException>(() => new AuthenticationService(_authTokenConfig.Object,
                 _authCredentialsValidator, _authTokenConfigValidator, _userService.Object));
         }
 
@@ -82,46 +84,53 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("AuthenticationService")]
         public void Should_ThrowValidationException_ForInvalidCredentials()
         {
-            Assert.Throws<ValidationException>(() =>
-                _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty)
-                    .WithPassword(string.Empty).Generate()));
+            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty)
+                .WithPassword(string.Empty).Generate());
+            
+            Assert.Null(result.Data);
+            Assert.Equal(Results.ValidationError, result.Result);
+            Assert.Equal(2, result.Messages.Length);
+            Assert.Equal("'Email' must not be empty.", result.Messages.First());
+            Assert.Equal("'Password' must not be empty.", result.Messages[1]);
         }
 
         [Fact]
         [Unit("AuthenticationService")]
-        public void Should_ThrowNotAllowedException_ForNonexistentEmail()
+        public void Should_ReturnNotAllowedError_ForNonexistentEmail()
         {
-            Assert.Throws<NotAllowedException>(() =>
-                _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(NonexistentEmail)
-                    .WithPassword(CorrectPassword).Generate()));
+            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+                _authCredentialsGenerator.WithEmail(NonexistentEmail)
+                    .WithPassword(CorrectPassword).Generate());
+
+            Assert.Null(result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("Invalid credentials", result.Messages.First());
         }
 
         [Fact]
         [Unit("AuthenticationService")]
-        public void Should_ThrowNotAllowedException_ForIncorrectPassword()
+        public void Should_ReturnNotAllowedError_ForIncorrectPassword()
         {
-            Assert.Throws<NotAllowedException>(() =>
-                _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(ExistingEmail)
-                    .WithPassword(IncorrectPassword).Generate()));
+            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+                _authCredentialsGenerator.WithEmail(ExistingEmail)
+                    .WithPassword(IncorrectPassword).Generate());
+
+            Assert.Null(result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("Invalid credentials", result.Messages.First());
         }
 
         [Fact]
         [Unit("AuthenticationService")]
-        public void Should_ThrowNotAllowedException_ForIncorrectCredentials()
+        public void Should_ReturnNotAllowedError_ForIncorrectCredentials()
         {
-            Assert.Throws<NotAllowedException>(() => _authenticationService.AuthenticateUser(_authCredentialsGenerator
-                .WithEmail(NonexistentEmail).WithPassword(IncorrectPassword).Generate()));
-        }
+            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+                _authCredentialsGenerator
+                    .WithEmail(NonexistentEmail).WithPassword(IncorrectPassword).Generate());
 
-        [Fact]
-        [Unit("AuthenticationService")]
-        public void Should_ReturnIdFromToken()
-        {
-            AuthenticationToken token = _authenticationService.AuthenticateUser(_authCredentialsGenerator
-                .WithEmail(ExistingEmail).WithPassword(CorrectPassword).Generate());
-            int id = _authenticationService.GetUserIdFromJwtToken(token.AccessToken!);
-
-            Assert.Equal(TestId, id);
+            Assert.Null(result.Data);
+            Assert.Equal(Results.NotAllowed, result.Result);
+            Assert.Equal("Invalid credentials", result.Messages.First());
         }
 
         [Theory]
@@ -133,9 +142,12 @@ namespace TechCraftsmen.User.Services.Tests
             "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForInvalidToken(string token)
         {
-            bool valid = _authenticationService.ValidateJwtToken(token, out UserDto? user);
+            OperationResultDto<bool> result = _authenticationService.ValidateJwtToken(token, out UserDto? user);
 
-            Assert.False(valid);
+            Assert.False(result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("Invalid auth token", result.Messages.First());
+
             Assert.Null(user);
         }
 
@@ -143,12 +155,21 @@ namespace TechCraftsmen.User.Services.Tests
         [Unit("AuthenticationService")]
         public void Should_GenerateValidToken_ForValidCredentials()
         {
-            AuthenticationToken token = _authenticationService.AuthenticateUser(_authCredentialsGenerator
-                .WithEmail(ExistingEmail).WithPassword(CorrectPassword).Generate());
-            bool valid = _authenticationService.ValidateJwtToken(token.AccessToken!, out UserDto? user);
+            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+                _authCredentialsGenerator
+                    .WithEmail(ExistingEmail).WithPassword(CorrectPassword).Generate());
 
-            Assert.NotNull(token);
-            Assert.True(valid);
+            Assert.NotNull(result.Data);
+            Assert.Equal(Results.Success, result.Result);
+            Assert.Equal("User authenticated with success", result.Messages.First());
+
+            OperationResultDto<bool> validationResult =
+                _authenticationService.ValidateJwtToken(result.Data.AccessToken!, out UserDto? user);
+
+            Assert.True(validationResult.Data);
+            Assert.Equal(Results.Success, validationResult.Result);
+            Assert.Equal("Auth token is valid", validationResult.Messages.First());
+
             Assert.NotNull(user);
             Assert.True(user.Id == TestId);
             Assert.True(user.Email == ExistingEmail);

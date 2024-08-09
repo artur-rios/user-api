@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,11 +8,11 @@ using System.Text;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
-
 
 namespace TechCraftsmen.User.Services
 {
@@ -21,41 +22,109 @@ namespace TechCraftsmen.User.Services
         private readonly IUserService _userService;
         private readonly IValidator<AuthenticationCredentialsDto> _authCredentialsValidator;
 
-        public AuthenticationService(IOptions<AuthenticationTokenConfiguration> authTokenConfig, IValidator<AuthenticationCredentialsDto> authCredentialsValidator, IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator, IUserService userService)
+        public AuthenticationService(IOptions<AuthenticationTokenConfiguration> authTokenConfig,
+            IValidator<AuthenticationCredentialsDto> authCredentialsValidator,
+            IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator, IUserService userService)
         {
             _authCredentialsValidator = authCredentialsValidator;
             _authTokenConfig = authTokenConfig.Value;
             _userService = userService;
 
-            authTokenConfigValidator.ValidateAndThrow(_authTokenConfig);
+            ValidateTokenConfigAndThrow(authTokenConfigValidator);
         }
 
-        public AuthenticationToken AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
+        public OperationResultDto<AuthenticationToken?> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
-            _authCredentialsValidator.ValidateAndThrow(credentialsDto);
+            ValidationResult? validationResult = _authCredentialsValidator.Validate(credentialsDto);
 
-            UserDto? user;
+            string[] validationErrors = validationResult.Errors.Select(vf => vf.ErrorMessage).ToArray();
 
-            try
+            if (!validationResult.IsValid)
             {
-                user = _userService.GetUsersByFilter(new UserFilter(credentialsDto.Email)).FirstOrDefault() ?? throw new NotAllowedException("Invalid credentials");
-            }
-            catch (NotFoundException)
-            {
-                throw new NotAllowedException("Invalid credentials");
+                return new OperationResultDto<AuthenticationToken?>(default, validationErrors,
+                    Results.ValidationError);
             }
 
-            HashDto password = _userService.GetPasswordByUserId(user.Id);
+            OperationResultDto<IList<UserDto>> search =
+                _userService.GetUsersByFilter(new UserFilter(credentialsDto.Email));
+
+            if (search.Result is not Results.Success)
+            {
+                return new OperationResultDto<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
+            }
+
+            UserDto user = search.Data!.First();
+
+            OperationResultDto<HashDto?> passwordSearch = _userService.GetPasswordByUserId(user.Id);
+
+            if (passwordSearch.Result is not Results.Success)
+            {
+                return new OperationResultDto<AuthenticationToken?>(default,
+                    ["Could not retrieve password from database"], Results.InternalError);
+            }
+
+            HashDto password = passwordSearch.Data!;
 
             if (!HashUtils.VerifyHash(credentialsDto.Password, password))
             {
-                throw new NotAllowedException("Invalid credentials");
+                return new OperationResultDto<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
             }
 
-            return GenerateJwtToken(user.Id);
+            AuthenticationToken authToken = GenerateJwtToken(user.Id);
+
+            return new OperationResultDto<AuthenticationToken?>(authToken, ["User authenticated with success"]);
         }
 
-        public AuthenticationToken GenerateJwtToken(int userId)
+        public OperationResultDto<bool> ValidateJwtToken(string token, out UserDto? authenticatedUser)
+        {
+            authenticatedUser = default;
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return new OperationResultDto<bool>(false, ["Invalid auth token"]);
+            }
+
+            JwtSecurityTokenHandler tokenHandler = new();
+            byte[] key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
+
+            try
+            {
+                tokenHandler.ValidateToken(token,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ClockSkew = TimeSpan.Zero
+                    }, out SecurityToken validatedToken);
+
+                JwtSecurityToken? jwtToken = (JwtSecurityToken)validatedToken;
+
+                int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+
+                OperationResultDto<IList<UserDto>> userSearch = _userService.GetUsersByFilter(new UserFilter(userId));
+
+                if (userSearch.Result is not Results.Success)
+                {
+                    return new OperationResultDto<bool>(false, ["User not found"], Results.NotFound);
+                }
+
+                authenticatedUser = userSearch.Data!.First();
+
+                return new OperationResultDto<bool>(true, ["Auth token is valid"]);
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                return new OperationResultDto<bool>(false, ["Auth token expired. Please authenticate again"]);
+            }
+            catch (Exception)
+            {
+                return new OperationResultDto<bool>(false, ["Auth token invalid"]);
+            }
+        }
+
+        private AuthenticationToken GenerateJwtToken(int userId)
         {
             byte[] key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
 
@@ -64,19 +133,20 @@ namespace TechCraftsmen.User.Services
             DateTime creationDate = DateTime.Now;
             DateTime expirationDate = creationDate + TimeSpan.FromSeconds(_authTokenConfig.Seconds);
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            JwtSecurityTokenHandler handler = new();
             SecurityToken? securityToken = handler.CreateToken(new SecurityTokenDescriptor
             {
                 Issuer = _authTokenConfig.Issuer,
                 Audience = _authTokenConfig.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials =
+                    new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Subject = identity,
                 NotBefore = creationDate,
                 Expires = expirationDate
             });
             string? token = handler.WriteToken(securityToken);
 
-            return new()
+            return new AuthenticationToken
             {
                 Authenticated = true,
                 Created = creationDate.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -85,54 +155,18 @@ namespace TechCraftsmen.User.Services
             };
         }
 
-        public int GetUserIdFromJwtToken(string token)
+        private void ValidateTokenConfigAndThrow(IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator)
         {
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken? jsonToken = tokenHandler.ReadToken(token);
-            JwtSecurityToken? jwtSecurityToken = jsonToken as JwtSecurityToken;
+            ValidationResult? validationResult = authTokenConfigValidator.Validate(_authTokenConfig);
 
-            return int.Parse(jwtSecurityToken!.Claims.First(x => x.Type == "id").Value);
-        }
-
-        public bool ValidateJwtToken(string token, out UserDto? authenticatedUser)
-        {
-            if (string.IsNullOrWhiteSpace(token))
+            if (validationResult.IsValid)
             {
-                authenticatedUser = null;
-
-                return false;
+                return;
             }
 
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(_authTokenConfig.Secret!);
+            string[] validationErrors = validationResult.Errors.Select(vf => vf.ErrorMessage).ToArray();
 
-            try
-            {
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-
-                JwtSecurityToken? jwtToken = (JwtSecurityToken)validatedToken;
-
-                int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-
-                authenticatedUser = _userService.GetUsersByFilter(new UserFilter(userId)).FirstOrDefault();
-
-                return authenticatedUser is not null;
-            }
-            catch (SecurityTokenExpiredException)
-            {
-                throw new NotAllowedException("Auth token expired. Please authenticate again");
-            }
-            catch (Exception)
-            {
-                throw new NotAllowedException("Auth token invalid");
-            }
+            throw new CustomException(validationErrors);
         }
     }
 }

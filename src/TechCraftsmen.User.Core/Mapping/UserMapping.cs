@@ -17,7 +17,7 @@ namespace TechCraftsmen.User.Core.Mapping
             };
         }
 
-        public static Entities.User ToEntity(this UserDto dto)
+        public static Entities.User? ToEntity(this UserDto dto)
         {
             return new Entities.User()
             {

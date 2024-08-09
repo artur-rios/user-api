@@ -21,7 +21,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
             Assert.Equal("Hello world!", result.Data);
-            Assert.Equal("User Api ON", result.Message);
+            Assert.Equal("User Api ON", result.Messages.First());
         }
     }
 }

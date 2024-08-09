@@ -16,7 +16,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [AllowAnonymous]
         public ActionResult<DataResultDto<string>> HelloWorld()
         {
-            return Success("Hello world!", "User Api ON");
+            OperationResultDto<string> result = new("Hello world!", ["User Api ON"]);
+            
+            return Resolve(result);
         }
 
         [HttpGet]
@@ -24,7 +26,9 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<UserFilter>> TestQuery([FromQuery] UserFilter filter)
         {
-            return Success(filter, "Filter parsed with success");
+            OperationResultDto<UserFilter> result = new(filter, ["Filter parsed with success"]);
+            
+            return Resolve(result);
         }
     }
 }
