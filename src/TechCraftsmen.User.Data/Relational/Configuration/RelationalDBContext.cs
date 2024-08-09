@@ -8,18 +8,17 @@ namespace TechCraftsmen.User.Data.Relational.Configuration
 {
     public class RelationalDbContext(ILoggerFactory loggerFactory, IOptions<RelationalDbContextOptions> options) : DbContext
     {
-        private readonly ILoggerFactory _loggerFactory = loggerFactory;
         private readonly RelationalDbContextOptions _options = options.Value;
 
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Core.Entities.User> Users { get; set; }
+        public DbSet<Role> Roles { get; init; }
+        public DbSet<Core.Entities.User> Users { get; init; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql(_options.RelationalDatabase);
 
             optionsBuilder
-                .UseLoggerFactory(_loggerFactory)
+                .UseLoggerFactory(loggerFactory)
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging();
         }

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-
-namespace TechCraftsmen.User.Core.Utils
+﻿namespace TechCraftsmen.User.Core.Utils
 {
     public static class FilterUtils
     {

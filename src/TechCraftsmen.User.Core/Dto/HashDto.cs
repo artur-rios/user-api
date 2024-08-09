@@ -2,7 +2,7 @@
 {
     public class HashDto
     {
-        public byte[] Hash = [];
-        public byte[] Salt = [];
+        public byte[] Hash { get; init; } = [];
+        public byte[] Salt { get; set; } = [];
     }
 }

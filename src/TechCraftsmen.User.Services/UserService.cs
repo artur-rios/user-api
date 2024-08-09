@@ -39,7 +39,7 @@ namespace TechCraftsmen.User.Services
                 return new OperationResultDto<int>(default, ["E-mail already registered"], Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity()!;
+            Core.Entities.User user = userDto.ToEntity();
 
             httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
 
@@ -101,7 +101,7 @@ namespace TechCraftsmen.User.Services
                 return new OperationResultDto<UserDto?>(default, canUpdate.Errors.ToArray(), Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity()!;
+            Core.Entities.User user = userDto.ToEntity();
 
             MergeUser(user, currentUser);
 

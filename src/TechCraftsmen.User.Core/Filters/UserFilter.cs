@@ -9,6 +9,7 @@
         public DateTime? CreatedAt { get; set; }
         public bool? Active { get; set; }
 
+        //* Necessary empty constructor
         public UserFilter()
         {
         }
@@ -17,7 +18,7 @@
         {
             Id = id;
         }
-        
+
         public UserFilter(string email)
         {
             Email = email;

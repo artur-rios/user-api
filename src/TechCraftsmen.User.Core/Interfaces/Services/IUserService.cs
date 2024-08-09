@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using TechCraftsmen.User.Core.Dto;
+﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Filters;
 
 namespace TechCraftsmen.User.Core.Interfaces.Services

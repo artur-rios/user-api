@@ -4,18 +4,18 @@ namespace TechCraftsmen.User.Core.Dto
 {
     public class UserDto
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
 
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
 
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
 
-        public int RoleId { get; set; } = (int)Roles.Regular;
+        public int RoleId { get; init; } = (int)Roles.Regular;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
-        public bool Active { get; set; } = true;
+        public bool Active { get; init; } = true;
     }
 }

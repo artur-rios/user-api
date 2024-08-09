@@ -2,6 +2,6 @@
 {
     public class RelationalDbContextOptions
     {
-        public string RelationalDatabase { get; set; } = string.Empty;
+        public string RelationalDatabase { get; init; } = string.Empty;
     }
 }

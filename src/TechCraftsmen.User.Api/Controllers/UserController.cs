@@ -12,14 +12,12 @@ namespace TechCraftsmen.User.Api.Controllers
     [Route("[controller]")]
     public class UserController(IUserService user) : BaseController
     {
-        private readonly IUserService _userService = user;
-
         [HttpPost]
         [Route("Create")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<int>> CreateUser([FromBody] UserDto userDto)
         {
-            OperationResultDto<int> userId = _userService.CreateUser(userDto);
+            OperationResultDto<int> userId = user.CreateUser(userDto);
 
             return Resolve(userId);
         }
@@ -29,7 +27,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<IList<UserDto>>> GetUsersByFilter([FromQuery] UserFilter filter)
         {
-            OperationResultDto<IList<UserDto>> users = _userService.GetUsersByFilter(filter);
+            OperationResultDto<IList<UserDto>> users = user.GetUsersByFilter(filter);
 
             return Resolve(users);
         }
@@ -39,7 +37,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<UserDto>> UpdateUser([FromBody] UserDto userDto)
         {
-            OperationResultDto<UserDto?> updatedUser = _userService.UpdateUser(userDto);
+            OperationResultDto<UserDto?> updatedUser = user.UpdateUser(userDto);
 
             return Resolve(updatedUser)!;
         }
@@ -49,7 +47,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<int>> ActivateUser([FromRoute] int id)
         {
-            OperationResultDto<int> activatedUserId = _userService.ActivateUser(id);
+            OperationResultDto<int> activatedUserId = user.ActivateUser(id);
 
             return Resolve(activatedUserId);
         }
@@ -59,7 +57,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<int>> DeactivateUser([FromRoute] int id)
         {
-            OperationResultDto<int> deactivatedUserId = _userService.DeactivateUser(id);
+            OperationResultDto<int> deactivatedUserId = user.DeactivateUser(id);
 
             return Resolve(deactivatedUserId);
         }
@@ -69,7 +67,7 @@ namespace TechCraftsmen.User.Api.Controllers
         [RoleRequirement(Roles.Admin, Roles.Test)]
         public ActionResult<DataResultDto<int>> DeleteUser([FromRoute] int id)
         {
-            OperationResultDto<int> deletedUserId = _userService.DeleteUser(id);
+            OperationResultDto<int> deletedUserId = user.DeleteUser(id);
 
             return Resolve(deletedUserId);
         }

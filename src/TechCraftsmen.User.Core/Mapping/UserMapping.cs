@@ -6,7 +6,7 @@ namespace TechCraftsmen.User.Core.Mapping
     {
         public static UserDto ToDto(this Entities.User user)
         {
-            return new UserDto()
+            return new UserDto
             {
                 Id = user.Id,
                 Email = user.Email,
@@ -17,9 +17,9 @@ namespace TechCraftsmen.User.Core.Mapping
             };
         }
 
-        public static Entities.User? ToEntity(this UserDto dto)
+        public static Entities.User ToEntity(this UserDto dto)
         {
-            return new Entities.User()
+            return new Entities.User
             {
                 Id = dto.Id,
                 Email = dto.Email,
