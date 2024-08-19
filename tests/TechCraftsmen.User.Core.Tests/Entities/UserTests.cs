@@ -26,10 +26,10 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
             _httpContextAccessor = new Mock<HttpContextAccessor>();
 
-            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", ExistingEmail)))
+            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", ExistingEmail), false))
                 .Returns(() => new List<Core.Entities.User>() { _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword().Generate() }.AsQueryable());
 
-            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", NonexistentEmail)))
+            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", NonexistentEmail), false))
                 .Returns(() => new List<Core.Entities.User>().AsQueryable());
 
             _httpContextAccessor.Object.HttpContext = new DefaultHttpContext();

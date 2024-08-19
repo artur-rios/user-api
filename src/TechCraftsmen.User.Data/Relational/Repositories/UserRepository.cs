@@ -7,7 +7,8 @@ using TechCraftsmen.User.Data.Relational.Configuration;
 
 namespace TechCraftsmen.User.Data.Relational.Repositories
 {
-    public class UserRepository(IDbContextFactory<RelationalDbContext> dbContextFactory) : ICrudRepository<Core.Entities.User>
+    public class UserRepository(IDbContextFactory<RelationalDbContext> dbContextFactory)
+        : ICrudRepository<Core.Entities.User>
     {
         private readonly RelationalDbContext _dbContext = dbContextFactory.CreateDbContext();
 
@@ -19,7 +20,7 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
             return user.Id;
         }
 
-        public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters)
+        public IQueryable<Core.Entities.User> GetByFilter(IDictionary<string, object> filters, bool track)
         {
             RelationalDbConfiguration.Tables.TryGetValue(nameof(Core.Entities.User), out string? tableName);
 
@@ -56,7 +57,9 @@ namespace TechCraftsmen.User.Data.Relational.Repositories
                 }
             }
 
-            return _dbContext.Users.FromSql(FormattableStringFactory.Create(query.ToString()));
+            return track
+                ? _dbContext.Users.FromSql(FormattableStringFactory.Create(query.ToString()))
+                : _dbContext.Users.FromSql(FormattableStringFactory.Create(query.ToString())).AsNoTracking();
         }
 
         public void Update(Core.Entities.User user)

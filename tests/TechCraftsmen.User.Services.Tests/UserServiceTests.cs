@@ -51,8 +51,8 @@ namespace TechCraftsmen.User.Services.Tests
 
             userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
 
-            userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>()))
-                .Returns((Dictionary<string, object> filter) =>
+            userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>(), It.IsAny<bool>()))
+                .Returns((Dictionary<string, object> filter, bool track) =>
                 {
                     object value = filter.FirstOrDefault().Value;
 

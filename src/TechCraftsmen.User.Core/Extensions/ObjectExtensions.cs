@@ -1,15 +1,15 @@
-﻿using System.Net.Mime;
+﻿using Newtonsoft.Json;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 
 namespace TechCraftsmen.User.Core.Extensions
 {
     public static class ObjectExtensions
     {
-        public static StringContent ToJsonContent(this object @object)
+        public static StringContent ToJsonStringContent(this object @object)
         {
-            string json = JsonSerializer.Serialize(@object);
+            string json = JsonConvert.SerializeObject(@object);
 
             return new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
         }

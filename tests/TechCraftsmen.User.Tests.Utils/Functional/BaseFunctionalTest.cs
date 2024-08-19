@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using System.Net;
-using System.Text;
 using TechCraftsmen.User.Api;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Core.Extensions;
 
 namespace TechCraftsmen.User.Tests.Utils.Functional
 {
@@ -26,21 +26,106 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
         protected async Task<string> Authorize(AuthenticationCredentialsDto credentials)
         {
-            StringContent payload = new(JsonConvert.SerializeObject(credentials), Encoding.UTF8, "application/json");
+            DataResultDto<AuthenticationToken>? result =
+                await Post<AuthenticationToken>(AuthenticateUserRoute, credentials);
 
-            HttpResponseMessage response = await Client.PostAsync(AuthenticateUserRoute, payload);
+            return result!.Data.AccessToken!;
+        }
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new CustomException(["Could not authenticate with the provided credentials"]);
-            }
+        protected async Task<DataResultDto<T>?> Get<T>(string route)
+        {
+            HttpResponseMessage response = await Client.GetAsync(route);
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<AuthenticationToken>? result =
-                JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
+            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
 
-            return result!.Data.AccessToken!;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return result;
+            }
+
+            string[] messages = result is not null ? result.Messages : ["Unknown error"];
+
+            throw new CustomException(messages, "Error on Get request");
+        }
+
+        protected async Task<DataResultDto<T>?> Patch<T>(string route, object? payloadObject = null)
+        {
+            StringContent? payload = payloadObject?.ToJsonStringContent();
+
+            HttpResponseMessage response = await Client.PatchAsync(route, payload);
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return result;
+            }
+
+            string[] messages = result is not null ? result.Messages : ["Unknown error"];
+
+            throw new CustomException(messages, "Error on Patch request");
+        }
+
+        protected async Task<DataResultDto<T>?> Post<T>(string route, object payloadObject)
+        {
+            StringContent payload = payloadObject.ToJsonStringContent();
+
+            HttpResponseMessage response = await Client.PostAsync(route, payload);
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+
+            if (response.StatusCode is HttpStatusCode.OK or HttpStatusCode.Created)
+            {
+                return result;
+            }
+
+            string[] messages = result is not null ? result.Messages : ["Unknown error"];
+
+            throw new CustomException(messages, "Error on Post request");
+        }
+
+        protected async Task<DataResultDto<T>?> Put<T>(string route, object payloadObject)
+        {
+            StringContent payload = payloadObject.ToJsonStringContent();
+
+            HttpResponseMessage response = await Client.PutAsync(route, payload);
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return result;
+            }
+
+            string[] messages = result is not null ? result.Messages : ["Unknown error"];
+
+            throw new CustomException(messages, "Error on Put request");
+        }
+
+        protected async Task<DataResultDto<T>?> Delete<T>(string route)
+        {
+            HttpResponseMessage response = await Client.DeleteAsync(route);
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return result;
+            }
+
+            string[] messages = result is not null ? result.Messages : ["Unknown error"];
+
+            throw new CustomException(messages, "Error on Delete request");
         }
     }
 }

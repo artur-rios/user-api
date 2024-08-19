@@ -6,7 +6,7 @@ CREATE TABLE "tb_user" (
   "salt" bytea NOT NULL,
   "role_id" integer NOT NULL,
   "active" bool NOT NULL,
-  "created_at" timestamp NOT NULL
+  "created_at" timestamp with time zone NOT NULL
 );
 
 CREATE TABLE "tb_role" (

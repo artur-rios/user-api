@@ -32,7 +32,7 @@ namespace TechCraftsmen.User.Services
 
             Dictionary<string, object> filter = new() { { "Email", userDto.Email } };
 
-            IQueryable<Core.Entities.User> userSearch = userRepository.GetByFilter(filter);
+            IQueryable<Core.Entities.User> userSearch = userRepository.GetByFilter(filter, true);
 
             if (userSearch.Any())
             {
@@ -42,11 +42,11 @@ namespace TechCraftsmen.User.Services
             Core.Entities.User user = userDto.ToEntity();
 
             httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
-
+            
             UserDto? authenticatedUser = userData as UserDto;
-
+            
             SimpleResultDto canRegister = user.CanRegister(authenticatedUser!.RoleId);
-
+            
             if (!canRegister.Success)
             {
                 return new OperationResultDto<int>(default, canRegister.Errors.ToArray(), Results.NotAllowed);
@@ -64,7 +64,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<IList<UserDto>> GetUsersByFilter(UserFilter filter)
         {
-            List<Core.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary()).ToList();
+            List<Core.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary(), false).ToList();
 
             if (users.Count == 0)
             {
@@ -78,7 +78,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<HashDto?> GetPasswordByUserId(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), true).FirstOrDefault();
 
             return user is null
                 ? new OperationResultDto<HashDto?>(default, ["User not found"], Results.NotFound)
@@ -87,7 +87,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<UserDto?> UpdateUser(UserDto userDto)
         {
-            Core.Entities.User? currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id")).FirstOrDefault();
+            Core.Entities.User? currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (currentUser == null)
             {
@@ -103,7 +103,7 @@ namespace TechCraftsmen.User.Services
 
             Core.Entities.User user = userDto.ToEntity();
 
-            MergeUser(user, currentUser);
+            MergeUser(currentUser, user);
 
             userRepository.Update(user);
 
@@ -112,7 +112,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<int> ActivateUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (user == null)
             {
@@ -135,7 +135,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<int> DeactivateUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (user == null)
             {
@@ -158,7 +158,7 @@ namespace TechCraftsmen.User.Services
 
         public OperationResultDto<int> DeleteUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id")).FirstOrDefault();
+            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), true).FirstOrDefault();
             
             if (user == null)
             {
@@ -180,6 +180,7 @@ namespace TechCraftsmen.User.Services
         private static void MergeUser(Core.Entities.User source, Core.Entities.User target, bool mergeStatus = true)
         {
             target.Password = source.Password;
+            target.Salt = source.Salt;
             target.CreatedAt = source.CreatedAt;
 
             if (mergeStatus)

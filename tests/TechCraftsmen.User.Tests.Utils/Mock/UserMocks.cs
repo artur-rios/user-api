@@ -11,6 +11,7 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
 
         public readonly Core.Entities.User TestUser = new()
         {
+            Id = TEST_ID,
             Name = "Test User",
             Email = "test@mail.com",
             RoleId = (int)Roles.Test
@@ -18,6 +19,7 @@ namespace TechCraftsmen.User.Tests.Utils.Mock
 
         public readonly UserDto TestUserDto = new()
         {
+            Id = TEST_ID,
             Name = "Test User",
             Email = "test@mail.com",
             RoleId = (int)Roles.Test

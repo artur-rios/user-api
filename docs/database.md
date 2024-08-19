@@ -15,7 +15,7 @@ Table tb_user {
   salt bytea [not null]
   role_id integer [not null]
   active bool [not null]
-  created_at timestamp [not null]
+  created_at timestamp with time zone [not null]
 }
 
 Table tb_role {
