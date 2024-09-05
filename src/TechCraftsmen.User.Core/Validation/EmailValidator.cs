@@ -31,7 +31,7 @@ namespace TechCraftsmen.User.Core.Validation
         {
             if (string.IsNullOrWhiteSpace(parameter))
             {
-                message = $"Email must not be null or empty";
+                message = "Email must not be null or empty";
 
                 return false;
             }

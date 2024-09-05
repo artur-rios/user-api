@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using System.Net;
 using TechCraftsmen.User.Api;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
@@ -39,15 +38,8 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
             string body = await response.Content.ReadAsStringAsync();
 
             DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return result;
-            }
-
-            string[] messages = result is not null ? result.Messages : ["Unknown error"];
-
-            throw new CustomException(messages, "Error on Get request");
+            
+            return result ?? throw new CustomException(["Unknown error"], "Error on Get request");
         }
 
         protected async Task<DataResultDto<T>?> Patch<T>(string route, object? payloadObject = null)
@@ -60,14 +52,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
             DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return result;
-            }
-
-            string[] messages = result is not null ? result.Messages : ["Unknown error"];
-
-            throw new CustomException(messages, "Error on Patch request");
+            return result ?? throw new CustomException(["Unknown error"], "Error on Patch request");
         }
 
         protected async Task<DataResultDto<T>?> Post<T>(string route, object payloadObject)
@@ -80,14 +65,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
             DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
 
-            if (response.StatusCode is HttpStatusCode.OK or HttpStatusCode.Created)
-            {
-                return result;
-            }
-
-            string[] messages = result is not null ? result.Messages : ["Unknown error"];
-
-            throw new CustomException(messages, "Error on Post request");
+            return result ?? throw new CustomException(["Unknown error"], "Error on Post request");
         }
 
         protected async Task<DataResultDto<T>?> Put<T>(string route, object payloadObject)
@@ -100,14 +78,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
             DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return result;
-            }
-
-            string[] messages = result is not null ? result.Messages : ["Unknown error"];
-
-            throw new CustomException(messages, "Error on Put request");
+            return result ?? throw new CustomException(["Unknown error"], "Error on Put request");
         }
 
         protected async Task<DataResultDto<T>?> Delete<T>(string route)
@@ -118,14 +89,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
 
             DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
             
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return result;
-            }
-
-            string[] messages = result is not null ? result.Messages : ["Unknown error"];
-
-            throw new CustomException(messages, "Error on Delete request");
+            return result ?? throw new CustomException(["Unknown error"], "Error on Delete request");
         }
     }
 }

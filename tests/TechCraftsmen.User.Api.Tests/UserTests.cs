@@ -13,6 +13,7 @@ namespace TechCraftsmen.User.Api.Tests
         private readonly UserDtoGenerator _dtoGenerator = new();
         private readonly UserMocks _userMocks = new();
         private const string UserRoute = "/User";
+        private const string NonexistentEmail = "inexists@mail.com";
 
         public async Task InitializeAsync()
         {
@@ -50,6 +51,19 @@ namespace TechCraftsmen.User.Api.Tests
         }
 
         [Fact]
+        public async void Should_ReturnNotFound_ForNoFilterMatch()
+        {
+            const string query = $"?Email={NonexistentEmail}";
+
+            DataResultDto<IList<UserDto>>? result = await Get<IList<UserDto>>($"{UserRoute}/Filter{query}");
+
+            Assert.NotNull(result);
+            Assert.Empty(result.Data);
+            Assert.False(result.Success);
+            Assert.Equal("No users found for the given filter", result.Messages.First());
+        }
+
+        [Fact]
         public async void Should_CreateDeactivateAndDeleteUser()
         {
             UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
@@ -74,6 +88,48 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.True(deletionResult.Data > 0);
             Assert.Equal(creationResult.Data, deletionResult.Data);
             Assert.Equal("User deleted with success", deletionResult.Messages.First());
+        }
+
+        [Fact]
+        public async void Should_ReturnValidationError_ForInvalidUserDto()
+        {
+            UserDto dto = _dtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword()
+                .WithRoleId((int)Roles.Regular).Generate();
+
+            DataResultDto<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+
+            Assert.NotNull(result);
+            Assert.Equal(default, result.Data);
+            Assert.False(result.Success);
+            Assert.Equal("Email must not be null or empty", result.Messages.First());
+        }
+
+        [Fact]
+        public async void Should_ReturnNotAllowedError_ForExistingEmail()
+        {
+            UserDto dto = _dtoGenerator.WithEmail(_userMocks.TestUserDto.Email).WithDefaultName().WithRandomPassword()
+                .WithRoleId((int)Roles.Regular).Generate();
+            
+            DataResultDto<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+            
+            Assert.NotNull(result);
+            Assert.Equal(default, result.Data);
+            Assert.False(result.Success);
+            Assert.Equal("E-mail already registered", result.Messages.First());
+        }
+
+        [Fact]
+        public async void Should_ReturnNotAllowedError_WhenNotAdmin_CreateAdmin()
+        {
+            UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
+                .WithRoleId((int)Roles.Admin).Generate();
+            
+            DataResultDto<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+
+            Assert.NotNull(result);
+            Assert.Equal(default, result.Data);
+            Assert.False(result.Success);
+            Assert.Equal($"Only admins can register a user with {Roles.Admin.ToString()} role", result.Messages.First());
         }
 
         [Fact]

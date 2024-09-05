@@ -69,7 +69,9 @@ namespace TechCraftsmen.User.Core.Entities
             {
                 if (authenticatedRoleId != (int)Roles.Admin)
                 {
-                    result.Errors.Add("Only admins can register this kind of user");
+                    Roles role = (Roles)RoleId;
+                    
+                    result.Errors.Add($"Only admins can register a user with {role.ToString()} role");
                 }
             }
             
