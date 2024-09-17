@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Utils
@@ -8,9 +8,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
     public class HashUtilsTests
     {
         private const string SampleText = "Text to be hashed";
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_HashText_And_ReturnHashAndSalt()
         {
             HashDto hashResult = HashUtils.HashText(SampleText);
@@ -19,9 +18,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
             Assert.NotEmpty(hashResult.Hash);
             Assert.NotEmpty(hashResult.Salt);
         }
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_KeepHashAndSalt_ForTheSameText_When_SaltIsPassed()
         {
             HashDto hashResult = HashUtils.HashText(SampleText);
@@ -30,9 +28,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
             Assert.True(hashResult.Hash.SequenceEqual(hashResultToCompare.Hash));
             Assert.True(hashResult.Salt.SequenceEqual(hashResultToCompare.Salt));
         }
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_ChangeHashAndSalt_ForTheSameText_When_SaltIsNotPassed()
         {
             HashDto hashResult = HashUtils.HashText(SampleText);
@@ -41,9 +38,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
             Assert.False(hashResult.Hash.SequenceEqual(hashResultToCompare.Hash));
             Assert.False(hashResult.Salt.SequenceEqual(hashResultToCompare.Salt));
         }
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_ReturnTrue_When_VerifyingWithCorrectHashAndSalt()
         {
             HashDto hashResult = HashUtils.HashText(SampleText);
@@ -52,9 +48,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
 
             Assert.True(verifyResult);
         }
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_ReturnFalse_When_VerifyingWithIncorrectHash()
         {
             HashDto hashResult = HashUtils.HashText($"{SampleText}a");
@@ -63,9 +58,8 @@ namespace TechCraftsmen.User.Core.Tests.Utils
 
             Assert.False(verifyResult);
         }
-
-        [Fact]
-        [Unit("HashUtils")]
+        
+        [UnitFact("HashUtils")]
         public void Should_ReturnFalse_When_VerifyingWithIncorrectSalt()
         {
             HashDto hashResult = HashUtils.HashText($"{SampleText}");

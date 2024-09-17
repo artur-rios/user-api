@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
@@ -11,9 +11,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
     {
         private readonly AuthenticationCredentialsDtoGenerator _authCredentialsGenerator = new();
         private readonly AuthenticationCredentialsDtoValidator _validator = new();
-
-        [Theory]
-        [Unit("AuthenticationCredentialsDtoValidator")]
+        
+        [UnitTheory("AuthenticationCredentialsDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -28,9 +27,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Password);
 
         }
-
-        [Theory]
-        [Unit("AuthenticationCredentialsDtoValidator")]
+        
+        [UnitTheory("AuthenticationCredentialsDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -44,9 +42,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Password);
         }
-
-        [Theory]
-        [Unit("AuthenticationCredentialsDtoValidator")]
+        
+        [UnitTheory("AuthenticationCredentialsDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -60,9 +57,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Email);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Password);
         }
-
-        [Fact]
-        [Unit("AuthenticationCredentialsDtoValidator")]
+        
+        [UnitFact("AuthenticationCredentialsDtoValidator")]
         public void Should_NotHaveError_ForValidAuthCredentials()
         {
             AuthenticationCredentialsDto credentialsDto = _authCredentialsGenerator.WithDefaultEmail().WithRandomPassword().Generate();

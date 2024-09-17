@@ -2,6 +2,7 @@
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
@@ -32,7 +33,7 @@ namespace TechCraftsmen.User.Api.Tests
             return Task.CompletedTask;
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_GetUsersByFilter()
         {
             string query = $"?Email={_userMocks.TestUser.Email}";
@@ -50,7 +51,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal(_userMocks.TestUser.RoleId, userFound?.RoleId);
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_ReturnNotFound_ForNoFilterMatch()
         {
             const string query = $"?Email={NonexistentEmail}";
@@ -63,7 +64,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("No users found for the given filter", result.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_CreateDeactivateAndDeleteUser()
         {
             UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
@@ -90,7 +91,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("User deleted with success", deletionResult.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_ReturnValidationError_ForInvalidUserDto()
         {
             UserDto dto = _dtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword()
@@ -104,7 +105,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("Email must not be null or empty", result.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_ReturnNotAllowedError_ForExistingEmail()
         {
             UserDto dto = _dtoGenerator.WithEmail(_userMocks.TestUserDto.Email).WithDefaultName().WithRandomPassword()
@@ -118,7 +119,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("E-mail already registered", result.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_ReturnNotAllowedError_WhenNotAdmin_CreateAdmin()
         {
             UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
@@ -132,7 +133,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal($"Only admins can register a user with {Roles.Admin.ToString()} role", result.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_DeactivateAndActivateUser()
         {
             DataResultDto<int>? deactivationResult = await Patch<int>($"{UserRoute}/{UserMocks.TEST_ID}/Deactivate");
@@ -150,7 +151,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("User activated with success", activationResult.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("User")]
         public async void Should_UpdateUser()
         {
             UserDto userToUpdate = _userMocks.TestUserDto.Clone() ?? throw new CustomException(["Extension method Clone returned null"], "Could not clone UserDto object");

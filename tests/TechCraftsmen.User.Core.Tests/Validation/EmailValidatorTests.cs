@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation
@@ -50,9 +50,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         public static TheoryData<string> InvalidEmailsData => new(InvalidEmails);
 
         public static TheoryData<string> ValidEmailsData => new(ValidEmails);
-
-        [Theory]
-        [Unit("EmailValidator")]
+        
+        [UnitTheory("EmailValidator")]
         [MemberData(nameof(InvalidEmailsData))]
         public void Should_ReturnFalse_For_InvalidEmails(string email)
         {
@@ -62,9 +61,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation
             Assert.True(result.Errors.Any());
             Assert.Equal("Email should be valid", result.Errors.FirstOrDefault());
         }
-
-        [Theory]
-        [Unit("EmailValidator")]
+        
+        [UnitTheory("EmailValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -77,9 +75,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation
             Assert.True(result.Errors.Any());
             Assert.Equal("Email must not be null or empty", result.Errors.FirstOrDefault());
         }
-
-        [Theory]
-        [Unit("EmailValidator")]
+        
+        [UnitTheory("EmailValidator")]
         [MemberData(nameof(ValidEmailsData))]
         public void Should_ReturnTrue_For_ValidEmail(string email)
         {

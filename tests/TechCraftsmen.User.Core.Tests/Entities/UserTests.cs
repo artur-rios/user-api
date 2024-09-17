@@ -6,7 +6,7 @@ using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Entities
@@ -36,8 +36,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             _httpContextAccessor.Object.HttpContext!.Items = new Dictionary<object, object?>() { { "User", userMocks.TestUserDto } };
         }
         
-        [Fact]
-        [Unit("User")]
+        [UnitFact("User")]
         public void Should_NotAllowCreationOfAdmins_IfAuthenticatedUserNotAnAdmin()
         {
             Core.Entities.User user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
@@ -51,11 +50,10 @@ namespace TechCraftsmen.User.Core.Tests.Entities
 
             Assert.False(canRegister.Success);
             Assert.True(canRegister.Errors.Any());
-            Assert.Equal("Only admins can register this kind of user", canRegister.Errors.FirstOrDefault());
+            Assert.Equal("Only admins can register a user with Admin role", canRegister.Errors.FirstOrDefault());
         }
         
-        [Fact]
-        [Unit("User")]
+        [UnitFact("User")]
         public void Should_NotAllowDeletion_ForActiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
@@ -66,9 +64,8 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.True(canDelete.Errors.Any());
             Assert.Equal("Can't delete active user", canDelete.Errors.FirstOrDefault());
         }
-
-        [Fact]
-        [Unit("User")]
+        
+        [UnitFact("User")]
         public void Should_AllowDeletion_ForInactiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
@@ -79,8 +76,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.False(canDelete.Errors.Any());
         }
         
-        [Fact]
-        [Unit("User")]
+        [UnitFact("User")]
         public void Should_NotAllowActivation_ForActiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
@@ -92,8 +88,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.Equal($"User already active", canActivate.Errors.FirstOrDefault());
         }
         
-        [Fact]
-        [Unit("User")]
+        [UnitFact("User")]
         public void Should_AllowActivation_ForInactiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
@@ -103,9 +98,8 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.True(canActivate.Success);
             Assert.False(canActivate.Errors.Any());
         }
-
-        [Fact]
-        [Unit("User")]
+        
+        [UnitFact("User")]
         public void Should_NotAllowDeactivation_ForInactiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
@@ -117,8 +111,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.Equal($"User already inactive", canDeactivate.Errors.FirstOrDefault());
         }
         
-        [Fact]
-        [Unit("User")]
+        [UnitFact("User")]
         public void Should_AllowDeactivation_ForInactiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
@@ -128,9 +121,8 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.True(canDeactivate.Success);
             Assert.False(canDeactivate.Errors.Any());
         }
-        
-        [Fact]
-        [Unit("User")]
+
+        [UnitFact("User")]
         public void Should_NotUpdate_InactiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
@@ -141,9 +133,8 @@ namespace TechCraftsmen.User.Core.Tests.Entities
             Assert.True(canUpdate.Errors.Any());
             Assert.Equal("Can't update inactive user", canUpdate.Errors.FirstOrDefault());
         }
-
-        [Fact]
-        [Unit("User")]
+        
+        [UnitFact("User")]
         public void Should_Update_ActiveUser()
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();

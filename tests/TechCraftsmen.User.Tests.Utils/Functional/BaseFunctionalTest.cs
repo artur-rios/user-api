@@ -28,7 +28,7 @@ namespace TechCraftsmen.User.Tests.Utils.Functional
             DataResultDto<AuthenticationToken>? result =
                 await Post<AuthenticationToken>(AuthenticateUserRoute, credentials);
 
-            return result!.Data.AccessToken!;
+            return result?.Data is not null ? result.Data.AccessToken! : throw new CustomException(result?.Messages ?? [], "Error on Authorize");
         }
 
         protected async Task<DataResultDto<T>?> Get<T>(string route)

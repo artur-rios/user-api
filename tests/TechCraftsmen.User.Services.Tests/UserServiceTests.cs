@@ -10,7 +10,7 @@ using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
@@ -102,9 +102,8 @@ namespace TechCraftsmen.User.Services.Tests
 
             _userService = new UserService(userRepository.Object, httpContextAccessor.Object, userValidator);
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnValidationError_When_UserDtoIsInvalid()
         {
             UserDto invalidDto = _userDtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword().WithRoleId().Generate();
@@ -115,9 +114,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.ValidationError, result.Result);
             Assert.Equal("Email must not be null or empty", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotAllowedError_When_ForAlreadyRegisteredEmail()
         {
             UserDto userWithExistingEmail = _userDtoGenerator.WithEmail(ExistingEmail).WithDefaultName()
@@ -129,9 +127,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotAllowed, result.Result);
             Assert.Equal("E-mail already registered", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_CreateUser_And_ReturnId_ForValidDto()
         {
             OperationResultDto<int> result = _userService.CreateUser(_userDtoMock);
@@ -140,9 +137,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Created, result.Result);
             Assert.Equal("User created with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_When_IdNotOnDatabase()
         {
             OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentId));
@@ -151,9 +147,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("No users found for the given filter", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnUser_When_IdIsOnDatabase()
         {
             OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingId));
@@ -163,9 +158,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("Search completed with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_When_FilterDoesNotReturnAnyResult()
         {
             OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentEmail));
@@ -174,9 +168,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("No users found for the given filter", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnUsers_For_ValidAndExistingFilter()
         {
             OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingEmail));
@@ -187,9 +180,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("Search completed with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
         {
             OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(NonexistentId);
@@ -198,9 +190,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("User not found", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnPassword_When_IdIsOnDatabase()
         {
             OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(ExistingId);
@@ -211,9 +202,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("Password found", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotUpdateUser()
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId)
@@ -227,8 +217,7 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal("User not found", result.Messages.First());
         }
 
-        [Fact]
-        [Unit("UserService")]
+        [UnitFact("UserService")]
         public void Should_ReturnNotNotAllowedError_WhenUserIsInactive()
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId)
@@ -241,9 +230,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotAllowed, result.Result);
             Assert.Equal("Can't update inactive user", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_UpdateUser()
         {
             Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(ExistingId)
@@ -256,9 +244,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("User updated with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotActivateUser()
         {
             OperationResultDto<int> result = _userService.ActivateUser(NonexistentId);
@@ -267,9 +254,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("User not found", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnEntityNotChanged_WhenUserIsActive_On_Activation()
         {
             OperationResultDto<int> result = _userService.ActivateUser(ExistingId);
@@ -278,9 +264,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.EntityNotChanged, result.Result);
             Assert.Equal("User already active", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ActivateUser()
         {
             OperationResultDto<int> result = _userService.ActivateUser(InactiveId);
@@ -289,9 +274,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("User activated with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeactivateUser()
         {
             OperationResultDto<int> result = _userService.DeactivateUser(NonexistentId);
@@ -300,9 +284,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("User not found", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnEntityNotChanged_WhenUserIsInactive_On_Deactivation()
         {
             OperationResultDto<int> result = _userService.DeactivateUser(InactiveId);
@@ -311,9 +294,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.EntityNotChanged, result.Result);
             Assert.Equal("User already inactive", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_DeactivateUser()
         {
             OperationResultDto<int> result = _userService.DeactivateUser(ExistingId);
@@ -322,9 +304,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("User deactivated with success", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeleteUser()
         {
             OperationResultDto<int> result = _userService.DeleteUser(NonexistentId);
@@ -333,9 +314,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotFound, result.Result);
             Assert.Equal("User not found", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_ReturnNotAllowedError_WhenUserIsActive()
         {
             OperationResultDto<int> result = _userService.DeleteUser(ExistingId);
@@ -344,9 +324,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotAllowed, result.Result);
             Assert.Equal("Can't delete active user", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("UserService")]
+        
+        [UnitFact("UserService")]
         public void Should_DeleteUser()
         {
             OperationResultDto<int> result = _userService.DeleteUser(InactiveId);

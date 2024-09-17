@@ -10,7 +10,7 @@ using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Services.Tests
@@ -68,9 +68,8 @@ namespace TechCraftsmen.User.Services.Tests
             _authenticationService = new AuthenticationService(_authTokenConfig.Object, _authCredentialsValidator,
                 _authTokenConfigValidator, _userService.Object);
         }
-
-        [Fact]
-        [Unit("AuthenticationService")]
+        
+        [UnitFact("AuthenticationService")]
         public void Should_ThrowValidationException_IfAuthTokenConfigIsMissing()
         {
             _authTokenConfig.Setup(config => config.Value).Returns(_authTokenConfigGenerator.WithAudience("audience")
@@ -80,8 +79,7 @@ namespace TechCraftsmen.User.Services.Tests
                 _authCredentialsValidator, _authTokenConfigValidator, _userService.Object));
         }
 
-        [Fact]
-        [Unit("AuthenticationService")]
+        [UnitFact("AuthenticationService")]
         public void Should_ThrowValidationException_ForInvalidCredentials()
         {
             OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty)
@@ -93,9 +91,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal("'Email' must not be empty.", result.Messages.First());
             Assert.Equal("'Password' must not be empty.", result.Messages[1]);
         }
-
-        [Fact]
-        [Unit("AuthenticationService")]
+        
+        [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForNonexistentEmail()
         {
             OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
@@ -107,8 +104,7 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal("Invalid credentials", result.Messages.First());
         }
 
-        [Fact]
-        [Unit("AuthenticationService")]
+        [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForIncorrectPassword()
         {
             OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
@@ -119,9 +115,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotAllowed, result.Result);
             Assert.Equal("Invalid credentials", result.Messages.First());
         }
-
-        [Fact]
-        [Unit("AuthenticationService")]
+        
+        [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForIncorrectCredentials()
         {
             OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
@@ -132,9 +127,8 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.NotAllowed, result.Result);
             Assert.Equal("Invalid credentials", result.Messages.First());
         }
-
-        [Theory]
-        [Unit("UserCreationRule")]
+        
+        [UnitTheory("UserCreationRule")]
         [InlineData("")]
         [InlineData("   ")]
         [InlineData(null)]
@@ -150,9 +144,8 @@ namespace TechCraftsmen.User.Services.Tests
 
             Assert.Null(user);
         }
-
-        [Fact]
-        [Unit("AuthenticationService")]
+        
+        [UnitFact("AuthenticationService")]
         public void Should_GenerateValidToken_ForValidCredentials()
         {
             OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(

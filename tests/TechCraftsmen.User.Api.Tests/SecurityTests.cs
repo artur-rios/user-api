@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
@@ -29,14 +30,9 @@ namespace TechCraftsmen.User.Api.Tests
             return Task.CompletedTask;
         }
         
-        [Fact]
+        [FunctionalFact("Security")]
         public async void Should_ReturnBadRequest_IfAuthenticatedWithTestUserOutsideTestEnvironment()
         {
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
-            {
-                return;
-            }
-
             const string filter = "Filter?Id=4"; // {UserMocks.TEST_ID}
 
             HttpResponseMessage response = await Client.GetAsync($"{UserRoute}/{filter}");

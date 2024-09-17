@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
@@ -16,7 +17,7 @@ namespace TechCraftsmen.User.Api.Tests
         private readonly EmailGenerator _emailGenerator = new();
         private const string AuthenticateUserRoute = "/Authentication/User";
 
-        [Fact]
+        [FunctionalFact("Authentication")]
         public async void Should_AuthenticateUser()
         {
             AuthenticationCredentialsDto credentialsDto = new()
@@ -40,7 +41,7 @@ namespace TechCraftsmen.User.Api.Tests
             Assert.Equal("User authenticated with success", result.Messages.First());
         }
 
-        [Fact]
+        [FunctionalFact("Authentication")]
         public async void Should_NotAuthenticate_ForIncorrectCredentials()
         {
             List<AuthenticationCredentialsDto> incorrectCredentials = [
@@ -65,7 +66,7 @@ namespace TechCraftsmen.User.Api.Tests
             }
         }
 
-        [Fact]
+        [FunctionalFact("Authentication")]
         public async void Should_NotAuthenticate_ForInvalidCredentials()
         {
             List<AuthenticationCredentialsDto> invalidCredentials = [

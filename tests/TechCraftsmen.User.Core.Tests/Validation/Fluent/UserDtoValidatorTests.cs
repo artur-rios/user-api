@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
@@ -11,9 +11,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
     {
         private readonly UserDtoGenerator _userDtoGenerator = new();
         private readonly UserDtoValidator _validator = new();
-
-        [Theory]
-        [Unit("UserDtoValidator")]
+        
+        [UnitTheory("UserDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -24,14 +23,13 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldHaveValidationErrorFor(user => user.Name);
-            result.ShouldNotHaveValidationErrorFor(user => user.Email);
-            result.ShouldNotHaveValidationErrorFor(user => user.Password);
-            result.ShouldNotHaveValidationErrorFor(user => user.RoleId);
+            result.ShouldHaveValidationErrorFor(u => user.Name);
+            result.ShouldNotHaveValidationErrorFor(u => user.Email);
+            result.ShouldNotHaveValidationErrorFor(u => user.Password);
+            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
         }
-
-        [Theory]
-        [Unit("UserDtoValidator")]
+        
+        [UnitTheory("UserDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData("ma@jjf..com")]
@@ -43,14 +41,13 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(user => user.Name);
-            result.ShouldHaveValidationErrorFor(user => user.Email);
-            result.ShouldNotHaveValidationErrorFor(user => user.Password);
-            result.ShouldNotHaveValidationErrorFor(user => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor(u => user.Name);
+            result.ShouldHaveValidationErrorFor(u => user.Email);
+            result.ShouldNotHaveValidationErrorFor(u => user.Password);
+            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
         }
-
-        [Theory]
-        [Unit("UserDtoValidator")]
+        
+        [UnitTheory("UserDtoValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData("Ab#cd#ef#")]
@@ -65,24 +62,23 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(user => user.Name);
-            result.ShouldNotHaveValidationErrorFor(user => user.Email);
-            result.ShouldHaveValidationErrorFor(user => user.Password);
-            result.ShouldNotHaveValidationErrorFor(user => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor(u => user.Name);
+            result.ShouldNotHaveValidationErrorFor(u => user.Email);
+            result.ShouldHaveValidationErrorFor(u => user.Password);
+            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
         }
-
-        [Fact]
-        [Unit("UserDtoValidator")]
+        
+        [UnitFact("UserDtoValidator")]
         public void Should_NotHaveError_ForValidUserDto()
         {
             UserDto user = _userDtoGenerator.WithDefaultName().WithDefaultEmail().WithRandomPassword().WithRoleId().Generate();
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(user => user.Name);
-            result.ShouldNotHaveValidationErrorFor(user => user.Email);
-            result.ShouldNotHaveValidationErrorFor(user => user.Password);
-            result.ShouldNotHaveValidationErrorFor(user => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor(u => user.Name);
+            result.ShouldNotHaveValidationErrorFor(u => user.Email);
+            result.ShouldNotHaveValidationErrorFor(u => user.Password);
+            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
         }
     }
 }

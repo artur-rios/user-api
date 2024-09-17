@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Traits;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
@@ -11,9 +11,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
     {
         private readonly AuthenticationTokenConfigurationGenerator _authTokenConfigGenerator = new();
         private readonly AuthenticationTokenConfigurationValidator _validator = new();
-
-        [Theory]
-        [Unit("AuthenticationTokenConfigurationValidator")]
+        
+        [UnitTheory("AuthenticationTokenConfigurationValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -28,9 +27,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Seconds);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Secret);
         }
-
-        [Theory]
-        [Unit("AuthenticationTokenConfigurationValidator")]
+        
+        [UnitTheory("AuthenticationTokenConfigurationValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -46,8 +44,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Secret);
         }
 
-        [Fact]
-        [Unit("AuthenticationTokenConfigurationValidator")]
+        [UnitFact("AuthenticationTokenConfigurationValidator")]
         public void Should_HaveError_ForZeroSeconds()
         {
             AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(0).WithSecret("secret").Generate();
@@ -59,9 +56,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Seconds);
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Secret);
         }
-
-        [Theory]
-        [Unit("AuthenticationTokenConfigurationValidator")]
+        
+        [UnitTheory("AuthenticationTokenConfigurationValidator")]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
@@ -76,9 +72,8 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
             result.ShouldNotHaveValidationErrorFor(authCredentials => authCredentials.Seconds);
             result.ShouldHaveValidationErrorFor(authCredentials => authCredentials.Secret);
         }
-
-        [Fact]
-        [Unit("AuthenticationTokenConfigurationValidator")]
+        
+        [UnitFact("AuthenticationTokenConfigurationValidator")]
         public void Should_NotHaveError_ForValidAuthCredentials()
         {
             AuthenticationTokenConfiguration authTokenConfigDto = _authTokenConfigGenerator.WithAudience("audience").WithIssuer("issuer").WithSeconds(60).WithSecret("secret").Generate();

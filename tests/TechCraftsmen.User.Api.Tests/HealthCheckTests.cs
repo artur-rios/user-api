@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Tests.Utils.Attributes;
 using TechCraftsmen.User.Tests.Utils.Functional;
 
 namespace TechCraftsmen.User.Api.Tests
@@ -9,7 +10,7 @@ namespace TechCraftsmen.User.Api.Tests
     {
         private const string HealthCheckRoute = "/HealthCheck";
 
-        [Fact]
+        [FunctionalFact("HealthCheck")]
         public async void Should_DoHealthCheck_And_ReturnSuccess()
         {
             HttpResponseMessage response = await Client.GetAsync(HealthCheckRoute);
