@@ -13,4 +13,48 @@ Written in C#, using .Net 8
 
 ## Folder structure
 
-// TODO
+📦database  
+📦docs  
+📦src  
+ ┣ 📂TechCraftsmen.User.Api  
+ ┃ ┣ 📂Controllers  
+ ┃ ┣ 📂Properties  
+ ┣ 📂TechCraftsmen.User.Configuration  
+ ┃ ┣ 📂Authorization  
+ ┃ ┣ 📂DependencyInjection  
+ ┃ ┣ 📂Middleware  
+ ┣ 📂TechCraftsmen.User.Core  
+ ┃ ┣ 📂Collections  
+ ┃ ┣ 📂Configuration  
+ ┃ ┣ 📂Dto  
+ ┃ ┣ 📂Entities  
+ ┃ ┣ 📂Enums  
+ ┃ ┣ 📂Exceptions  
+ ┃ ┣ 📂Extensions  
+ ┃ ┣ 📂Filters  
+ ┃ ┣ 📂Interfaces  
+ ┃ ┃ ┣ 📂Repositories  
+ ┃ ┃ ┗ 📂Services  
+ ┃ ┣ 📂Mapping  
+ ┃ ┣ 📂Utils  
+ ┃ ┣ 📂Validation  
+ ┃ ┃ ┣ 📂Fluent  
+ ┣ 📂TechCraftsmen.User.Data  
+ ┃ ┣ 📂Relational  
+ ┃ ┃ ┣ 📂Configuration  
+ ┃ ┃ ┣ 📂Mapping  
+ ┃ ┃ ┗ 📂Repositories  
+ ┗ 📂TechCraftsmen.User.Services  
+ 📦tests  
+ ┣ 📂TechCraftsmen.User.Api.Tests  
+ ┣ 📂TechCraftsmen.User.Core.Tests  
+ ┃ ┣ 📂Entities  
+ ┃ ┣ 📂Utils  
+ ┃ ┣ 📂Validation  
+ ┃ ┃ ┣ 📂Fluent  
+ ┣ 📂TechCraftsmen.User.Services.Tests  
+ ┗ 📂TechCraftsmen.User.Tests.Utils  
+ ┃ ┣ 📂Attributes  
+ ┃ ┣ 📂Functional  
+ ┃ ┣ 📂Generators  
+ ┃ ┣ 📂Mock  
