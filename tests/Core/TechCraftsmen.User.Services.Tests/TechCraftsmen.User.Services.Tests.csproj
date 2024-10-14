@@ -25,8 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TechCraftsmen.User.Core\TechCraftsmen.User.Core.csproj" />
-    <ProjectReference Include="..\TechCraftsmen.User.Tests.Utils\TechCraftsmen.User.Tests.Utils.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\TechCraftsmen.User.Services\TechCraftsmen.User.Services.csproj" />
+    <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Configuration\TechCraftsmen.User.Tests.Configuration.csproj" />
   </ItemGroup>
 
 </Project>
