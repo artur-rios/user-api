@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using TechCraftsmen.User.Core.Validation;
+﻿using TechCraftsmen.User.Core.Validation;
 
-namespace TechCraftsmen.User.Configuration.DependencyInjection
+namespace TechCraftsmen.User.WebApi.DependencyInjection
 {
     public static class ValidationConfiguration
     {

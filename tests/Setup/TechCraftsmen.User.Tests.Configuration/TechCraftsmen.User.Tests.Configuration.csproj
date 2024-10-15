@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Application\TechCraftsmen.User.Api\TechCraftsmen.User.Api.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\TechCraftsmen.User.WebApi\TechCraftsmen.User.WebApi.csproj" />
     <ProjectReference Include="..\..\..\src\Core\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj" />
   </ItemGroup>
 

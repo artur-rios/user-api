@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Application\TechCraftsmen.User.Api\TechCraftsmen.User.Api.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\TechCraftsmen.User.WebApi\TechCraftsmen.User.WebApi.csproj" />
     <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Configuration\TechCraftsmen.User.Tests.Configuration.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Api", "src\Application\TechCraftsmen.User.Api\TechCraftsmen.User.Api.csproj", "{488BCFEB-0E6C-4726-BD2C-F83DD40D00FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.WebApi", "src\Application\TechCraftsmen.User.WebApi\TechCraftsmen.User.WebApi.csproj", "{488BCFEB-0E6C-4726-BD2C-F83DD40D00FB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Domain", "src\Core\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj", "{51F710FF-570F-424D-BA91-70CE105BC099}"
 EndProject

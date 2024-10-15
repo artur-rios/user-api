@@ -3,7 +3,7 @@ using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Mapping;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
-namespace TechCraftsmen.User.Api.Controllers
+namespace TechCraftsmen.User.WebApi.Controllers
 {
     public abstract class BaseController : Controller
     {

@@ -5,7 +5,7 @@ using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
-namespace TechCraftsmen.User.Configuration.Authorization
+namespace TechCraftsmen.User.WebApi.Authorization
 {
     public class JwtMiddleware(RequestDelegate next)
     {

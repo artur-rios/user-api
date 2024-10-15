@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using TechCraftsmen.User.Core.Interfaces.Repositories;
+﻿using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Data.Relational.Configuration;
 using TechCraftsmen.User.Data.Relational.Repositories;
 
-namespace TechCraftsmen.User.Configuration.DependencyInjection
+namespace TechCraftsmen.User.WebApi.DependencyInjection
 {
     public static class RelationalDatabaseConfiguration
     {

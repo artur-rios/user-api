@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Configuration.Authorization;
+using TechCraftsmen.User.WebApi.Authorization;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Filters;
 
-namespace TechCraftsmen.User.Api.Controllers
+namespace TechCraftsmen.User.WebApi.Controllers
 {
     [ApiController]
     [Authorize]

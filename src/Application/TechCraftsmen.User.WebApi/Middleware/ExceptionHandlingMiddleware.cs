@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
 
-namespace TechCraftsmen.User.Configuration.Middleware
+namespace TechCraftsmen.User.WebApi.Middleware
 {
 
     public class ExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)

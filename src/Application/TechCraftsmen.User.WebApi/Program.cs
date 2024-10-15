@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Configuration.Authorization;
-using TechCraftsmen.User.Configuration.DependencyInjection;
-using TechCraftsmen.User.Configuration.Middleware;
+using TechCraftsmen.User.WebApi.Authorization;
+using TechCraftsmen.User.WebApi.DependencyInjection;
+using TechCraftsmen.User.WebApi.Middleware;
 using TechCraftsmen.User.Core.Configuration;
 using TechCraftsmen.User.Core.Dto;
 
-namespace TechCraftsmen.User.Api
+namespace TechCraftsmen.User.WebApi
 {
     public class Program
     {

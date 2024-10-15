@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using TechCraftsmen.User.Api;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
+using TechCraftsmen.User.WebApi;
 
 namespace TechCraftsmen.User.Tests.Utils.Functional
 {
