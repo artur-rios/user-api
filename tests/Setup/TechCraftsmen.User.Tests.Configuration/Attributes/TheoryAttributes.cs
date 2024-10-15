@@ -1,6 +1,6 @@
 ﻿using Xunit.Sdk;
 
-namespace TechCraftsmen.User.Tests.Utils.Attributes
+namespace TechCraftsmen.User.Tests.Configuration.Attributes
 {
     [XunitTestCaseDiscoverer("Xunit.Sdk.TheoryDiscoverer", "xunit.execution.{Platform}")]
     [AttributeUsage(AttributeTargets.Method)]

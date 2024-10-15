@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation

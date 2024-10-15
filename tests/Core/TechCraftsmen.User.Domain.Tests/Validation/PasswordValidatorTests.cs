@@ -1,7 +1,7 @@
 ﻿using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Validation

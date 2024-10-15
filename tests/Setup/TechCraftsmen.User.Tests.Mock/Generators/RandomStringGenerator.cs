@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Collections;
 using TechCraftsmen.User.Core.Exceptions;
 
-namespace TechCraftsmen.User.Tests.Utils.Generators
+namespace TechCraftsmen.User.Tests.Mock.Generators
 {
     public class RandomStringGenerator
     {

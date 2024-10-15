@@ -2,7 +2,7 @@
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Validation;
 
-namespace TechCraftsmen.User.Tests.Utils.Generators
+namespace TechCraftsmen.User.Tests.Mock.Generators
 {
     public class UserDtoGenerator
     {

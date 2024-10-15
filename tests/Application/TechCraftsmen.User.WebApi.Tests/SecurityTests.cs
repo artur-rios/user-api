@@ -1,15 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Tests.Utils.Attributes;
-using TechCraftsmen.User.Tests.Utils.Functional;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Functional;
+using TechCraftsmen.User.Tests.Mock.Data;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
     public class SecurityTests() : BaseFunctionalTest("Production"), IAsyncLifetime
     {
-        private readonly UserMocks _userMocks = new();
+        private readonly UserMockData _userMocks = new();
         private const string UserRoute = "/User";
 
         public async Task InitializeAsync()
@@ -17,7 +17,7 @@ namespace TechCraftsmen.User.WebApi.Tests
             AuthenticationCredentialsDto credentials = new()
             {
                 Email = _userMocks.TestUser.Email,
-                Password = UserMocks.TEST_PASSWORD
+                Password = UserMockData.TEST_PASSWORD
             };
 
             string authToken = await Authorize(credentials);

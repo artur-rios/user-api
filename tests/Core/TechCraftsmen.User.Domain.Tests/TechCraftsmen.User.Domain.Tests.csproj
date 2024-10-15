@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj" />
     <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Configuration\TechCraftsmen.User.Tests.Configuration.csproj" />
+    <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Mock\TechCraftsmen.User.Tests.Mock.csproj" />
   </ItemGroup>
 
 </Project>

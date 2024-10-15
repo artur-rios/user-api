@@ -6,7 +6,7 @@ using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
 using TechCraftsmen.User.WebApi;
 
-namespace TechCraftsmen.User.Tests.Utils.Functional
+namespace TechCraftsmen.User.Tests.Configuration.Functional
 {
     public class BaseFunctionalTest
     {

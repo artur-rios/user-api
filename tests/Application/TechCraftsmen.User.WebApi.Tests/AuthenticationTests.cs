@@ -3,16 +3,16 @@ using System.Net;
 using System.Text;
 using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
-using TechCraftsmen.User.Tests.Utils.Attributes;
-using TechCraftsmen.User.Tests.Utils.Functional;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Functional;
+using TechCraftsmen.User.Tests.Mock.Data;
+using TechCraftsmen.User.Tests.Mock.Generators;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
     public class AuthenticationTests : BaseFunctionalTest
     {
-        private readonly UserMocks _userMocks = new();
+        private readonly UserMockData _userMocks = new();
         private readonly RandomStringGenerator _randomStringGenerator = new();
         private readonly EmailGenerator _emailGenerator = new();
         private const string AuthenticateUserRoute = "/Authentication/User";
@@ -23,7 +23,7 @@ namespace TechCraftsmen.User.WebApi.Tests
             AuthenticationCredentialsDto credentialsDto = new()
             {
                 Email = _userMocks.TestUser.Email,
-                Password = UserMocks.TEST_PASSWORD
+                Password = UserMockData.TEST_PASSWORD
             };
 
             StringContent payload = new(JsonConvert.SerializeObject(credentialsDto), Encoding.UTF8, "application/json");
@@ -45,9 +45,9 @@ namespace TechCraftsmen.User.WebApi.Tests
         public async void Should_NotAuthenticate_ForIncorrectCredentials()
         {
             List<AuthenticationCredentialsDto> incorrectCredentials = [
-                new AuthenticationCredentialsDto(_userMocks.TestUser.Email, _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMocks.TEST_PASSWORD]).Generate()),
-            new AuthenticationCredentialsDto(_emailGenerator.Generate(), UserMocks.TEST_PASSWORD),
-            new AuthenticationCredentialsDto(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMocks.TEST_PASSWORD]).Generate())
+                new AuthenticationCredentialsDto(_userMocks.TestUser.Email, _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMockData.TEST_PASSWORD]).Generate()),
+            new AuthenticationCredentialsDto(_emailGenerator.Generate(), UserMockData.TEST_PASSWORD),
+            new AuthenticationCredentialsDto(_emailGenerator.Generate(), _randomStringGenerator.WithLength(8).WithLowerChars().WithNumbers().WithUpperChars().DifferentFrom([UserMockData.TEST_PASSWORD]).Generate())
             ];
 
             foreach (AuthenticationCredentialsDto? credentialDto in incorrectCredentials)
@@ -70,7 +70,7 @@ namespace TechCraftsmen.User.WebApi.Tests
         public async void Should_NotAuthenticate_ForInvalidCredentials()
         {
             List<AuthenticationCredentialsDto> invalidCredentials = [
-                new AuthenticationCredentialsDto(string.Empty, UserMocks.TEST_PASSWORD),
+                new AuthenticationCredentialsDto(string.Empty, UserMockData.TEST_PASSWORD),
             new AuthenticationCredentialsDto(_userMocks.TestUser.Email, string.Empty),
             new AuthenticationCredentialsDto()
             ];

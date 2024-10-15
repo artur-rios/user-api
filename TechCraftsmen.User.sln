@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{3386E19C-9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{B45FA021-6335-4E4B-8AAA-25D94FD9ADEF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.Tests.Mock", "tests\Setup\TechCraftsmen.User.Tests.Mock\TechCraftsmen.User.Tests.Mock.csproj", "{6884DAD4-B571-47E2-B8E3-2E5C48F30407}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{C084C09A-72D9-49E9-9A9C-60E4086F9E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C084C09A-72D9-49E9-9A9C-60E4086F9E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C084C09A-72D9-49E9-9A9C-60E4086F9E74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6884DAD4-B571-47E2-B8E3-2E5C48F30407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6884DAD4-B571-47E2-B8E3-2E5C48F30407}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6884DAD4-B571-47E2-B8E3-2E5C48F30407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6884DAD4-B571-47E2-B8E3-2E5C48F30407}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{C084C09A-72D9-49E9-9A9C-60E4086F9E74} = {6E758F37-A93E-4B47-ACA1-2F07B200AD12}
 		{0ABA5EB8-AC48-45FD-B658-CEC59618A662} = {3386E19C-95C0-4FE0-9319-682E1A1516DC}
 		{A6268E4E-AD94-421C-A740-BFAAFAF1892E} = {3386E19C-95C0-4FE0-9319-682E1A1516DC}
+		{6884DAD4-B571-47E2-B8E3-2E5C48F30407} = {B45FA021-6335-4E4B-8AAA-25D94FD9ADEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1948660-1CA1-44AC-82BE-EAD898FED9D7}

@@ -2,17 +2,17 @@
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
-using TechCraftsmen.User.Tests.Utils.Attributes;
-using TechCraftsmen.User.Tests.Utils.Functional;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Mock;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Functional;
+using TechCraftsmen.User.Tests.Mock.Data;
+using TechCraftsmen.User.Tests.Mock.Generators;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
     public class UserTests : BaseFunctionalTest, IAsyncLifetime
     {
         private readonly UserDtoGenerator _dtoGenerator = new();
-        private readonly UserMocks _userMocks = new();
+        private readonly UserMockData _userMocks = new();
         private const string UserRoute = "/User";
         private const string NonexistentEmail = "inexists@mail.com";
 
@@ -20,7 +20,7 @@ namespace TechCraftsmen.User.WebApi.Tests
         {
             AuthenticationCredentialsDto credentials = new()
             {
-                Email = _userMocks.TestUser.Email, Password = UserMocks.TEST_PASSWORD
+                Email = _userMocks.TestUser.Email, Password = UserMockData.TEST_PASSWORD
             };
 
             string authToken = await Authorize(credentials);
@@ -136,18 +136,18 @@ namespace TechCraftsmen.User.WebApi.Tests
         [FunctionalFact("User")]
         public async void Should_DeactivateAndActivateUser()
         {
-            DataResultDto<int>? deactivationResult = await Patch<int>($"{UserRoute}/{UserMocks.TEST_ID}/Deactivate");
+            DataResultDto<int>? deactivationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Deactivate");
             
             Assert.NotNull(deactivationResult);
             Assert.True(deactivationResult.Data > 0);
-            Assert.Equal(UserMocks.TEST_ID, deactivationResult.Data);
+            Assert.Equal(UserMockData.TEST_ID, deactivationResult.Data);
             Assert.Equal("User deactivated with success", deactivationResult.Messages.First());
 
-            DataResultDto<int>? activationResult = await Patch<int>($"{UserRoute}/{UserMocks.TEST_ID}/Activate");
+            DataResultDto<int>? activationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Activate");
             
             Assert.NotNull(activationResult);
             Assert.True(activationResult.Data > 0);
-            Assert.Equal(UserMocks.TEST_ID, activationResult.Data);
+            Assert.Equal(UserMockData.TEST_ID, activationResult.Data);
             Assert.Equal("User activated with success", activationResult.Messages.First());
         }
 

@@ -4,9 +4,9 @@ using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Mock;
-using TechCraftsmen.User.Tests.Utils.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Mock.Data;
+using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Entities
@@ -22,7 +22,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         public UserTests()
         {
             _userGenerator = new UserGenerator();
-            UserMocks userMocks = new();
+            UserMockData userMocks = new();
             Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
             _httpContextAccessor = new Mock<HttpContextAccessor>();
 

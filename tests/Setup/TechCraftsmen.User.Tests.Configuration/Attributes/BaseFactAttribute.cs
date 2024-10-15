@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace TechCraftsmen.User.Tests.Utils.Attributes
+namespace TechCraftsmen.User.Tests.Configuration.Attributes
 {
     public class BaseFactAttribute : FactAttribute
     {

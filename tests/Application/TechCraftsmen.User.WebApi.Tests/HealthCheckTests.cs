@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Tests.Utils.Attributes;
-using TechCraftsmen.User.Tests.Utils.Functional;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Functional;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {

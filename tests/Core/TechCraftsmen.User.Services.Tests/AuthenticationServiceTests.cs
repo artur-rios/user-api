@@ -9,8 +9,8 @@ using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation.Fluent;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
 
 namespace TechCraftsmen.User.Services.Tests

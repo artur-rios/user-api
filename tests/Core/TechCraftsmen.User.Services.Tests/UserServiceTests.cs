@@ -8,9 +8,9 @@ using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Core.Validation.Fluent;
-using TechCraftsmen.User.Tests.Utils.Generators;
-using TechCraftsmen.User.Tests.Utils.Mock;
-using TechCraftsmen.User.Tests.Utils.Attributes;
+using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Mock.Data;
+using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
@@ -47,7 +47,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithRoleId((int)Roles.Regular).Generate();
             _userDtoMock = _userMock.ToDto();
             _userDtoMock.Password = _passwordMock;
-            UserMocks userMocks = new();
+            UserMockData userMocks = new();
 
             userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
 

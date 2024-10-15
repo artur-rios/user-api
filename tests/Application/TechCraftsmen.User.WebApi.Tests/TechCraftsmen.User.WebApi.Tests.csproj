@@ -34,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Application\TechCraftsmen.User.WebApi\TechCraftsmen.User.WebApi.csproj" />
     <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Configuration\TechCraftsmen.User.Tests.Configuration.csproj" />
+    <ProjectReference Include="..\..\Setup\TechCraftsmen.User.Tests.Mock\TechCraftsmen.User.Tests.Mock.csproj" />
   </ItemGroup>
 
 </Project>
