@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Moq;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
 using TechCraftsmen.User.Core.Utils;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
@@ -46,7 +47,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
 
             UserDto? authenticatedUser = userData as UserDto;
 
-            SimpleResultDto canRegister = user.CanRegister(authenticatedUser!.RoleId);
+            DomainOutput canRegister = user.CanRegister(authenticatedUser!.RoleId);
 
             Assert.False(canRegister.Success);
             Assert.True(canRegister.Errors.Any());
@@ -58,7 +59,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            SimpleResultDto canDelete = user.CanDelete();
+            DomainOutput canDelete = user.CanDelete();
 
             Assert.False(canDelete.Success);
             Assert.True(canDelete.Errors.Any());
@@ -70,7 +71,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            SimpleResultDto canDelete = user.CanDelete();
+            DomainOutput canDelete = user.CanDelete();
 
             Assert.True(canDelete.Success);
             Assert.False(canDelete.Errors.Any());
@@ -81,7 +82,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            SimpleResultDto canActivate = user.CanActivate();
+            DomainOutput canActivate = user.CanActivate();
 
             Assert.False(canActivate.Success);
             Assert.True(canActivate.Errors.Any());
@@ -93,7 +94,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            SimpleResultDto canActivate = user.CanActivate();
+            DomainOutput canActivate = user.CanActivate();
 
             Assert.True(canActivate.Success);
             Assert.False(canActivate.Errors.Any());
@@ -104,7 +105,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            SimpleResultDto canDeactivate = user.CanDeactivate();
+            DomainOutput canDeactivate = user.CanDeactivate();
 
             Assert.False(canDeactivate.Success);
             Assert.True(canDeactivate.Errors.Any());
@@ -116,7 +117,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            SimpleResultDto canDeactivate = user.CanDeactivate();
+            DomainOutput canDeactivate = user.CanDeactivate();
 
             Assert.True(canDeactivate.Success);
             Assert.False(canDeactivate.Errors.Any());
@@ -127,7 +128,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
             
-            SimpleResultDto canUpdate = user.CanUpdate();
+            DomainOutput canUpdate = user.CanUpdate();
 
             Assert.False(canUpdate.Success);
             Assert.True(canUpdate.Errors.Any());
@@ -139,7 +140,7 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
             
-            SimpleResultDto canUpdate = user.CanUpdate();
+            DomainOutput canUpdate = user.CanUpdate();
 
             Assert.True(canUpdate.Success);
             Assert.False(canUpdate.Errors.Any());

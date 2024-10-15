@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Entities
 {
@@ -19,51 +19,45 @@ namespace TechCraftsmen.User.Core.Entities
 
         public bool Active { get; set; } = true;
 
-        public SimpleResultDto CanActivate()
+        public DomainOutput CanActivate()
         {
-            SimpleResultDto result = new();
+            DomainOutput result = new();
             
             if (Active)
             {
-                result.Errors.Add($"User already active");
+                result.Errors.Add("User already active");
             }
-            
-            result.SetSuccessByErrors();
 
             return result;
         }
         
-        public SimpleResultDto CanDeactivate()
+        public DomainOutput CanDeactivate()
         {
-            SimpleResultDto result = new();
+            DomainOutput result = new();
             
             if (!Active)
             {
-                result.Errors.Add($"User already inactive");
+                result.Errors.Add("User already inactive");
             }
-            
-            result.SetSuccessByErrors();
 
             return result;
         }
         
-        public SimpleResultDto CanDelete()
+        public DomainOutput CanDelete()
         {
-            SimpleResultDto result = new();
+            DomainOutput result = new();
             
             if (Active)
             {
                 result.Errors.Add("Can't delete active user");
             }
-            
-            result.SetSuccessByErrors();
 
             return result;
         }
 
-        public SimpleResultDto CanRegister(int authenticatedRoleId)
+        public DomainOutput CanRegister(int authenticatedRoleId)
         {
-            SimpleResultDto result = new();
+            DomainOutput result = new();
             
             if (RoleId != (int)Roles.Regular)
             {
@@ -74,22 +68,18 @@ namespace TechCraftsmen.User.Core.Entities
                     result.Errors.Add($"Only admins can register a user with {role.ToString()} role");
                 }
             }
-            
-            result.SetSuccessByErrors();
 
             return result;
         }
 
-        public SimpleResultDto CanUpdate()
+        public DomainOutput CanUpdate()
         {
-            SimpleResultDto result = new();
+            DomainOutput result = new();
             
             if (!Active)
             {
                 result.Errors.Add("Can't update inactive user");
             }
-            
-            result.SetSuccessByErrors();
 
             return result;
         }

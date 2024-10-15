@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Interfaces;
+using TechCraftsmen.User.WebApi.ValueObjects;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
 namespace TechCraftsmen.User.WebApi.Authorization
@@ -32,7 +34,7 @@ namespace TechCraftsmen.User.WebApi.Authorization
         {
             string? token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
 
-            OperationResultDto<bool> validationResult =
+            ServiceOutput<bool> validationResult =
                 authService.ValidateJwtToken(token!, out UserDto? authenticatedUser);
             
             messages = validationResult.Messages;
@@ -71,7 +73,7 @@ namespace TechCraftsmen.User.WebApi.Authorization
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
             
-            DataResultDto<string> response = new(string.Empty, messages);
+            WebApiOutput<string> response = new(string.Empty, messages);
             
             string payload = JsonConvert.SerializeObject(response);
 

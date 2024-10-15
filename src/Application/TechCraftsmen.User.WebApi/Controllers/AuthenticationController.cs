@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.WebApi.Authorization;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
-using TechCraftsmen.User.Core.Interfaces.Services;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Interfaces;
+using TechCraftsmen.User.WebApi.ValueObjects;
 
 namespace TechCraftsmen.User.WebApi.Controllers
 {
@@ -14,9 +16,9 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpPost]
         [Route("User")]
         [AllowAnonymous]
-        public ActionResult<DataResultDto<AuthenticationToken?>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
+        public ActionResult<WebApiOutput<AuthenticationToken?>> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
-            OperationResultDto<AuthenticationToken?> authToken = authService.AuthenticateUser(credentialsDto);
+            ServiceOutput<AuthenticationToken?> authToken = authService.AuthenticateUser(credentialsDto);
 
             return Resolve(authToken);
         }

@@ -1,18 +1,16 @@
-﻿using TechCraftsmen.User.Core.Dto;
+﻿using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Validation
 {
     public abstract class BaseValidator<T>
     {
-        internal readonly SimpleResultDto Result = new();
+        internal readonly DomainOutput Result = new();
 
-        public abstract SimpleResultDto Validate(T parameter);
+        public abstract DomainOutput Validate(T parameter);
         internal abstract bool IsParameterValid(T parameter, out string message);
 
-        internal SimpleResultDto Resolve()
+        internal DomainOutput Resolve()
         {
-            Result.Success = !Result.Errors.Any();
-
             return Result;
         }
     }

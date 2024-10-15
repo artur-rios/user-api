@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Mapping;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.WebApi.Mapping;
+using TechCraftsmen.User.WebApi.ValueObjects;
 using Results = TechCraftsmen.User.Core.Enums.Results;
 
 namespace TechCraftsmen.User.WebApi.Controllers
 {
     public abstract class BaseController : Controller
     {
-        protected static ActionResult<DataResultDto<T>> Resolve<T>(OperationResultDto<T> operationResult)
+        protected static ActionResult<WebApiOutput<T>> Resolve<T>(ServiceOutput<T> operationResult)
         {
-            return new ObjectResult(operationResult.ToDataResult()){ StatusCode = ToStatusCode(operationResult.Result) };
+            return new ObjectResult(operationResult.ToWebApiOutput()){ StatusCode = ToStatusCode(operationResult.Result) };
         }
 
         private static int ToStatusCode(Results result) => result switch

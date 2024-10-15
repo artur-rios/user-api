@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Extensions;
+using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.WebApi;
+using TechCraftsmen.User.WebApi.ValueObjects;
 
 namespace TechCraftsmen.User.Tests.Configuration.Functional
 {
@@ -25,24 +26,24 @@ namespace TechCraftsmen.User.Tests.Configuration.Functional
 
         protected async Task<string> Authorize(AuthenticationCredentialsDto credentials)
         {
-            DataResultDto<AuthenticationToken>? result =
+            WebApiOutput<AuthenticationToken>? result =
                 await Post<AuthenticationToken>(AuthenticateUserRoute, credentials);
 
             return result?.Data is not null ? result.Data.AccessToken! : throw new CustomException(result?.Messages ?? [], "Error on Authorize");
         }
 
-        protected async Task<DataResultDto<T>?> Get<T>(string route)
+        protected async Task<WebApiOutput<T>?> Get<T>(string route)
         {
             HttpResponseMessage response = await Client.GetAsync(route);
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            WebApiOutput<T>? result = JsonConvert.DeserializeObject<WebApiOutput<T>>(body);
             
             return result ?? throw new CustomException(["Unknown error"], "Error on Get request");
         }
 
-        protected async Task<DataResultDto<T>?> Patch<T>(string route, object? payloadObject = null)
+        protected async Task<WebApiOutput<T>?> Patch<T>(string route, object? payloadObject = null)
         {
             StringContent? payload = payloadObject?.ToJsonStringContent();
 
@@ -50,12 +51,12 @@ namespace TechCraftsmen.User.Tests.Configuration.Functional
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            WebApiOutput<T>? result = JsonConvert.DeserializeObject<WebApiOutput<T>>(body);
 
             return result ?? throw new CustomException(["Unknown error"], "Error on Patch request");
         }
 
-        protected async Task<DataResultDto<T>?> Post<T>(string route, object payloadObject)
+        protected async Task<WebApiOutput<T>?> Post<T>(string route, object payloadObject)
         {
             StringContent payload = payloadObject.ToJsonStringContent();
 
@@ -63,12 +64,12 @@ namespace TechCraftsmen.User.Tests.Configuration.Functional
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            WebApiOutput<T>? result = JsonConvert.DeserializeObject<WebApiOutput<T>>(body);
 
             return result ?? throw new CustomException(["Unknown error"], "Error on Post request");
         }
 
-        protected async Task<DataResultDto<T>?> Put<T>(string route, object payloadObject)
+        protected async Task<WebApiOutput<T>?> Put<T>(string route, object payloadObject)
         {
             StringContent payload = payloadObject.ToJsonStringContent();
 
@@ -76,18 +77,18 @@ namespace TechCraftsmen.User.Tests.Configuration.Functional
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            WebApiOutput<T>? result = JsonConvert.DeserializeObject<WebApiOutput<T>>(body);
 
             return result ?? throw new CustomException(["Unknown error"], "Error on Put request");
         }
 
-        protected async Task<DataResultDto<T>?> Delete<T>(string route)
+        protected async Task<WebApiOutput<T>?> Delete<T>(string route)
         {
             HttpResponseMessage response = await Client.DeleteAsync(route);
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<T>? result = JsonConvert.DeserializeObject<DataResultDto<T>>(body);
+            WebApiOutput<T>? result = JsonConvert.DeserializeObject<WebApiOutput<T>>(body);
             
             return result ?? throw new CustomException(["Unknown error"], "Error on Delete request");
         }

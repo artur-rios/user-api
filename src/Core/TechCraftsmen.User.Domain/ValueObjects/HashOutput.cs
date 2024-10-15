@@ -1,6 +1,6 @@
-﻿namespace TechCraftsmen.User.Core.Dto
+﻿namespace TechCraftsmen.User.Core.ValueObjects
 {
-    public class HashDto
+    public class HashOutput
     {
         public byte[] Hash { get; init; } = [];
         public byte[] Salt { get; set; } = [];

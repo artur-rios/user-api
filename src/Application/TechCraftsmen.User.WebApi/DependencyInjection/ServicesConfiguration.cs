@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Interfaces.Services;
-using TechCraftsmen.User.Services;
+﻿using TechCraftsmen.User.Services.Implementations;
+using TechCraftsmen.User.Services.Interfaces;
 
 namespace TechCraftsmen.User.WebApi.DependencyInjection
 {

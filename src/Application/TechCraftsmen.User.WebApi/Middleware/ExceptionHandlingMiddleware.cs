@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.WebApi.ValueObjects;
 
 namespace TechCraftsmen.User.WebApi.Middleware
 {
@@ -31,7 +31,7 @@ namespace TechCraftsmen.User.WebApi.Middleware
                 messages = customException.Messages;
             }
             
-            DataResultDto<string> response = new(string.Empty, messages);
+            WebApiOutput<string> response = new(string.Empty, messages);
             const HttpStatusCode httpStatus = HttpStatusCode.InternalServerError;
             
             _logger.LogError("Error: {error}", exception.Message);

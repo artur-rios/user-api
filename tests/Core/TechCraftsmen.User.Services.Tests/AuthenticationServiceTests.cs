@@ -1,14 +1,17 @@
 ﻿using Microsoft.Extensions.Options;
 using Moq;
 using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation.Fluent;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Implementations;
+using TechCraftsmen.User.Services.Interfaces;
+using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
@@ -50,20 +53,20 @@ namespace TechCraftsmen.User.Services.Tests
                 {
                     if (filter.Id == TestId || filter.Email is ExistingEmail)
                     {
-                        return new OperationResultDto<IList<UserDto>>(
+                        return new ServiceOutput<IList<UserDto>>(
                         [
                             _userDtoGenerator.WithId(TestId).WithEmail(ExistingEmail).WithPassword(CorrectPassword)
                                 .Generate()
                         ], ["Search completed with success"]);
                     }
 
-                    return new OperationResultDto<IList<UserDto>>([], ["No users found for the given filter"],
+                    return new ServiceOutput<IList<UserDto>>([], ["No users found for the given filter"],
                         Results.NotFound);
                 });
 
             _userService.Setup(service => service.GetPasswordByUserId(TestId))
                 .Returns(
-                    () => new OperationResultDto<HashDto?>(HashUtils.HashText(CorrectPassword), ["Password found"]));
+                    () => new ServiceOutput<HashOutput?>(HashUtils.HashText(CorrectPassword), ["Password found"]));
 
             _authenticationService = new AuthenticationService(_authTokenConfig.Object, _authCredentialsValidator,
                 _authTokenConfigValidator, _userService.Object);
@@ -82,7 +85,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("AuthenticationService")]
         public void Should_ThrowValidationException_ForInvalidCredentials()
         {
-            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty)
+            ServiceOutput<AuthenticationToken?> result = _authenticationService.AuthenticateUser(_authCredentialsGenerator.WithEmail(string.Empty)
                 .WithPassword(string.Empty).Generate());
             
             Assert.Null(result.Data);
@@ -95,7 +98,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForNonexistentEmail()
         {
-            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+            ServiceOutput<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
                 _authCredentialsGenerator.WithEmail(NonexistentEmail)
                     .WithPassword(CorrectPassword).Generate());
 
@@ -107,7 +110,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForIncorrectPassword()
         {
-            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+            ServiceOutput<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
                 _authCredentialsGenerator.WithEmail(ExistingEmail)
                     .WithPassword(IncorrectPassword).Generate());
 
@@ -119,7 +122,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("AuthenticationService")]
         public void Should_ReturnNotAllowedError_ForIncorrectCredentials()
         {
-            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+            ServiceOutput<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
                 _authCredentialsGenerator
                     .WithEmail(NonexistentEmail).WithPassword(IncorrectPassword).Generate());
 
@@ -136,7 +139,7 @@ namespace TechCraftsmen.User.Services.Tests
             "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForInvalidToken(string token)
         {
-            OperationResultDto<bool> result = _authenticationService.ValidateJwtToken(token, out UserDto? user);
+            ServiceOutput<bool> result = _authenticationService.ValidateJwtToken(token, out UserDto? user);
 
             Assert.False(result.Data);
             Assert.Equal(Results.Success, result.Result);
@@ -148,7 +151,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("AuthenticationService")]
         public void Should_GenerateValidToken_ForValidCredentials()
         {
-            OperationResultDto<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
+            ServiceOutput<AuthenticationToken?> result = _authenticationService.AuthenticateUser(
                 _authCredentialsGenerator
                     .WithEmail(ExistingEmail).WithPassword(CorrectPassword).Generate());
 
@@ -156,7 +159,7 @@ namespace TechCraftsmen.User.Services.Tests
             Assert.Equal(Results.Success, result.Result);
             Assert.Equal("User authenticated with success", result.Messages.First());
 
-            OperationResultDto<bool> validationResult =
+            ServiceOutput<bool> validationResult =
                 _authenticationService.ValidateJwtToken(result.Data.AccessToken!, out UserDto? user);
 
             Assert.True(validationResult.Data);

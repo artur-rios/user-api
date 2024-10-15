@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Validation
 {
@@ -10,7 +10,7 @@ namespace TechCraftsmen.User.Core.Validation
         [GeneratedRegex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$")]
         private static partial Regex EmailRegex();
         
-        public override SimpleResultDto Validate(string email)
+        public override DomainOutput Validate(string email)
         {
             if (!IsParameterValid(email, out string validationMessage))
             {

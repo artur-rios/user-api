@@ -1,13 +1,16 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Filters;
 using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Mapping;
 using TechCraftsmen.User.Core.Validation;
 using TechCraftsmen.User.Core.Validation.Fluent;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Implementations;
+using TechCraftsmen.User.Services.Mapping;
+using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
@@ -108,7 +111,7 @@ namespace TechCraftsmen.User.Services.Tests
         {
             UserDto invalidDto = _userDtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword().WithRoleId().Generate();
 
-            OperationResultDto<int> result = _userService.CreateUser(invalidDto);
+            ServiceOutput<int> result = _userService.CreateUser(invalidDto);
             
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.ValidationError, result.Result);
@@ -121,7 +124,7 @@ namespace TechCraftsmen.User.Services.Tests
             UserDto userWithExistingEmail = _userDtoGenerator.WithEmail(ExistingEmail).WithDefaultName()
                 .WithRandomPassword().WithRoleId().Generate();
 
-            OperationResultDto<int> result = _userService.CreateUser(userWithExistingEmail);
+            ServiceOutput<int> result = _userService.CreateUser(userWithExistingEmail);
             
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.NotAllowed, result.Result);
@@ -131,7 +134,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_CreateUser_And_ReturnId_ForValidDto()
         {
-            OperationResultDto<int> result = _userService.CreateUser(_userDtoMock);
+            ServiceOutput<int> result = _userService.CreateUser(_userDtoMock);
             
             Assert.Equal(_userMock.Id, result.Data);
             Assert.Equal(Results.Created, result.Result);
@@ -141,7 +144,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_When_IdNotOnDatabase()
         {
-            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentId));
+            ServiceOutput<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentId));
 
             Assert.Empty(result.Data!);
             Assert.Equal(Results.NotFound, result.Result);
@@ -151,7 +154,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnUser_When_IdIsOnDatabase()
         {
-            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingId));
+            ServiceOutput<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingId));
             
             Assert.NotNull(result.Data);
             Assert.Equal(ExistingId, result.Data.First().Id);
@@ -162,7 +165,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_When_FilterDoesNotReturnAnyResult()
         {
-            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentEmail));
+            ServiceOutput<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(NonexistentEmail));
 
             Assert.Empty(result.Data!);
             Assert.Equal(Results.NotFound, result.Result);
@@ -172,7 +175,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnUsers_For_ValidAndExistingFilter()
         {
-            OperationResultDto<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingEmail));
+            ServiceOutput<IList<UserDto>> result = _userService.GetUsersByFilter(new UserFilter(ExistingEmail));
 
             Assert.NotNull(result.Data);
             Assert.NotEmpty(result.Data);
@@ -184,7 +187,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
         {
-            OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(NonexistentId);
+            ServiceOutput<HashOutput?> result = _userService.GetPasswordByUserId(NonexistentId);
 
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.NotFound, result.Result);
@@ -194,7 +197,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnPassword_When_IdIsOnDatabase()
         {
-            OperationResultDto<HashDto?> result = _userService.GetPasswordByUserId(ExistingId);
+            ServiceOutput<HashOutput?> result = _userService.GetPasswordByUserId(ExistingId);
 
             Assert.NotNull(result.Data);
             Assert.NotEmpty(result.Data.Hash);
@@ -210,7 +213,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
+            ServiceOutput<UserDto?> result = _userService.UpdateUser(userDto);
 
             Assert.Null(result.Data);
             Assert.Equal(Results.NotFound, result.Result);
@@ -224,7 +227,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
+            ServiceOutput<UserDto?> result = _userService.UpdateUser(userDto);
 
             Assert.Null(result.Data);
             Assert.Equal(Results.NotAllowed, result.Result);
@@ -238,7 +241,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
-            OperationResultDto<UserDto?> result = _userService.UpdateUser(userDto);
+            ServiceOutput<UserDto?> result = _userService.UpdateUser(userDto);
 
             Assert.NotNull(result.Data);
             Assert.Equal(Results.Success, result.Result);
@@ -248,7 +251,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotActivateUser()
         {
-            OperationResultDto<int> result = _userService.ActivateUser(NonexistentId);
+            ServiceOutput<int> result = _userService.ActivateUser(NonexistentId);
 
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.NotFound, result.Result);
@@ -258,7 +261,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnEntityNotChanged_WhenUserIsActive_On_Activation()
         {
-            OperationResultDto<int> result = _userService.ActivateUser(ExistingId);
+            ServiceOutput<int> result = _userService.ActivateUser(ExistingId);
 
             Assert.Equal(ExistingId, result.Data);
             Assert.Equal(Results.EntityNotChanged, result.Result);
@@ -268,7 +271,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ActivateUser()
         {
-            OperationResultDto<int> result = _userService.ActivateUser(InactiveId);
+            ServiceOutput<int> result = _userService.ActivateUser(InactiveId);
 
             Assert.Equal(InactiveId, result.Data);
             Assert.Equal(Results.Success, result.Result);
@@ -278,7 +281,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeactivateUser()
         {
-            OperationResultDto<int> result = _userService.DeactivateUser(NonexistentId);
+            ServiceOutput<int> result = _userService.DeactivateUser(NonexistentId);
 
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.NotFound, result.Result);
@@ -288,7 +291,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnEntityNotChanged_WhenUserIsInactive_On_Deactivation()
         {
-            OperationResultDto<int> result = _userService.DeactivateUser(InactiveId);
+            ServiceOutput<int> result = _userService.DeactivateUser(InactiveId);
 
             Assert.Equal(InactiveId, result.Data);
             Assert.Equal(Results.EntityNotChanged, result.Result);
@@ -298,7 +301,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_DeactivateUser()
         {
-            OperationResultDto<int> result = _userService.DeactivateUser(ExistingId);
+            ServiceOutput<int> result = _userService.DeactivateUser(ExistingId);
 
             Assert.Equal(ExistingId, result.Data);
             Assert.Equal(Results.Success, result.Result);
@@ -308,7 +311,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotDeleteUser()
         {
-            OperationResultDto<int> result = _userService.DeleteUser(NonexistentId);
+            ServiceOutput<int> result = _userService.DeleteUser(NonexistentId);
 
             Assert.Equal(default, result.Data);
             Assert.Equal(Results.NotFound, result.Result);
@@ -318,7 +321,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotAllowedError_WhenUserIsActive()
         {
-            OperationResultDto<int> result = _userService.DeleteUser(ExistingId);
+            ServiceOutput<int> result = _userService.DeleteUser(ExistingId);
             
             Assert.Equal(ExistingId, result.Data);
             Assert.Equal(Results.NotAllowed, result.Result);
@@ -328,7 +331,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_DeleteUser()
         {
-            OperationResultDto<int> result = _userService.DeleteUser(InactiveId);
+            ServiceOutput<int> result = _userService.DeleteUser(InactiveId);
 
             Assert.Equal(InactiveId, result.Data);
             Assert.Equal(Results.Success, result.Result);

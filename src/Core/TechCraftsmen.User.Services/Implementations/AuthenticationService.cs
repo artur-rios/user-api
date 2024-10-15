@@ -6,15 +6,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
 using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Exceptions;
 using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Interfaces.Services;
 using TechCraftsmen.User.Core.Utils;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Interfaces;
 
-namespace TechCraftsmen.User.Services
+namespace TechCraftsmen.User.Services.Implementations
 {
     public class AuthenticationService : IAuthenticationService
     {
@@ -33,7 +34,7 @@ namespace TechCraftsmen.User.Services
             ValidateTokenConfigAndThrow(authTokenConfigValidator);
         }
 
-        public OperationResultDto<AuthenticationToken?> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
+        public ServiceOutput<AuthenticationToken?> AuthenticateUser(AuthenticationCredentialsDto credentialsDto)
         {
             ValidationResult? validationResult = _authCredentialsValidator.Validate(credentialsDto);
 
@@ -41,47 +42,47 @@ namespace TechCraftsmen.User.Services
 
             if (!validationResult.IsValid)
             {
-                return new OperationResultDto<AuthenticationToken?>(default, validationErrors,
+                return new ServiceOutput<AuthenticationToken?>(default, validationErrors,
                     Results.ValidationError);
             }
 
-            OperationResultDto<IList<UserDto>> search =
+            ServiceOutput<IList<UserDto>> search =
                 _userService.GetUsersByFilter(new UserFilter(credentialsDto.Email));
 
             if (search.Result is not Results.Success)
             {
-                return new OperationResultDto<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
+                return new ServiceOutput<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
             }
 
             UserDto user = search.Data!.First();
 
-            OperationResultDto<HashDto?> passwordSearch = _userService.GetPasswordByUserId(user.Id);
+            ServiceOutput<HashOutput?> passwordSearch = _userService.GetPasswordByUserId(user.Id);
 
             if (passwordSearch.Result is not Results.Success)
             {
-                return new OperationResultDto<AuthenticationToken?>(default,
+                return new ServiceOutput<AuthenticationToken?>(default,
                     ["Could not retrieve password from database"], Results.InternalError);
             }
 
-            HashDto password = passwordSearch.Data!;
+            HashOutput password = passwordSearch.Data!;
 
             if (!HashUtils.VerifyHash(credentialsDto.Password, password))
             {
-                return new OperationResultDto<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
+                return new ServiceOutput<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
             }
 
             AuthenticationToken authToken = GenerateJwtToken(user.Id);
 
-            return new OperationResultDto<AuthenticationToken?>(authToken, ["User authenticated with success"]);
+            return new ServiceOutput<AuthenticationToken?>(authToken, ["User authenticated with success"]);
         }
 
-        public OperationResultDto<bool> ValidateJwtToken(string token, out UserDto? authenticatedUser)
+        public ServiceOutput<bool> ValidateJwtToken(string token, out UserDto? authenticatedUser)
         {
             authenticatedUser = default;
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                return new OperationResultDto<bool>(false, ["Invalid auth token"]);
+                return new ServiceOutput<bool>(false, ["Invalid auth token"]);
             }
 
             JwtSecurityTokenHandler tokenHandler = new();
@@ -103,24 +104,24 @@ namespace TechCraftsmen.User.Services
 
                 int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
-                OperationResultDto<IList<UserDto>> userSearch = _userService.GetUsersByFilter(new UserFilter(userId));
+                ServiceOutput<IList<UserDto>> userSearch = _userService.GetUsersByFilter(new UserFilter(userId));
 
                 if (userSearch.Result is not Results.Success)
                 {
-                    return new OperationResultDto<bool>(false, ["User not found"], Results.NotFound);
+                    return new ServiceOutput<bool>(false, ["User not found"], Results.NotFound);
                 }
 
                 authenticatedUser = userSearch.Data!.First();
 
-                return new OperationResultDto<bool>(true, ["Auth token is valid"]);
+                return new ServiceOutput<bool>(true, ["Auth token is valid"]);
             }
             catch (SecurityTokenExpiredException)
             {
-                return new OperationResultDto<bool>(false, ["Auth token expired. Please authenticate again"]);
+                return new ServiceOutput<bool>(false, ["Auth token expired. Please authenticate again"]);
             }
             catch (Exception)
             {
-                return new OperationResultDto<bool>(false, ["Auth token invalid"]);
+                return new ServiceOutput<bool>(false, ["Auth token invalid"]);
             }
         }
 

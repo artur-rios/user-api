@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
-using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Dto;
 
-namespace TechCraftsmen.User.Core.Validation.Fluent
+namespace TechCraftsmen.User.Services.Validation
 {
     public class UserDtoValidator : AbstractValidator<UserDto>
     {
@@ -14,7 +16,7 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             RuleFor(user => user.Name).NotEmpty();
             RuleFor(user => user.Email).Custom((email, context) =>
             {
-                SimpleResultDto ruleResult = _emailRule.Validate(email);
+                DomainOutput ruleResult = _emailRule.Validate(email);
 
                 if (ruleResult.Success)
                 {
@@ -29,7 +31,7 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             RuleFor(user => user.Password).NotEmpty();
             RuleFor(user => user.Password).Custom((password, context) =>
             {
-                SimpleResultDto ruleResult = _passwordValidator.Validate(password);
+                DomainOutput ruleResult = _passwordValidator.Validate(password);
 
                 if (ruleResult.Success)
                 {
@@ -43,7 +45,7 @@ namespace TechCraftsmen.User.Core.Validation.Fluent
             });
             RuleFor(user => user.RoleId).Custom((roleId, context) =>
             {
-                SimpleResultDto ruleResult = _roleIdValidator.Validate(roleId);
+                DomainOutput ruleResult = _roleIdValidator.Validate(roleId);
 
                 if (ruleResult.Success)
                 {

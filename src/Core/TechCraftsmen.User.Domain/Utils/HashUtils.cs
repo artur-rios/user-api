@@ -1,7 +1,7 @@
 ﻿using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
 using System.Text;
-using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Utils
 {
@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Core.Utils
         // 600 MB
         private const int MemoryToUseInKb = 600000;
 
-        public static HashDto HashText(string text, byte[]? salt = null)
+        public static HashOutput HashText(string text, byte[]? salt = null)
         {
             salt ??= CreateSalt();
 
@@ -28,14 +28,14 @@ namespace TechCraftsmen.User.Core.Utils
                 MemorySize = MemoryToUseInKb
             };
 
-            return new HashDto { Hash = argon2Id.GetBytes(128), Salt = salt };
+            return new HashOutput { Hash = argon2Id.GetBytes(128), Salt = salt };
         }
 
-        public static bool VerifyHash(string text, HashDto hashDto)
+        public static bool VerifyHash(string text, HashOutput hashOutput)
         {
-            HashDto result = HashText(text, hashDto.Salt);
+            HashOutput result = HashText(text, hashOutput.Salt);
 
-            return hashDto.Hash.SequenceEqual(result.Hash);
+            return hashOutput.Hash.SequenceEqual(result.Hash);
         }
 
         public static byte[] CreateSalt()

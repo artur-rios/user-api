@@ -1,11 +1,11 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Validation
 {
     public class RoleIdValidator : BaseValidator<int>
     {
-        public override SimpleResultDto Validate(int roleId)
+        public override DomainOutput Validate(int roleId)
         {
             if (!IsParameterValid(roleId, out string validationMessage))
             {

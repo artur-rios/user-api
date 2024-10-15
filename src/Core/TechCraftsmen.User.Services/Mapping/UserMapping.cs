@@ -1,10 +1,10 @@
-﻿using TechCraftsmen.User.Core.Dto;
+﻿using TechCraftsmen.User.Services.Dto;
 
-namespace TechCraftsmen.User.Core.Mapping
+namespace TechCraftsmen.User.Services.Mapping
 {
     public static class UserMapping
     {
-        public static UserDto ToDto(this Entities.User user)
+        public static UserDto ToDto(this Core.Entities.User user)
         {
             return new UserDto
             {
@@ -17,9 +17,9 @@ namespace TechCraftsmen.User.Core.Mapping
             };
         }
 
-        public static Entities.User ToEntity(this UserDto dto)
+        public static Core.Entities.User ToEntity(this UserDto dto)
         {
-            return new Entities.User
+            return new Core.Entities.User
             {
                 Id = dto.Id,
                 Email = dto.Email,

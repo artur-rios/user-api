@@ -1,7 +1,7 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Core.Enums;
 using TechCraftsmen.User.Core.Utils;
 using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Tests.Mock.Generators
 {
@@ -63,7 +63,7 @@ namespace TechCraftsmen.User.Tests.Mock.Generators
 
         public UserGenerator WithPassword(string password)
         {
-            HashDto hashResult = HashUtils.HashText(password);
+            HashOutput hashResult = HashUtils.HashText(password);
 
             _password = hashResult.Hash;
             _salt = hashResult.Salt;
@@ -74,7 +74,7 @@ namespace TechCraftsmen.User.Tests.Mock.Generators
         public UserGenerator WithRandomPassword()
         {
             string randomString = RandomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
-            HashDto hashResult = HashUtils.HashText(randomString);
+            HashOutput hashResult = HashUtils.HashText(randomString);
 
             _password = hashResult.Hash;
             _salt = hashResult.Salt;

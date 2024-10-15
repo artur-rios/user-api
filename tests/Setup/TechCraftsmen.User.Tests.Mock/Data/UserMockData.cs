@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Services.Dto;
 
 namespace TechCraftsmen.User.Tests.Mock.Data
 {

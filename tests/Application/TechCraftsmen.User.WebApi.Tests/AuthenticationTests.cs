@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using System.Text;
-using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Configuration.Functional;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
+using TechCraftsmen.User.WebApi.ValueObjects;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
@@ -32,7 +33,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
             string body = await response.Content.ReadAsStringAsync();
 
-            DataResultDto<AuthenticationToken>? result = JsonConvert.DeserializeObject<DataResultDto<AuthenticationToken>>(body);
+            WebApiOutput<AuthenticationToken>? result = JsonConvert.DeserializeObject<WebApiOutput<AuthenticationToken>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
@@ -58,7 +59,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
                 string body = await response.Content.ReadAsStringAsync();
 
-                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+                WebApiOutput<string>? result = JsonConvert.DeserializeObject<WebApiOutput<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
@@ -83,7 +84,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
                 string body = await response.Content.ReadAsStringAsync();
 
-                DataResultDto<string>? result = JsonConvert.DeserializeObject<DataResultDto<string>>(body);
+                WebApiOutput<string>? result = JsonConvert.DeserializeObject<WebApiOutput<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);

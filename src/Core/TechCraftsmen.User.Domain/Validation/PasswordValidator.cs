@@ -1,12 +1,12 @@
 ﻿using TechCraftsmen.User.Core.Collections;
-using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.Core.ValueObjects;
 
 namespace TechCraftsmen.User.Core.Validation
 {
     public class PasswordValidator : BaseValidator<string>
     {
         public const int MINIMUM_LENGTH = 8;
-        public override SimpleResultDto Validate(string password)
+        public override DomainOutput Validate(string password)
         {
             if (!IsParameterValid(password, out string validationMessage))
             {

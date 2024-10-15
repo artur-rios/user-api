@@ -1,6 +1,6 @@
 ﻿using TechCraftsmen.User.Core.Enums;
 
-namespace TechCraftsmen.User.Core.Dto
+namespace TechCraftsmen.User.Services.Dto
 {
     public class UserDto
     {

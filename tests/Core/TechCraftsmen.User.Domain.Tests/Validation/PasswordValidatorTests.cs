@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Dto;
-using TechCraftsmen.User.Core.Validation;
+﻿using TechCraftsmen.User.Core.Validation;
+using TechCraftsmen.User.Core.ValueObjects;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         {
             string password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().Generate();
 
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -28,7 +28,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         {
             string password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithUpperChars().Generate();
 
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -40,7 +40,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         {
             string password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithLowerChars().Generate();
 
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -52,7 +52,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         {
             string password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH - 1).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -65,7 +65,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters", Justification = "Testing purposes")]
         public void Should_ReturnFalse_ForPassword_NullOrEmpty(string password)
         {
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.False(result.Success);
             Assert.True(result.Errors.Any());
@@ -77,7 +77,7 @@ namespace TechCraftsmen.User.Core.Tests.Validation
         {
             string password = _randomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithNumbers().WithLowerChars().WithUpperChars().Generate();
 
-            SimpleResultDto result = _validator.Validate(password);
+            DomainOutput result = _validator.Validate(password);
 
             Assert.True(result.Success);
             Assert.False(result.Errors.Any());

@@ -1,8 +1,8 @@
 ﻿using TechCraftsmen.User.Core.Enums;
 
-namespace TechCraftsmen.User.Core.Dto
+namespace TechCraftsmen.User.Core.ValueObjects
 {
-    public class OperationResultDto<T>(T? data, string[] messages, Results result = Results.Success)
+    public class ServiceOutput<T>(T? data, string[] messages, Results result = Results.Success)
     {
         public T? Data { get; } = data;
         public string[] Messages { get; } = messages;

@@ -3,7 +3,7 @@ using TechCraftsmen.User.WebApi.Authorization;
 using TechCraftsmen.User.WebApi.DependencyInjection;
 using TechCraftsmen.User.WebApi.Middleware;
 using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Dto;
+using TechCraftsmen.User.WebApi.ValueObjects;
 
 namespace TechCraftsmen.User.WebApi
 {
@@ -41,7 +41,7 @@ namespace TechCraftsmen.User.WebApi
                         .Where(e => e.Value?.Errors.Count > 0)
                         .Select(e => $"Parameter: {e.Key} | Error: {e.Value?.Errors.First().ErrorMessage}").ToArray();
 
-                    DataResultDto<string> result = new(string.Empty, errors);
+                    WebApiOutput<string> result = new(string.Empty, errors);
 
                     return new BadRequestObjectResult(result);
                 };
