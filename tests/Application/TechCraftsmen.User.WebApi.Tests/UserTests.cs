@@ -7,7 +7,7 @@ using TechCraftsmen.User.Tests.Utils.Functional;
 using TechCraftsmen.User.Tests.Utils.Generators;
 using TechCraftsmen.User.Tests.Utils.Mock;
 
-namespace TechCraftsmen.User.Api.Tests
+namespace TechCraftsmen.User.WebApi.Tests
 {
     public class UserTests : BaseFunctionalTest, IAsyncLifetime
     {

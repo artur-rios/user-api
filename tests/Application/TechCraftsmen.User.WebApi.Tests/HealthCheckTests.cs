@@ -4,7 +4,7 @@ using TechCraftsmen.User.Core.Dto;
 using TechCraftsmen.User.Tests.Utils.Attributes;
 using TechCraftsmen.User.Tests.Utils.Functional;
 
-namespace TechCraftsmen.User.Api.Tests
+namespace TechCraftsmen.User.WebApi.Tests
 {
     public class HealthCheckTests : BaseFunctionalTest
     {

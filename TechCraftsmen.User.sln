@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TechCraftsmen.User.Tests.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.Services.Tests", "tests\Core\TechCraftsmen.User.Services.Tests\TechCraftsmen.User.Services.Tests.csproj", "{A6268E4E-AD94-421C-A740-BFAAFAF1892E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.Api.Tests", "tests\Application\TechCraftsmen.User.Api.Tests\TechCraftsmen.User.Api.Tests.csproj", "{C084C09A-72D9-49E9-9A9C-60E4086F9E74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechCraftsmen.User.WebApi.Tests", "tests\Application\TechCraftsmen.User.WebApi.Tests\TechCraftsmen.User.WebApi.Tests.csproj", "{C084C09A-72D9-49E9-9A9C-60E4086F9E74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{20B0ACA5-0798-4283-BABA-BEA782B68BA8}"
 EndProject
