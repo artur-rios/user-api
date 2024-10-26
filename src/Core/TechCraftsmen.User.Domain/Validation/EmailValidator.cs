@@ -1,27 +1,21 @@
-﻿using System.Text.RegularExpressions;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Output;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Domain.Validation
 {
-    public partial class EmailValidator : BaseValidator<string>
+    public class EmailValidator : BaseValidator<string>
     {
-        private static readonly Regex ValidatorRegex = EmailRegex();
-
-        [GeneratedRegex(@"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$")]
-        private static partial Regex EmailRegex();
-        
-        public override DomainOutput Validate(string email)
+        public override ProcessOutput Validate(string email)
         {
             if (!IsParameterValid(email, out string validationMessage))
             {
-                Result.Errors.Add(validationMessage);
+                Errors.Add(validationMessage);
 
                 return Resolve();
             }
 
-            if (!ValidatorRegex.IsMatch(email))
+            if (!RegexCollection.Email().IsMatch(email))
             {
-                Result.Errors.Add("Email should be valid");
+                Errors.Add("Email should be valid");
             }
 
             return Resolve();

@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.Net;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Configuration.Functional;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.WebApi.Controllers;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
@@ -17,7 +17,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
             string body = await response.Content.ReadAsStringAsync();
 
-            WebApiOutput<string>? result = JsonConvert.DeserializeObject<WebApiOutput<string>>(body);
+            BaseController.Output<string>? result = JsonConvert.DeserializeObject<BaseController.Output<string>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);

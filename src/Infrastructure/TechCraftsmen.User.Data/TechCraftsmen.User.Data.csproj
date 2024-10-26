@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\TechCraftsmen.User.Utils\TechCraftsmen.User.Utils.csproj" />
   </ItemGroup>
 
 </Project>

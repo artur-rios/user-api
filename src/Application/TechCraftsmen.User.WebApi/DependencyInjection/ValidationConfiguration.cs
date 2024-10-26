@@ -1,4 +1,4 @@
-﻿using TechCraftsmen.User.Core.Validation;
+﻿using TechCraftsmen.User.Domain.Validation;
 
 namespace TechCraftsmen.User.WebApi.DependencyInjection
 {

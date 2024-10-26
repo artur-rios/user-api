@@ -1,6 +1,6 @@
-﻿using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.ValueObjects;
-using TechCraftsmen.User.Tests.Configuration.Attributes;
+﻿using TechCraftsmen.User.Tests.Configuration.Attributes;
+using TechCraftsmen.User.Tests.Mock.Generators;
+using TechCraftsmen.User.Utils.Security;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Utils
@@ -12,39 +12,39 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         [UnitFact("HashUtils")]
         public void Should_HashText_And_ReturnHashAndSalt()
         {
-            HashOutput hashResult = HashUtils.HashText(SampleText);
+            Hash hash = new(SampleText);
 
-            Assert.NotNull(hashResult);
-            Assert.NotEmpty(hashResult.Hash);
-            Assert.NotEmpty(hashResult.Salt);
+            Assert.NotNull(hash);
+            Assert.NotEmpty(hash.Value);
+            Assert.NotEmpty(hash.Salt);
         }
         
         [UnitFact("HashUtils")]
         public void Should_KeepHashAndSalt_ForTheSameText_When_SaltIsPassed()
         {
-            HashOutput hashResult = HashUtils.HashText(SampleText);
-            HashOutput hashResultToCompare = HashUtils.HashText(SampleText, hashResult.Salt);
+            Hash hash = new(SampleText);
+            Hash hashResultToCompare = new(SampleText, hash.Salt);
 
-            Assert.True(hashResult.Hash.SequenceEqual(hashResultToCompare.Hash));
-            Assert.True(hashResult.Salt.SequenceEqual(hashResultToCompare.Salt));
+            Assert.True(hash.Value.SequenceEqual(hashResultToCompare.Value));
+            Assert.True(hash.Salt.SequenceEqual(hashResultToCompare.Salt));
         }
         
         [UnitFact("HashUtils")]
         public void Should_ChangeHashAndSalt_ForTheSameText_When_SaltIsNotPassed()
         {
-            HashOutput hashResult = HashUtils.HashText(SampleText);
-            HashOutput hashResultToCompare = HashUtils.HashText(SampleText);
+            Hash hash = new(SampleText);
+            Hash hashResultToCompare = new(SampleText);
 
-            Assert.False(hashResult.Hash.SequenceEqual(hashResultToCompare.Hash));
-            Assert.False(hashResult.Salt.SequenceEqual(hashResultToCompare.Salt));
+            Assert.False(hash.Value.SequenceEqual(hashResultToCompare.Value));
+            Assert.False(hash.Salt.SequenceEqual(hashResultToCompare.Salt));
         }
         
         [UnitFact("HashUtils")]
         public void Should_ReturnTrue_When_VerifyingWithCorrectHashAndSalt()
         {
-            HashOutput hashResult = HashUtils.HashText(SampleText);
+            Hash hash = new(SampleText);
 
-            bool verifyResult = HashUtils.VerifyHash(SampleText, hashResult);
+            bool verifyResult = hash.TextMatches(SampleText);
 
             Assert.True(verifyResult);
         }
@@ -52,9 +52,9 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         [UnitFact("HashUtils")]
         public void Should_ReturnFalse_When_VerifyingWithIncorrectHash()
         {
-            HashOutput hashResult = HashUtils.HashText($"{SampleText}a");
+            Hash hash = new($"{SampleText}a");
 
-            bool verifyResult = HashUtils.VerifyHash(SampleText, hashResult);
+            bool verifyResult = hash.TextMatches(SampleText);
 
             Assert.False(verifyResult);
         }
@@ -62,12 +62,13 @@ namespace TechCraftsmen.User.Core.Tests.Utils
         [UnitFact("HashUtils")]
         public void Should_ReturnFalse_When_VerifyingWithIncorrectSalt()
         {
-            HashOutput hashResult = HashUtils.HashText($"{SampleText}");
-            byte[] randomSalt = HashUtils.CreateSalt();
+            byte[] randomSalt = CustomRandomNumberGenerator.RandomNumberBytes();
+            
+            Hash hash = new($"{SampleText}");
 
-            hashResult.Salt = randomSalt;
+            hash.Salt = randomSalt;
 
-            bool verifyResult = HashUtils.VerifyHash(SampleText, hashResult);
+            bool verifyResult = hash.TextMatches(SampleText);
 
             Assert.False(verifyResult);
         }

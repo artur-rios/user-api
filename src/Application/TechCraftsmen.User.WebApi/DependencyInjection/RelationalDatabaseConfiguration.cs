@@ -1,6 +1,6 @@
-﻿using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Data.Relational.Configuration;
-using TechCraftsmen.User.Data.Relational.Repositories;
+﻿using TechCraftsmen.User.Data.Configuration;
+using TechCraftsmen.User.Data.Repositories;
+using TechCraftsmen.User.Domain.Interfaces;
 
 namespace TechCraftsmen.User.WebApi.DependencyInjection
 {
@@ -16,7 +16,7 @@ namespace TechCraftsmen.User.WebApi.DependencyInjection
 
         public static void AddRelationalRepositories(this IServiceCollection services)
         {
-            services.AddScoped<ICrudRepository<Core.Entities.User>, UserRepository>();
+            services.AddScoped<ICrudRepository<Domain.Entities.User>, UserRepository>();
         }
     }
 }

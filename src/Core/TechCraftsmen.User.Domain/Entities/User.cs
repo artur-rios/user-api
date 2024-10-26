@@ -1,7 +1,6 @@
-﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Enums;
 
-namespace TechCraftsmen.User.Core.Entities
+namespace TechCraftsmen.User.Domain.Entities
 {
     public class User : BaseEntity
     {
@@ -19,69 +18,77 @@ namespace TechCraftsmen.User.Core.Entities
 
         public bool Active { get; set; } = true;
 
-        public DomainOutput CanActivate()
+        public bool CanActivate(out string[] errors)
         {
-            DomainOutput result = new();
-            
-            if (Active)
-            {
-                result.Errors.Add("User already active");
-            }
-
-            return result;
-        }
-        
-        public DomainOutput CanDeactivate()
-        {
-            DomainOutput result = new();
-            
             if (!Active)
             {
-                result.Errors.Add("User already inactive");
+                errors = [];
+                
+                return true;
             }
 
-            return result;
+            errors = ["User already active"];
+
+            return false;
+
         }
         
-        public DomainOutput CanDelete()
+        public bool CanDeactivate(out string[] errors)
         {
-            DomainOutput result = new();
-            
             if (Active)
             {
-                result.Errors.Add("Can't delete active user");
+                errors = [];
+                
+                return true;
             }
 
-            return result;
+            errors = ["User already inactive"];
+
+            return false;
         }
-
-        public DomainOutput CanRegister(int authenticatedRoleId)
+        
+        public bool CanDelete(out string[] errors)
         {
-            DomainOutput result = new();
-            
-            if (RoleId != (int)Roles.Regular)
-            {
-                if (authenticatedRoleId != (int)Roles.Admin)
-                {
-                    Roles role = (Roles)RoleId;
-                    
-                    result.Errors.Add($"Only admins can register a user with {role.ToString()} role");
-                }
-            }
-
-            return result;
-        }
-
-        public DomainOutput CanUpdate()
-        {
-            DomainOutput result = new();
-            
             if (!Active)
             {
-                result.Errors.Add("Can't update inactive user");
+                errors = [];
+                
+                return true;
             }
 
-            return result;
+            errors = ["Can't delete active user"];
+
+            return false;
+        }
+
+        public bool CanRegister(int authenticatedRoleId, out string[] errors)
+        {
+            if (authenticatedRoleId == (int)Roles.Admin || RoleId == (int)Roles.Regular)
+            {
+                errors = [];
+
+                return true;
+            }
+
+            Roles role = (Roles)RoleId;
+
+            errors = [$"Only admins can register a user with {role.ToString()} role"];
+
+            return false;
+        }
+
+        public bool CanUpdate(out string[] errors)
+        {
+            if (Active)
+            {
+                errors = [];
+
+                return true;
+            }
+
+            errors = ["Can't update inactive user"];
+            
+            return false;
         }
     }
 }

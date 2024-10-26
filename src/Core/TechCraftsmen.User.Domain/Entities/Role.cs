@@ -1,4 +1,4 @@
-namespace TechCraftsmen.User.Core.Entities
+namespace TechCraftsmen.User.Domain.Entities
 {
     public class Role : BaseEntity
     {

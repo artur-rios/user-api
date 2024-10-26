@@ -1,7 +1,6 @@
-﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Domain.Validation;
+using TechCraftsmen.User.Utils.Security;
 
 namespace TechCraftsmen.User.Tests.Mock.Generators
 {
@@ -63,10 +62,10 @@ namespace TechCraftsmen.User.Tests.Mock.Generators
 
         public UserGenerator WithPassword(string password)
         {
-            HashOutput hashResult = HashUtils.HashText(password);
+            Hash hash = new(password);
 
-            _password = hashResult.Hash;
-            _salt = hashResult.Salt;
+            _password = hash.Value;
+            _salt = hash.Salt;
 
             return this;
         }
@@ -74,9 +73,9 @@ namespace TechCraftsmen.User.Tests.Mock.Generators
         public UserGenerator WithRandomPassword()
         {
             string randomString = RandomStringGenerator.WithLength(PasswordValidator.MINIMUM_LENGTH).WithLowerChars().WithUpperChars().WithNumbers().Generate();
-            HashOutput hashResult = HashUtils.HashText(randomString);
+            Hash hashResult = new(randomString);
 
-            _password = hashResult.Hash;
+            _password = hashResult.Value;
             _salt = hashResult.Salt;
 
             return this;
@@ -96,9 +95,9 @@ namespace TechCraftsmen.User.Tests.Mock.Generators
             return this;
         }
 
-        public Core.Entities.User Generate()
+        public Domain.Entities.User Generate()
         {
-            Core.Entities.User user = new()
+            Domain.Entities.User user = new()
             {
                 Id = _id,
                 Name = _name,

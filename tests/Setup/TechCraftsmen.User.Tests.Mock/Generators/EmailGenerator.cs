@@ -9,14 +9,14 @@
         private string? _customUsername;
         private int? _id;
 
-        public EmailGenerator WithCustomDomainName(string domainName)
+        public EmailGenerator WithDomainName(string domainName)
         {
             _customDomainName = domainName;
 
             return this;
         }
 
-        public EmailGenerator WithCustomUserName(string username)
+        public EmailGenerator WithUserName(string username)
         {
             _customUsername = username;
 
@@ -39,8 +39,8 @@
 
         public string Generate()
         {
-            string? username = _customUsername ?? DefaultUserName;
-            string? domainName = _customDomainName ?? DefaultDomainName;
+            string username = _customUsername ?? DefaultUserName;
+            string domainName = _customDomainName ?? DefaultDomainName;
 
             if (_id is not null)
             {

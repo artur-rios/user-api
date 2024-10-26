@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Domain.Enums;
 using TechCraftsmen.User.Services.Dto;
 
 namespace TechCraftsmen.User.WebApi.Authorization

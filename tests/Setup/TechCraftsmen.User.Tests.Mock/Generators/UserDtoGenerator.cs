@@ -1,5 +1,5 @@
-﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Validation;
+﻿using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Domain.Validation;
 using TechCraftsmen.User.Services.Dto;
 
 namespace TechCraftsmen.User.Tests.Mock.Generators

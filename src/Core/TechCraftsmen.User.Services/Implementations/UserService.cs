@@ -1,20 +1,20 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using TechCraftsmen.User.Core.Extensions;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Interfaces;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Filters;
 using TechCraftsmen.User.Services.Interfaces;
 using TechCraftsmen.User.Services.Mapping;
-using Results = TechCraftsmen.User.Core.Enums.Results;
+using TechCraftsmen.User.Services.Output;
+using TechCraftsmen.User.Utils.Extensions;
+using TechCraftsmen.User.Utils.Security;
+using Results = TechCraftsmen.User.Services.Enums.Results;
 
 namespace TechCraftsmen.User.Services.Implementations
 {
     public class UserService(
-        ICrudRepository<Core.Entities.User> userRepository,
+        ICrudRepository<Domain.Entities.User> userRepository,
         IHttpContextAccessor httpContextAccessor,
         IValidator<UserDto> userValidator
     ) : IUserService
@@ -33,30 +33,28 @@ namespace TechCraftsmen.User.Services.Implementations
 
             Dictionary<string, object> filter = new() { { "Email", userDto.Email } };
 
-            IQueryable<Core.Entities.User> userSearch = userRepository.GetByFilter(filter, true);
+            IQueryable<Domain.Entities.User> userSearch = userRepository.GetByFilter(filter, true);
 
             if (userSearch.Any())
             {
                 return new ServiceOutput<int>(default, ["E-mail already registered"], Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity();
+            Domain.Entities.User user = userDto.ToEntity();
 
             httpContextAccessor.HttpContext!.Items.TryGetValue("User", out object? userData);
             
             UserDto? authenticatedUser = userData as UserDto;
             
-            DomainOutput canRegister = user.CanRegister(authenticatedUser!.RoleId);
-            
-            if (!canRegister.Success)
+            if (!user.CanRegister(authenticatedUser!.RoleId, out string[] errors))
             {
-                return new ServiceOutput<int>(default, canRegister.Errors.ToArray(), Results.NotAllowed);
+                return new ServiceOutput<int>(default, errors.ToArray(), Results.NotAllowed);
             }
 
-            HashOutput hashResult = HashUtils.HashText(userDto.Password);
+            Hash hash = new(userDto.Password);
 
-            user.Password = hashResult.Hash;
-            user.Salt = hashResult.Salt;
+            user.Password = hash.Value;
+            user.Salt = hash.Salt;
 
             int createdId = userRepository.Create(user);
 
@@ -65,7 +63,7 @@ namespace TechCraftsmen.User.Services.Implementations
 
         public ServiceOutput<IList<UserDto>> GetUsersByFilter(UserFilter filter)
         {
-            List<Core.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary(), false).ToList();
+            List<Domain.Entities.User> users = userRepository.GetByFilter(filter.NonNullPropertiesToDictionary(), false).ToList();
 
             if (users.Count == 0)
             {
@@ -77,32 +75,21 @@ namespace TechCraftsmen.User.Services.Implementations
             return new ServiceOutput<IList<UserDto>>(usersFound, ["Search completed with success"]);
         }
 
-        public ServiceOutput<HashOutput?> GetPasswordByUserId(int id)
-        {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), true).FirstOrDefault();
-
-            return user is null
-                ? new ServiceOutput<HashOutput?>(default, ["User not found"], Results.NotFound)
-                : new ServiceOutput<HashOutput?>(new HashOutput() { Hash = user.Password, Salt = user.Salt }, ["Password found"]);
-        }
-
         public ServiceOutput<UserDto?> UpdateUser(UserDto userDto)
         {
-            Core.Entities.User? currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id"), false).FirstOrDefault();
+            Domain.Entities.User? currentUser = userRepository.GetByFilter(userDto.Id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (currentUser == null)
             {
                 return new ServiceOutput<UserDto?>(default, ["User not found"], Results.NotFound);
             }
 
-            DomainOutput canUpdate = currentUser.CanUpdate();
-
-            if (!canUpdate.Success)
+            if (!currentUser.CanUpdate(out string[] errors))
             {
-                return new ServiceOutput<UserDto?>(default, canUpdate.Errors.ToArray(), Results.NotAllowed);
+                return new ServiceOutput<UserDto?>(default, errors.ToArray(), Results.NotAllowed);
             }
 
-            Core.Entities.User user = userDto.ToEntity();
+            Domain.Entities.User user = userDto.ToEntity();
 
             MergeUser(currentUser, user);
 
@@ -113,18 +100,16 @@ namespace TechCraftsmen.User.Services.Implementations
 
         public ServiceOutput<int> ActivateUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
+            Domain.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (user == null)
             {
                 return new ServiceOutput<int>(default, ["User not found"], Results.NotFound);
             }
 
-            DomainOutput canActivate = user.CanActivate();
-
-            if (!canActivate.Success)
+            if (!user.CanActivate(out string[] errors))
             {
-                return new ServiceOutput<int>(id, canActivate.Errors.ToArray(), Results.EntityNotChanged);
+                return new ServiceOutput<int>(id, errors.ToArray(), Results.EntityNotChanged);
             }
 
             user.Active = true;
@@ -136,18 +121,16 @@ namespace TechCraftsmen.User.Services.Implementations
 
         public ServiceOutput<int> DeactivateUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
+            Domain.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), false).FirstOrDefault();
             
             if (user == null)
             {
                 return new ServiceOutput<int>(default, ["User not found"], Results.NotFound);
             }
 
-            DomainOutput canDeactivate = user.CanDeactivate();
-
-            if (!canDeactivate.Success)
+            if (!user.CanDeactivate(out string[] errors))
             {
-                return new ServiceOutput<int>(id, canDeactivate.Errors.ToArray(), Results.EntityNotChanged);
+                return new ServiceOutput<int>(id, errors.ToArray(), Results.EntityNotChanged);
             }
 
             user.Active = false;
@@ -159,18 +142,16 @@ namespace TechCraftsmen.User.Services.Implementations
 
         public ServiceOutput<int> DeleteUser(int id)
         {
-            Core.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), true).FirstOrDefault();
+            Domain.Entities.User? user = userRepository.GetByFilter(id.ToDictionary("Id"), true).FirstOrDefault();
             
             if (user == null)
             {
                 return new ServiceOutput<int>(default, ["User not found"], Results.NotFound);
             }
 
-            DomainOutput canDelete = user.CanDelete();
-
-            if (!canDelete.Success)
+            if (!user.CanDelete(out string[] errors))
             {
-                return new ServiceOutput<int>(id, canDelete.Errors.ToArray(), Results.NotAllowed);
+                return new ServiceOutput<int>(id, errors.ToArray(), Results.NotAllowed);
             }
 
             userRepository.Delete(user);
@@ -178,7 +159,7 @@ namespace TechCraftsmen.User.Services.Implementations
             return new ServiceOutput<int>(id, ["User deleted with success"]);
         }
 
-        private static void MergeUser(Core.Entities.User source, Core.Entities.User target, bool mergeStatus = true)
+        private static void MergeUser(Domain.Entities.User source, Domain.Entities.User target, bool mergeStatus = true)
         {
             target.Password = source.Password;
             target.Salt = source.Salt;

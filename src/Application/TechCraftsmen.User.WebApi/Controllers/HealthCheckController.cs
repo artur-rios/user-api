@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.WebApi.Authorization;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.ValueObjects;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Services.Filters;
+using TechCraftsmen.User.Services.Output;
 
 namespace TechCraftsmen.User.WebApi.Controllers
 {
@@ -15,7 +14,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
-        public ActionResult<WebApiOutput<string>> HelloWorld()
+        public ActionResult<Output<string>> HelloWorld()
         {
             ServiceOutput<string> result = new("Hello world!", ["User Api ON"]);
             
@@ -25,7 +24,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpGet]
         [Route("Query")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<UserFilter>> TestQuery([FromQuery] UserFilter filter)
+        public ActionResult<Output<UserFilter>> TestQuery([FromQuery] UserFilter filter)
         {
             ServiceOutput<UserFilter> result = new(filter, ["Filter parsed with success"]);
             

@@ -1,12 +1,12 @@
-﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Exceptions;
-using TechCraftsmen.User.Core.Extensions;
+﻿using TechCraftsmen.User.Domain.Enums;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Configuration.Functional;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.Utils.Exceptions;
+using TechCraftsmen.User.Utils.Extensions;
+using TechCraftsmen.User.WebApi.Controllers;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
@@ -39,7 +39,7 @@ namespace TechCraftsmen.User.WebApi.Tests
         {
             string query = $"?Email={_userMocks.TestUser.Email}";
 
-            WebApiOutput<IList<UserDto>>? result = await Get<IList<UserDto>>($"{UserRoute}/Filter{query}");
+            BaseController.Output<IList<UserDto>>? result = await Get<IList<UserDto>>($"{UserRoute}/Filter{query}");
 
             Assert.NotNull(result);
             Assert.Equal("Search completed with success", result.Messages.First());
@@ -57,7 +57,7 @@ namespace TechCraftsmen.User.WebApi.Tests
         {
             const string query = $"?Email={NonexistentEmail}";
 
-            WebApiOutput<IList<UserDto>>? result = await Get<IList<UserDto>>($"{UserRoute}/Filter{query}");
+            BaseController.Output<IList<UserDto>>? result = await Get<IList<UserDto>>($"{UserRoute}/Filter{query}");
 
             Assert.NotNull(result);
             Assert.Empty(result.Data);
@@ -71,20 +71,20 @@ namespace TechCraftsmen.User.WebApi.Tests
             UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
                 .WithRoleId((int)Roles.Regular).Generate();
 
-            WebApiOutput<int>? creationResult = await Post<int>($"{UserRoute}/Create", dto);
+            BaseController.Output<int>? creationResult = await Post<int>($"{UserRoute}/Create", dto);
 
             Assert.NotNull(creationResult);
             Assert.True(creationResult.Data > 0);
             Assert.Equal("User created with success", creationResult.Messages.First());
 
-            WebApiOutput<int>? deactivationResult = await Patch<int>($"{UserRoute}/{creationResult.Data}/Deactivate");
+            BaseController.Output<int>? deactivationResult = await Patch<int>($"{UserRoute}/{creationResult.Data}/Deactivate");
             
             Assert.NotNull(deactivationResult);
             Assert.True(deactivationResult.Data > 0);
             Assert.Equal(creationResult.Data, deactivationResult.Data);
             Assert.Equal("User deactivated with success", deactivationResult.Messages.First());
 
-            WebApiOutput<int>? deletionResult = await Delete<int>($"{UserRoute}/{creationResult.Data}/Delete");
+            BaseController.Output<int>? deletionResult = await Delete<int>($"{UserRoute}/{creationResult.Data}/Delete");
             
             Assert.NotNull(deletionResult);
             Assert.True(deletionResult.Data > 0);
@@ -98,7 +98,7 @@ namespace TechCraftsmen.User.WebApi.Tests
             UserDto dto = _dtoGenerator.WithEmail("").WithDefaultName().WithRandomPassword()
                 .WithRoleId((int)Roles.Regular).Generate();
 
-            WebApiOutput<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+            BaseController.Output<int>? result = await Post<int>($"{UserRoute}/Create", dto);
 
             Assert.NotNull(result);
             Assert.Equal(default, result.Data);
@@ -112,7 +112,7 @@ namespace TechCraftsmen.User.WebApi.Tests
             UserDto dto = _dtoGenerator.WithEmail(_userMocks.TestUserDto.Email).WithDefaultName().WithRandomPassword()
                 .WithRoleId((int)Roles.Regular).Generate();
             
-            WebApiOutput<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+            BaseController.Output<int>? result = await Post<int>($"{UserRoute}/Create", dto);
             
             Assert.NotNull(result);
             Assert.Equal(default, result.Data);
@@ -126,7 +126,7 @@ namespace TechCraftsmen.User.WebApi.Tests
             UserDto dto = _dtoGenerator.WithEmail("creation.test@mail.com").WithDefaultName().WithRandomPassword()
                 .WithRoleId((int)Roles.Admin).Generate();
             
-            WebApiOutput<int>? result = await Post<int>($"{UserRoute}/Create", dto);
+            BaseController.Output<int>? result = await Post<int>($"{UserRoute}/Create", dto);
 
             Assert.NotNull(result);
             Assert.Equal(default, result.Data);
@@ -137,14 +137,14 @@ namespace TechCraftsmen.User.WebApi.Tests
         [FunctionalFact("User")]
         public async void Should_DeactivateAndActivateUser()
         {
-            WebApiOutput<int>? deactivationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Deactivate");
+            BaseController.Output<int>? deactivationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Deactivate");
             
             Assert.NotNull(deactivationResult);
             Assert.True(deactivationResult.Data > 0);
             Assert.Equal(UserMockData.TEST_ID, deactivationResult.Data);
             Assert.Equal("User deactivated with success", deactivationResult.Messages.First());
 
-            WebApiOutput<int>? activationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Activate");
+            BaseController.Output<int>? activationResult = await Patch<int>($"{UserRoute}/{UserMockData.TEST_ID}/Activate");
             
             Assert.NotNull(activationResult);
             Assert.True(activationResult.Data > 0);
@@ -158,14 +158,14 @@ namespace TechCraftsmen.User.WebApi.Tests
             UserDto userToUpdate = _userMocks.TestUserDto.Clone() ?? throw new CustomException(["Extension method Clone returned null"], "Could not clone UserDto object");
             userToUpdate.Name = "Updated name";
 
-            WebApiOutput<UserDto>? updateResult = await Put<UserDto>($"{UserRoute}/Update", userToUpdate);
+            BaseController.Output<UserDto>? updateResult = await Put<UserDto>($"{UserRoute}/Update", userToUpdate);
             
             Assert.NotNull(updateResult);
             Assert.Equal(userToUpdate.Id, updateResult.Data.Id);
             Assert.Equal(userToUpdate.Name, updateResult.Data.Name);
             Assert.Equal("User updated with success", updateResult.Messages.First());
 
-            WebApiOutput<IList<UserDto>>? updatedUserResult = await Get<IList<UserDto>>($"{UserRoute}/Filter?Id={userToUpdate.Id}");
+            BaseController.Output<IList<UserDto>>? updatedUserResult = await Get<IList<UserDto>>($"{UserRoute}/Filter?Id={userToUpdate.Id}");
 
             Assert.NotNull(updatedUserResult);
             Assert.NotEmpty(updatedUserResult.Data);
@@ -175,14 +175,14 @@ namespace TechCraftsmen.User.WebApi.Tests
             Assert.Equal(userToUpdate.Id, updatedUser.Id);
             Assert.Equal(userToUpdate.Name, updatedUser.Name);
 
-            WebApiOutput<UserDto>? rollbackResult = await Put<UserDto>($"{UserRoute}/Update", _userMocks.TestUserDto);
+            BaseController.Output<UserDto>? rollbackResult = await Put<UserDto>($"{UserRoute}/Update", _userMocks.TestUserDto);
             
             Assert.NotNull(rollbackResult);
             Assert.Equal(_userMocks.TestUserDto.Id, rollbackResult.Data.Id);
             Assert.Equal(_userMocks.TestUserDto.Name, rollbackResult.Data.Name);
             Assert.Equal("User updated with success", rollbackResult.Messages.First());
             
-            WebApiOutput<IList<UserDto>>? rollbackUserResult = await Get<IList<UserDto>>($"{UserRoute}/Filter?Id={userToUpdate.Id}");
+            BaseController.Output<IList<UserDto>>? rollbackUserResult = await Get<IList<UserDto>>($"{UserRoute}/Filter?Id={userToUpdate.Id}");
 
             Assert.NotNull(rollbackUserResult);
             Assert.NotEmpty(rollbackUserResult.Data);

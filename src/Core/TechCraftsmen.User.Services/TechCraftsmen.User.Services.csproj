@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TechCraftsmen.User.Domain\TechCraftsmen.User.Domain.csproj" />
+    <ProjectReference Include="..\TechCraftsmen.User.Utils\TechCraftsmen.User.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

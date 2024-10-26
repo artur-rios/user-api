@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechCraftsmen.User.WebApi.Authorization;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Enums;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Filters;
 using TechCraftsmen.User.Services.Interfaces;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.Services.Output;
 
 namespace TechCraftsmen.User.WebApi.Controllers
 {
@@ -17,7 +16,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpPost]
         [Route("Create")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<int>> CreateUser([FromBody] UserDto userDto)
+        public ActionResult<Output<int>> CreateUser([FromBody] UserDto userDto)
         {
             ServiceOutput<int> userId = user.CreateUser(userDto);
 
@@ -27,7 +26,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpGet]
         [Route("Filter")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<IList<UserDto>>> GetUsersByFilter([FromQuery] UserFilter filter)
+        public ActionResult<Output<IList<UserDto>>> GetUsersByFilter([FromQuery] UserFilter filter)
         {
             ServiceOutput<IList<UserDto>> users = user.GetUsersByFilter(filter);
 
@@ -37,7 +36,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpPut]
         [Route("Update")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<UserDto>> UpdateUser([FromBody] UserDto userDto)
+        public ActionResult<Output<UserDto>> UpdateUser([FromBody] UserDto userDto)
         {
             ServiceOutput<UserDto?> updatedUser = user.UpdateUser(userDto);
 
@@ -47,7 +46,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpPatch]
         [Route("{id:int}/Activate")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<int>> ActivateUser([FromRoute] int id)
+        public ActionResult<Output<int>> ActivateUser([FromRoute] int id)
         {
             ServiceOutput<int> activatedUserId = user.ActivateUser(id);
 
@@ -57,7 +56,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpPatch]
         [Route("{id:int}/Deactivate")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<int>> DeactivateUser([FromRoute] int id)
+        public ActionResult<Output<int>> DeactivateUser([FromRoute] int id)
         {
             ServiceOutput<int> deactivatedUserId = user.DeactivateUser(id);
 
@@ -67,7 +66,7 @@ namespace TechCraftsmen.User.WebApi.Controllers
         [HttpDelete]
         [Route("{id:int}/Delete")]
         [RoleRequirement(Roles.Admin, Roles.Test)]
-        public ActionResult<WebApiOutput<int>> DeleteUser([FromRoute] int id)
+        public ActionResult<Output<int>> DeleteUser([FromRoute] int id)
         {
             ServiceOutput<int> deletedUserId = user.DeleteUser(id);
 

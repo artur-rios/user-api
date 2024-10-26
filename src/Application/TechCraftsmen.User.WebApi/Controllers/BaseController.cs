@@ -1,14 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Services.Output;
 using TechCraftsmen.User.WebApi.Mapping;
-using TechCraftsmen.User.WebApi.ValueObjects;
-using Results = TechCraftsmen.User.Core.Enums.Results;
+using Results = TechCraftsmen.User.Services.Enums.Results;
 
 namespace TechCraftsmen.User.WebApi.Controllers
 {
     public abstract class BaseController : Controller
     {
-        protected static ActionResult<WebApiOutput<T>> Resolve<T>(ServiceOutput<T> operationResult)
+        public class Output<T>(T data, string[] messages, bool success = false)
+        {
+            public T Data { get; } = data;
+            public string[] Messages { get; } = messages;
+            public DateTime Timestamp { get; } = DateTime.UtcNow;
+            public bool Success { get; set; } = success;
+        }
+        
+        protected static ActionResult<Output<T>> Resolve<T>(ServiceOutput<T> operationResult)
         {
             return new ObjectResult(operationResult.ToWebApiOutput()){ StatusCode = ToStatusCode(operationResult.Result) };
         }

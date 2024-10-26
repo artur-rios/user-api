@@ -1,21 +1,20 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Validation;
-using TechCraftsmen.User.Core.Validation.Fluent;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Domain.Interfaces;
+using TechCraftsmen.User.Domain.Validation;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Filters;
 using TechCraftsmen.User.Services.Implementations;
 using TechCraftsmen.User.Services.Mapping;
+using TechCraftsmen.User.Services.Output;
 using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
 using Xunit;
-using Results = TechCraftsmen.User.Core.Enums.Results;
+using Results = TechCraftsmen.User.Services.Enums.Results;
 
 namespace TechCraftsmen.User.Services.Tests
 {
@@ -29,7 +28,7 @@ namespace TechCraftsmen.User.Services.Tests
 
         private readonly string _passwordMock;
         private readonly UserDto _userDtoMock;
-        private readonly Core.Entities.User _userMock;
+        private readonly Domain.Entities.User _userMock;
 
         private const int ExistingId = 1;
         private const int NonexistentId = 2;
@@ -39,7 +38,7 @@ namespace TechCraftsmen.User.Services.Tests
 
         public UserServiceTests()
         {
-            Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
+            Mock<ICrudRepository<Domain.Entities.User>> userRepository = new();
             IValidator<UserDto> userValidator = new UserDtoValidator();
             Mock<HttpContextAccessor> httpContextAccessor = new();
 
@@ -52,7 +51,7 @@ namespace TechCraftsmen.User.Services.Tests
             _userDtoMock.Password = _passwordMock;
             UserMockData userMocks = new();
 
-            userRepository.Setup(repo => repo.Create(It.IsAny<Core.Entities.User>())).Returns(() => _userMock.Id);
+            userRepository.Setup(repo => repo.Create(It.IsAny<Domain.Entities.User>())).Returns(() => _userMock.Id);
 
             userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>(), It.IsAny<bool>()))
                 .Returns((Dictionary<string, object> filter, bool track) =>
@@ -63,7 +62,7 @@ namespace TechCraftsmen.User.Services.Tests
                     {
                         return (int)filter.FirstOrDefault().Value switch
                         {
-                            ExistingId => new List<Core.Entities.User>
+                            ExistingId => new List<Domain.Entities.User>
                             {
                                 _userGenerator.WithId(ExistingId)
                                     .WithDefaultEmail()
@@ -71,7 +70,7 @@ namespace TechCraftsmen.User.Services.Tests
                                     .WithRandomPassword()
                                     .Generate()
                             }.AsQueryable(),
-                            InactiveId => new List<Core.Entities.User>
+                            InactiveId => new List<Domain.Entities.User>
                             {
                                 _userGenerator.WithId(InactiveId)
                                     .WithDefaultEmail()
@@ -80,24 +79,24 @@ namespace TechCraftsmen.User.Services.Tests
                                     .WithStatus(false)
                                     .Generate()
                             }.AsQueryable(),
-                            _ => new List<Core.Entities.User>().AsQueryable()
+                            _ => new List<Domain.Entities.User>().AsQueryable()
                         };
                     }
 
                     return filter.FirstOrDefault().Value as string == ExistingEmail
-                        ? new List<Core.Entities.User>
+                        ? new List<Domain.Entities.User>
                         {
                             _userGenerator.WithId(ExistingId)
                                 .WithEmail(ExistingEmail)
                                 .WithRandomPassword()
                                 .Generate()
                         }.AsQueryable()
-                        : new List<Core.Entities.User>().AsQueryable();
+                        : new List<Domain.Entities.User>().AsQueryable();
                 });
 
-            userRepository.Setup(repo => repo.Update(It.IsAny<Core.Entities.User>()));
+            userRepository.Setup(repo => repo.Update(It.IsAny<Domain.Entities.User>()));
 
-            userRepository.Setup(repo => repo.Delete(It.IsAny<Core.Entities.User>()));
+            userRepository.Setup(repo => repo.Delete(It.IsAny<Domain.Entities.User>()));
 
             httpContextAccessor.Object.HttpContext = new DefaultHttpContext();
             httpContextAccessor.Object.HttpContext!.Items =
@@ -185,31 +184,9 @@ namespace TechCraftsmen.User.Services.Tests
         }
         
         [UnitFact("UserService")]
-        public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndPasswordCannotBeFound()
-        {
-            ServiceOutput<HashOutput?> result = _userService.GetPasswordByUserId(NonexistentId);
-
-            Assert.Equal(default, result.Data);
-            Assert.Equal(Results.NotFound, result.Result);
-            Assert.Equal("User not found", result.Messages.First());
-        }
-        
-        [UnitFact("UserService")]
-        public void Should_ReturnPassword_When_IdIsOnDatabase()
-        {
-            ServiceOutput<HashOutput?> result = _userService.GetPasswordByUserId(ExistingId);
-
-            Assert.NotNull(result.Data);
-            Assert.NotEmpty(result.Data.Hash);
-            Assert.NotEmpty(result.Data.Salt);
-            Assert.Equal(Results.Success, result.Result);
-            Assert.Equal("Password found", result.Messages.First());
-        }
-        
-        [UnitFact("UserService")]
         public void Should_ReturnNotFoundError_WhenIdNotOnDatabaseAndCannotUpdateUser()
         {
-            Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId)
+            Domain.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(NonexistentId)
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
@@ -223,7 +200,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_ReturnNotNotAllowedError_WhenUserIsInactive()
         {
-            Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId)
+            Domain.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(InactiveId)
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 
@@ -237,7 +214,7 @@ namespace TechCraftsmen.User.Services.Tests
         [UnitFact("UserService")]
         public void Should_UpdateUser()
         {
-            Core.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(ExistingId)
+            Domain.Entities.User userMock = _userGenerator.WithDefaultEmail().WithDefaultName().WithId(ExistingId)
                 .WithPassword(_passwordMock).Generate();
             UserDto userDto = userMock.ToDto();
 

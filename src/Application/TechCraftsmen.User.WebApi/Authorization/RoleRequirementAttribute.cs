@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.Core.Enums;
+using TechCraftsmen.User.Domain.Enums;
 
 namespace TechCraftsmen.User.WebApi.Authorization
 {

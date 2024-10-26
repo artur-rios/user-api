@@ -1,38 +1,37 @@
-﻿using TechCraftsmen.User.Core.Collections;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Output;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Domain.Validation
 {
     public class PasswordValidator : BaseValidator<string>
     {
         public const int MINIMUM_LENGTH = 8;
-        public override DomainOutput Validate(string password)
+        public override ProcessOutput Validate(string password)
         {
             if (!IsParameterValid(password, out string validationMessage))
             {
-                Result.Errors.Add(validationMessage);
+                Errors.Add(validationMessage);
 
                 return Resolve();
             }
 
             if (!RegexCollection.HasNumber().IsMatch(password))
             {
-                Result.Errors.Add("Password must contain a number");
+                Errors.Add("Password must contain a number");
             }
 
             if (!RegexCollection.HasLowerChar().IsMatch(password))
             {
-                Result.Errors.Add("Password must contain a lower char");
+                Errors.Add("Password must contain a lower char");
             }
 
             if (!RegexCollection.HasUpperChar().IsMatch(password))
             {
-                Result.Errors.Add("Password must contain a upper char");
+                Errors.Add("Password must contain a upper char");
             }
 
             if (password.Length < MINIMUM_LENGTH)
             {
-                Result.Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
+                Errors.Add($"Password must contain at least {MINIMUM_LENGTH} characters");
             }
 
             return Resolve();

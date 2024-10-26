@@ -1,15 +1,15 @@
-﻿using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Domain.Output;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Domain.Validation
 {
     public class RoleIdValidator : BaseValidator<int>
     {
-        public override DomainOutput Validate(int roleId)
+        public override ProcessOutput Validate(int roleId)
         {
             if (!IsParameterValid(roleId, out string validationMessage))
             {
-                Result.Errors.Add(validationMessage);
+                Errors.Add(validationMessage);
 
                 return Resolve();
             }
@@ -18,7 +18,7 @@ namespace TechCraftsmen.User.Core.Validation
 
             if (!validRole)
             {
-                Result.Errors.Add("Role should be valid");
+                Errors.Add("Role should be valid");
             }
 
             return Resolve();

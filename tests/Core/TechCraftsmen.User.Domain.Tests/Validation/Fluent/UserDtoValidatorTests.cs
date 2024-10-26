@@ -1,5 +1,4 @@
 ﻿using FluentValidation.TestHelper;
-using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
@@ -24,10 +23,10 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldHaveValidationErrorFor(u => user.Name);
-            result.ShouldNotHaveValidationErrorFor(u => user.Email);
-            result.ShouldNotHaveValidationErrorFor(u => user.Password);
-            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
+            result.ShouldHaveValidationErrorFor("Name");
+            result.ShouldNotHaveValidationErrorFor("Email");
+            result.ShouldNotHaveValidationErrorFor("Password");
+            result.ShouldNotHaveValidationErrorFor("RoleId");
         }
         
         [UnitTheory("UserDtoValidator")]
@@ -42,10 +41,10 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(u => user.Name);
-            result.ShouldHaveValidationErrorFor(u => user.Email);
-            result.ShouldNotHaveValidationErrorFor(u => user.Password);
-            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor("Name");
+            result.ShouldHaveValidationErrorFor("Email");
+            result.ShouldNotHaveValidationErrorFor("Password");
+            result.ShouldNotHaveValidationErrorFor("RoleId");
         }
         
         [UnitTheory("UserDtoValidator")]
@@ -63,10 +62,10 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(u => user.Name);
-            result.ShouldNotHaveValidationErrorFor(u => user.Email);
-            result.ShouldHaveValidationErrorFor(u => user.Password);
-            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor("Name");
+            result.ShouldNotHaveValidationErrorFor("Email");
+            result.ShouldHaveValidationErrorFor("Password");
+            result.ShouldNotHaveValidationErrorFor("RoleId");
         }
         
         [UnitFact("UserDtoValidator")]
@@ -76,10 +75,10 @@ namespace TechCraftsmen.User.Core.Tests.Validation.Fluent
 
             TestValidationResult<UserDto>? result = _validator.TestValidate(user);
 
-            result.ShouldNotHaveValidationErrorFor(u => user.Name);
-            result.ShouldNotHaveValidationErrorFor(u => user.Email);
-            result.ShouldNotHaveValidationErrorFor(u => user.Password);
-            result.ShouldNotHaveValidationErrorFor(u => user.RoleId);
+            result.ShouldNotHaveValidationErrorFor("Name");
+            result.ShouldNotHaveValidationErrorFor("Email");
+            result.ShouldNotHaveValidationErrorFor("Password");
+            result.ShouldNotHaveValidationErrorFor("RoleId");
         }
     }
 }

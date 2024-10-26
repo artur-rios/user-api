@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Moq;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Interfaces.Repositories;
-using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Enums;
+using TechCraftsmen.User.Domain.Interfaces;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
+using TechCraftsmen.User.Utils.Extensions;
 using Xunit;
 
 namespace TechCraftsmen.User.Core.Tests.Entities
@@ -24,14 +23,14 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         {
             _userGenerator = new UserGenerator();
             UserMockData userMocks = new();
-            Mock<ICrudRepository<Core.Entities.User>> userRepository = new();
+            Mock<ICrudRepository<Domain.Entities.User>> userRepository = new();
             _httpContextAccessor = new Mock<HttpContextAccessor>();
 
-            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", ExistingEmail), false))
-                .Returns(() => new List<Core.Entities.User>() { _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword().Generate() }.AsQueryable());
+            userRepository.Setup(repo => repo.GetByFilter(ExistingEmail.ToDictionary("Email"), false))
+                .Returns(() => new List<Domain.Entities.User> { _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword().Generate() }.AsQueryable());
 
-            userRepository.Setup(repo => repo.GetByFilter(FilterUtils.CreateDictionary("Email", NonexistentEmail), false))
-                .Returns(() => new List<Core.Entities.User>().AsQueryable());
+            userRepository.Setup(repo => repo.GetByFilter(NonexistentEmail.ToDictionary("Email"), false))
+                .Returns(() => new List<Domain.Entities.User>().AsQueryable());
 
             _httpContextAccessor.Object.HttpContext = new DefaultHttpContext();
             _httpContextAccessor.Object.HttpContext!.Items = new Dictionary<object, object?>() { { "User", userMocks.TestUserDto } };
@@ -40,110 +39,110 @@ namespace TechCraftsmen.User.Core.Tests.Entities
         [UnitFact("User")]
         public void Should_NotAllowCreationOfAdmins_IfAuthenticatedUserNotAnAdmin()
         {
-            Core.Entities.User user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
+            Domain.Entities.User user = _userGenerator.WithDefaultEmail().WithDefaultName().WithRandomId().WithRandomPassword()
                 .WithRoleId((int)Roles.Admin).Generate();
                 
             _httpContextAccessor.Object.HttpContext!.Items.TryGetValue("User", out object? userData);
 
             UserDto? authenticatedUser = userData as UserDto;
 
-            DomainOutput canRegister = user.CanRegister(authenticatedUser!.RoleId);
+            bool canRegister = user.CanRegister(authenticatedUser!.RoleId, out string[] errors);
 
-            Assert.False(canRegister.Success);
-            Assert.True(canRegister.Errors.Any());
-            Assert.Equal("Only admins can register a user with Admin role", canRegister.Errors.FirstOrDefault());
+            Assert.False(canRegister);
+            Assert.NotEmpty(errors);
+            Assert.Equal("Only admins can register a user with Admin role", errors.FirstOrDefault());
         }
         
         [UnitFact("User")]
         public void Should_NotAllowDeletion_ForActiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            DomainOutput canDelete = user.CanDelete();
+            bool canDelete = user.CanDelete(out string[] errors);
 
-            Assert.False(canDelete.Success);
-            Assert.True(canDelete.Errors.Any());
-            Assert.Equal("Can't delete active user", canDelete.Errors.FirstOrDefault());
+            Assert.False(canDelete);
+            Assert.NotEmpty(errors);
+            Assert.Equal("Can't delete active user", errors.FirstOrDefault());
         }
         
         [UnitFact("User")]
         public void Should_AllowDeletion_ForInactiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            DomainOutput canDelete = user.CanDelete();
+            bool canDelete = user.CanDelete(out string[] errors);
 
-            Assert.True(canDelete.Success);
-            Assert.False(canDelete.Errors.Any());
+            Assert.True(canDelete);
+            Assert.Empty(errors);
         }
         
         [UnitFact("User")]
         public void Should_NotAllowActivation_ForActiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            DomainOutput canActivate = user.CanActivate();
+            bool canActivate = user.CanActivate(out string[] errors);
 
-            Assert.False(canActivate.Success);
-            Assert.True(canActivate.Errors.Any());
-            Assert.Equal($"User already active", canActivate.Errors.FirstOrDefault());
+            Assert.False(canActivate);
+            Assert.NotEmpty(errors);
+            Assert.Equal("User already active", errors.FirstOrDefault());
         }
         
         [UnitFact("User")]
         public void Should_AllowActivation_ForInactiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            DomainOutput canActivate = user.CanActivate();
+            bool canActivate = user.CanActivate(out string[] errors);
 
-            Assert.True(canActivate.Success);
-            Assert.False(canActivate.Errors.Any());
+            Assert.True(canActivate);
+            Assert.Empty(errors);
         }
         
         [UnitFact("User")]
         public void Should_NotAllowDeactivation_ForInactiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(false).Generate();
 
-            DomainOutput canDeactivate = user.CanDeactivate();
+            bool canDeactivate = user.CanDeactivate(out string[] errors);
 
-            Assert.False(canDeactivate.Success);
-            Assert.True(canDeactivate.Errors.Any());
-            Assert.Equal($"User already inactive", canDeactivate.Errors.FirstOrDefault());
+            Assert.False(canDeactivate);
+            Assert.NotEmpty(errors);
+            Assert.Equal("User already inactive", errors.FirstOrDefault());
         }
         
         [UnitFact("User")]
         public void Should_AllowDeactivation_ForInactiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(true).Generate();
 
-            DomainOutput canDeactivate = user.CanDeactivate();
+            bool canDeactivate = user.CanDeactivate(out string[] errors);
 
-            Assert.True(canDeactivate.Success);
-            Assert.False(canDeactivate.Errors.Any());
+            Assert.True(canDeactivate);
+            Assert.Empty(errors);
         }
 
         [UnitFact("User")]
         public void Should_NotUpdate_InactiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(false).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(false).Generate();
             
-            DomainOutput canUpdate = user.CanUpdate();
+            bool canUpdate = user.CanUpdate(out string[] errors);
 
-            Assert.False(canUpdate.Success);
-            Assert.True(canUpdate.Errors.Any());
-            Assert.Equal("Can't update inactive user", canUpdate.Errors.FirstOrDefault());
+            Assert.False(canUpdate);
+            Assert.NotEmpty(errors);
+            Assert.Equal("Can't update inactive user", errors.FirstOrDefault());
         }
         
         [UnitFact("User")]
         public void Should_Update_ActiveUser()
         {
-            Core.Entities.User user = _userGenerator.WithStatus(true).Generate();
+            Domain.Entities.User user = _userGenerator.WithStatus(true).Generate();
             
-            DomainOutput canUpdate = user.CanUpdate();
+            bool canUpdate = user.CanUpdate(out string[] errors);
 
-            Assert.True(canUpdate.Success);
-            Assert.False(canUpdate.Errors.Any());
+            Assert.True(canUpdate);
+            Assert.Empty(errors);
         }
     }
 }

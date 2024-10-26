@@ -1,6 +1,6 @@
-﻿using TechCraftsmen.User.Core.Entities;
-using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Services.Authentication;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Output;
 
 namespace TechCraftsmen.User.Services.Interfaces
 {

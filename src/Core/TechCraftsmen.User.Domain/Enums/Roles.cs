@@ -1,4 +1,4 @@
-﻿namespace TechCraftsmen.User.Core.Enums
+﻿namespace TechCraftsmen.User.Domain.Enums
 {
     public enum Roles
     {

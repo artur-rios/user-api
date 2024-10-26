@@ -1,4 +1,4 @@
-﻿using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Domain.Enums;
 
 namespace TechCraftsmen.User.Services.Dto
 {

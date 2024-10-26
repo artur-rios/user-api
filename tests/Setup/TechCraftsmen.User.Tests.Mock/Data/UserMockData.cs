@@ -1,4 +1,4 @@
-﻿using TechCraftsmen.User.Core.Enums;
+﻿using TechCraftsmen.User.Domain.Enums;
 using TechCraftsmen.User.Services.Dto;
 
 namespace TechCraftsmen.User.Tests.Mock.Data
@@ -8,7 +8,7 @@ namespace TechCraftsmen.User.Tests.Mock.Data
         public const string TEST_PASSWORD = "$k9!dTTW*zTe4uAHX";
         public const int TEST_ID = 2;
 
-        public readonly Core.Entities.User TestUser = new()
+        public readonly Domain.Entities.User TestUser = new()
         {
             Id = TEST_ID,
             Name = "Test User",

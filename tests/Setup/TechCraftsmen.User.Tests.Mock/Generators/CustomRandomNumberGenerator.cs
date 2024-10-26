@@ -1,4 +1,6 @@
-﻿namespace TechCraftsmen.User.Tests.Mock.Generators
+﻿using System.Security.Cryptography;
+
+namespace TechCraftsmen.User.Tests.Mock.Generators
 {
     public static class CustomRandomNumberGenerator
     {
@@ -19,6 +21,16 @@
             }
 
             return random;
+        }
+        
+        public static byte[] RandomNumberBytes()
+        {
+            byte[] buffer = new byte[16];
+
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+            rng.GetBytes(buffer);
+
+            return buffer;
         }
     }
 }

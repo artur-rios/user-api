@@ -1,4 +1,4 @@
-﻿using TechCraftsmen.User.Core.Configuration;
+﻿using TechCraftsmen.User.Services.Configuration;
 
 namespace TechCraftsmen.User.Tests.Mock.Generators
 {

@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using System.Text;
-using TechCraftsmen.User.Core.Entities;
+using TechCraftsmen.User.Services.Authentication;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Configuration.Functional;
 using TechCraftsmen.User.Tests.Mock.Data;
 using TechCraftsmen.User.Tests.Mock.Generators;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.WebApi.Controllers;
 
 namespace TechCraftsmen.User.WebApi.Tests
 {
@@ -33,7 +33,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
             string body = await response.Content.ReadAsStringAsync();
 
-            WebApiOutput<AuthenticationToken>? result = JsonConvert.DeserializeObject<WebApiOutput<AuthenticationToken>>(body);
+            BaseController.Output<AuthenticationToken>? result = JsonConvert.DeserializeObject<BaseController.Output<AuthenticationToken>>(body);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(result);
@@ -59,7 +59,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
                 string body = await response.Content.ReadAsStringAsync();
 
-                WebApiOutput<string>? result = JsonConvert.DeserializeObject<WebApiOutput<string>>(body);
+                BaseController.Output<string>? result = JsonConvert.DeserializeObject<BaseController.Output<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);
@@ -84,7 +84,7 @@ namespace TechCraftsmen.User.WebApi.Tests
 
                 string body = await response.Content.ReadAsStringAsync();
 
-                WebApiOutput<string>? result = JsonConvert.DeserializeObject<WebApiOutput<string>>(body);
+                BaseController.Output<string>? result = JsonConvert.DeserializeObject<BaseController.Output<string>>(body);
 
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
                 Assert.NotNull(result);

@@ -1,6 +1,6 @@
-﻿using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.ValueObjects;
-using TechCraftsmen.User.Services.Dto;
+﻿using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Filters;
+using TechCraftsmen.User.Services.Output;
 
 namespace TechCraftsmen.User.Services.Interfaces
 {
@@ -8,7 +8,6 @@ namespace TechCraftsmen.User.Services.Interfaces
     {
         ServiceOutput<int> CreateUser(UserDto userDto);
         ServiceOutput<IList<UserDto>> GetUsersByFilter(UserFilter filter);
-        ServiceOutput<HashOutput?> GetPasswordByUserId(int id);
         ServiceOutput<UserDto?> UpdateUser(UserDto userDto);
         ServiceOutput<int> ActivateUser(int id);
         ServiceOutput<int> DeactivateUser(int id);

@@ -1,17 +1,17 @@
-﻿using TechCraftsmen.User.Core.ValueObjects;
+﻿using TechCraftsmen.User.Domain.Output;
 
-namespace TechCraftsmen.User.Core.Validation
+namespace TechCraftsmen.User.Domain.Validation
 {
     public abstract class BaseValidator<T>
     {
-        internal readonly DomainOutput Result = new();
-
-        public abstract DomainOutput Validate(T parameter);
+        internal readonly List<string> Errors = [];
+        
+        public abstract ProcessOutput Validate(T parameter);
         internal abstract bool IsParameterValid(T parameter, out string message);
 
-        internal DomainOutput Resolve()
+        internal ProcessOutput Resolve()
         {
-            return Result;
+            return new ProcessOutput(Errors);
         }
     }
 }

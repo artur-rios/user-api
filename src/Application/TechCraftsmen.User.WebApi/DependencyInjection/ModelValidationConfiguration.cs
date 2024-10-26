@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Validation.Fluent;
+using TechCraftsmen.User.Services.Configuration;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Services.Validation;
 

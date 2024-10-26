@@ -5,31 +5,36 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Entities;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Exceptions;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Interfaces;
+using TechCraftsmen.User.Services.Authentication;
+using TechCraftsmen.User.Services.Configuration;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Enums;
+using TechCraftsmen.User.Services.Filters;
 using TechCraftsmen.User.Services.Interfaces;
+using TechCraftsmen.User.Services.Mapping;
+using TechCraftsmen.User.Services.Output;
+using TechCraftsmen.User.Utils.Exceptions;
+using TechCraftsmen.User.Utils.Extensions;
+using TechCraftsmen.User.Utils.Security;
 
 namespace TechCraftsmen.User.Services.Implementations
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly AuthenticationTokenConfiguration _authTokenConfig;
-        private readonly IUserService _userService;
         private readonly IValidator<AuthenticationCredentialsDto> _authCredentialsValidator;
+        private readonly ICrudRepository<Domain.Entities.User> _userRepository;
 
-        public AuthenticationService(IOptions<AuthenticationTokenConfiguration> authTokenConfig,
+        public AuthenticationService(
+            IOptions<AuthenticationTokenConfiguration> authTokenConfig,
             IValidator<AuthenticationCredentialsDto> authCredentialsValidator,
-            IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator, IUserService userService)
+            IValidator<AuthenticationTokenConfiguration> authTokenConfigValidator,
+            ICrudRepository<Domain.Entities.User> userRepository)
         {
             _authCredentialsValidator = authCredentialsValidator;
             _authTokenConfig = authTokenConfig.Value;
-            _userService = userService;
+            _userRepository = userRepository;
 
             ValidateTokenConfigAndThrow(authTokenConfigValidator);
         }
@@ -46,27 +51,20 @@ namespace TechCraftsmen.User.Services.Implementations
                     Results.ValidationError);
             }
 
-            ServiceOutput<IList<UserDto>> search =
-                _userService.GetUsersByFilter(new UserFilter(credentialsDto.Email));
+            UserFilter searchFilter = new(credentialsDto.Email);
 
-            if (search.Result is not Results.Success)
+            List<Domain.Entities.User> search = _userRepository.GetByFilter(searchFilter.NonNullPropertiesToDictionary(), false).ToList();
+
+            if (search.Count == 0)
             {
                 return new ServiceOutput<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
             }
 
-            UserDto user = search.Data!.First();
+            Domain.Entities.User user = search.First();
 
-            ServiceOutput<HashOutput?> passwordSearch = _userService.GetPasswordByUserId(user.Id);
+            Hash passwordHash = new Hash(user.Password, user.Salt);
 
-            if (passwordSearch.Result is not Results.Success)
-            {
-                return new ServiceOutput<AuthenticationToken?>(default,
-                    ["Could not retrieve password from database"], Results.InternalError);
-            }
-
-            HashOutput password = passwordSearch.Data!;
-
-            if (!HashUtils.VerifyHash(credentialsDto.Password, password))
+            if (!passwordHash.TextMatches(credentialsDto.Password))
             {
                 return new ServiceOutput<AuthenticationToken?>(default, ["Invalid credentials"], Results.NotAllowed);
             }
@@ -103,15 +101,17 @@ namespace TechCraftsmen.User.Services.Implementations
                 JwtSecurityToken? jwtToken = (JwtSecurityToken)validatedToken;
 
                 int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                
+                UserFilter searchFilter = new(userId);
 
-                ServiceOutput<IList<UserDto>> userSearch = _userService.GetUsersByFilter(new UserFilter(userId));
+                List<Domain.Entities.User> search = _userRepository.GetByFilter(searchFilter.NonNullPropertiesToDictionary(), false).ToList();
 
-                if (userSearch.Result is not Results.Success)
+                if (search.Count == 0)
                 {
                     return new ServiceOutput<bool>(false, ["User not found"], Results.NotFound);
                 }
 
-                authenticatedUser = userSearch.Data!.First();
+                authenticatedUser = search.First().ToDto();
 
                 return new ServiceOutput<bool>(true, ["Auth token is valid"]);
             }

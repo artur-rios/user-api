@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using TechCraftsmen.User.WebApi.Authorization;
+using TechCraftsmen.User.Services.Configuration;
 using TechCraftsmen.User.WebApi.DependencyInjection;
 using TechCraftsmen.User.WebApi.Middleware;
-using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.WebApi.ValueObjects;
+using TechCraftsmen.User.WebApi.Controllers;
 
 namespace TechCraftsmen.User.WebApi
 {
@@ -41,7 +40,7 @@ namespace TechCraftsmen.User.WebApi
                         .Where(e => e.Value?.Errors.Count > 0)
                         .Select(e => $"Parameter: {e.Key} | Error: {e.Value?.Errors.First().ErrorMessage}").ToArray();
 
-                    WebApiOutput<string> result = new(string.Empty, errors);
+                    BaseController.Output<string> result = new(string.Empty, errors);
 
                     return new BadRequestObjectResult(result);
                 };

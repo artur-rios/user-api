@@ -1,19 +1,16 @@
 ﻿using Microsoft.Extensions.Options;
 using Moq;
-using TechCraftsmen.User.Core.Configuration;
-using TechCraftsmen.User.Core.Entities;
-using TechCraftsmen.User.Core.Enums;
-using TechCraftsmen.User.Core.Exceptions;
-using TechCraftsmen.User.Core.Filters;
-using TechCraftsmen.User.Core.Utils;
-using TechCraftsmen.User.Core.Validation.Fluent;
-using TechCraftsmen.User.Core.ValueObjects;
+using TechCraftsmen.User.Domain.Interfaces;
+using TechCraftsmen.User.Services.Authentication;
+using TechCraftsmen.User.Services.Configuration;
 using TechCraftsmen.User.Services.Dto;
+using TechCraftsmen.User.Services.Enums;
 using TechCraftsmen.User.Services.Implementations;
-using TechCraftsmen.User.Services.Interfaces;
+using TechCraftsmen.User.Services.Output;
 using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
 using TechCraftsmen.User.Tests.Mock.Generators;
+using TechCraftsmen.User.Utils.Exceptions;
 using Xunit;
 
 namespace TechCraftsmen.User.Services.Tests
@@ -26,8 +23,8 @@ namespace TechCraftsmen.User.Services.Tests
         private readonly AuthenticationTokenConfigurationValidator _authTokenConfigValidator;
         private readonly AuthenticationCredentialsDtoGenerator _authCredentialsGenerator;
         private readonly AuthenticationCredentialsDtoValidator _authCredentialsValidator;
-        private readonly UserDtoGenerator _userDtoGenerator = new();
-        private readonly Mock<IUserService> _userService;
+        private readonly UserGenerator _userGenerator = new();
+        private readonly Mock<ICrudRepository<Domain.Entities.User>> _userRepository;
 
         private const int TestId = 1;
         private const string TestTokenSecret = "epnwawhzcxiykhuxzudhgioxwychqfjeaoebxinqmnhscgjwdz";
@@ -43,33 +40,34 @@ namespace TechCraftsmen.User.Services.Tests
             _authTokenConfigValidator = new AuthenticationTokenConfigurationValidator();
             _authCredentialsGenerator = new AuthenticationCredentialsDtoGenerator();
             _authCredentialsValidator = new AuthenticationCredentialsDtoValidator();
-            _userService = new Mock<IUserService>();
+            _userRepository = new Mock<ICrudRepository<Domain.Entities.User>>();
 
             _authTokenConfig.Setup(config => config.Value).Returns(_authTokenConfigGenerator.WithAudience("audience")
                 .WithIssuer("issuer").WithSeconds(60).WithSecret(TestTokenSecret).Generate());
 
-            _userService.Setup(service => service.GetUsersByFilter(It.IsAny<UserFilter>()))
-                .Returns((UserFilter filter) =>
+            _userRepository.Setup(repo => repo.GetByFilter(It.IsAny<Dictionary<string, object>>(), It.IsAny<bool>()))
+                .Returns((Dictionary<string, object> filter, bool track) =>
                 {
-                    if (filter.Id == TestId || filter.Email is ExistingEmail)
-                    {
-                        return new ServiceOutput<IList<UserDto>>(
-                        [
-                            _userDtoGenerator.WithId(TestId).WithEmail(ExistingEmail).WithPassword(CorrectPassword)
-                                .Generate()
-                        ], ["Search completed with success"]);
-                    }
+                   filter.TryGetValue("Id", out object? id);
+                   filter.TryGetValue("Email", out object? email);
 
-                    return new ServiceOutput<IList<UserDto>>([], ["No users found for the given filter"],
-                        Results.NotFound);
+                   bool isTestId = id is not null && (int)id == TestId;
+                   bool isExistingEmail = email is not null && (string)email == ExistingEmail;
+
+                   if (isTestId || isExistingEmail)
+                   {
+                       return new List<Domain.Entities.User>
+                       {
+                           _userGenerator.WithId(TestId).WithEmail(ExistingEmail).WithPassword(CorrectPassword)
+                               .Generate()
+                       }.AsQueryable();
+                   }
+
+                   return new List<Domain.Entities.User>().AsQueryable();
                 });
 
-            _userService.Setup(service => service.GetPasswordByUserId(TestId))
-                .Returns(
-                    () => new ServiceOutput<HashOutput?>(HashUtils.HashText(CorrectPassword), ["Password found"]));
-
             _authenticationService = new AuthenticationService(_authTokenConfig.Object, _authCredentialsValidator,
-                _authTokenConfigValidator, _userService.Object);
+                _authTokenConfigValidator, _userRepository.Object);
         }
         
         [UnitFact("AuthenticationService")]
@@ -79,7 +77,7 @@ namespace TechCraftsmen.User.Services.Tests
                 .WithIssuer("issuer").WithSeconds(0).WithSecret("").Generate());
 
             Assert.Throws<CustomException>(() => new AuthenticationService(_authTokenConfig.Object,
-                _authCredentialsValidator, _authTokenConfigValidator, _userService.Object));
+                _authCredentialsValidator, _authTokenConfigValidator, _userRepository.Object));
         }
 
         [UnitFact("AuthenticationService")]

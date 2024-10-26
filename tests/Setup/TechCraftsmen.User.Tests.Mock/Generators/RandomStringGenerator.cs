@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using TechCraftsmen.User.Core.Collections;
-using TechCraftsmen.User.Core.Exceptions;
+using TechCraftsmen.User.Domain.Validation;
+using TechCraftsmen.User.Utils.Exceptions;
 
 namespace TechCraftsmen.User.Tests.Mock.Generators
 {

@@ -1,5 +1,4 @@
 ﻿using FluentValidation.TestHelper;
-using TechCraftsmen.User.Core.Validation.Fluent;
 using TechCraftsmen.User.Services.Dto;
 using TechCraftsmen.User.Services.Validation;
 using TechCraftsmen.User.Tests.Configuration.Attributes;
